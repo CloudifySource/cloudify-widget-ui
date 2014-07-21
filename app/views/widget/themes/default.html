@@ -37,7 +37,7 @@
 
     <span id="time_left" ng-show="!!widgetStatus.timeleftMillis">Trial time left: <span id="time_left_counter">{{getTimeLeft()}}</span></span>
 
-    <div id="video_container" ng-show="!!widget.embedVideoSnippet" ng-bind-html="widget.embedVideoSnippet">
+    <div id="video_container" class="video-container" ng-show="!!widget.embedVideoSnippet" ng-bind-html="videoUrl">
     </div>
 
     <!-- advanced message -->

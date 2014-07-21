@@ -13,7 +13,7 @@
  *
  */
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetsDefaultCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window, $routeParams) {
+    .controller('WidgetsDefaultCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window, $routeParams, $sce) {
         $scope.widgetId = $routeParams.widgetId;
         $scope.currentTime = new Date().getTime();
 
@@ -135,6 +135,7 @@ angular.module('cloudifyWidgetUiApp')
 
         WidgetsService.getPublicWidget($routeParams.widgetId).then(function (result) {
             $scope.widget = result.data;
+            $scope.videoUrl = $sce.trustAsHtml($scope.widget.embedVideoSnippet);
         });
 
 

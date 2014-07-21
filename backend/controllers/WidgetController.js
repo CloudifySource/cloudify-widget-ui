@@ -23,7 +23,7 @@ exports.list = function (req, res) {
 };
 
 function getWidgetPublicParams(widget) {
-    var result = _.pick(widget, 'showAdvanced', 'productName', 'productVersion', 'title', 'providerUrl', '_id', 'login', 'showAdvanced', 'socialLogin','theme');
+    var result = _.pick(widget, 'showAdvanced', 'embedVideoSnippet', 'productName', 'productVersion', 'title', 'providerUrl', '_id', 'login', 'showAdvanced', 'socialLogin','theme');
     if (result.hasOwnProperty('socialLogin')) {
         result.socialLogin = _.pick(result.socialLogin, 'data');
     }
