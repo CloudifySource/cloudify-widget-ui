@@ -12,10 +12,14 @@ files = [
     'app/bower_components/angular/angular.js',
     'app/bower_components/angular-cookies/angular-cookies.js',
     'app/bower_components/angular-route/angular-route.js',
+    'app/bower_components/angular-sanitize/angular-sanitize.js',
     'app/bower_components/ngstorage/ngStorage.js',
     'app/bower_components/angular-resource/angular-resource.js',
     'app/bower_components/angular-mocks/angular-mocks.js',
-  'app/bower_components/angular-mocks/angular-mocks.js',
+    'app/bower_components/angular-mocks/angular-mocks.js',
+    'app/bower_components/gs-ui-infra/app/scripts/app.js',
+    'app/bower_components/gs-ui-infra/app/scripts/filters/i18n.js',
+    'app/bower_components/gs-ui-infra/app/scripts/services/i18next.js',
   'app/scripts/*.js',
   'app/scripts/**/*.js',
   'test/mock/**/*.js',
@@ -56,7 +60,7 @@ autoWatch = false;
 browsers = ['Chrome'];
 
 // If browser does not capture in given timeout [ms], kill it
-captureTimeout = 10000;
+captureTimeout = 30000;
 
 // Continuous Integration mode
 // if true, it capture browsers, run tests and exit

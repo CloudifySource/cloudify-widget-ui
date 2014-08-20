@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngResource', 'ngSanitize'])
+angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngResource', 'ngSanitize', 'gsUiInfraApp'])
 // register the interceptor as a service
     .factory('myHttpInterceptor', function ($q, $rootScope, $location) {
         var $scope = $rootScope;
@@ -184,4 +184,11 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
         $httpProvider.interceptors.push('myHttpInterceptor');
 
         $logProvider.debugEnabled(false);
+    })
+    .run(function(I18next, $rootScope) {
+        $rootScope.$watch('currentLanguage', function(newVal/*, oldVal*/) {
+            I18next.setOptions({lng: newVal});
+        });
+
+        $rootScope.currentLanguage = 'en';
     });

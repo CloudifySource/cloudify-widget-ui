@@ -13,7 +13,7 @@
  *
  */
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetsDefaultCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window, $routeParams, $sce) {
+    .controller('WidgetsDefaultCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window, $routeParams, $sce, WidgetConstants) {
         $scope.widgetId = $routeParams.widgetId;
         $scope.currentTime = new Date().getTime();
 
@@ -180,20 +180,20 @@ angular.module('cloudifyWidgetUiApp')
                     return;
                 }
                 var data = e.data;
-                switch (data.name) {
-                    case 'widget_status':
-                        _handleStatus(data.data);
-                        break;
-                    case 'widget_played':
-                        $scope.executionId = data.executionId;
-                        break;
-                    case 'widget_stopped':
-                        $scope.widgetStatus.state = STATE_STOPPED;
-                        _resetWidgetStatus();
-                        break;
-                    default:
-                        break;
+
+                if (data.name === WidgetConstants.STATUS) {
+                    _handleStatus(data.data);
                 }
+
+                if (data.name === WidgetConstants.PLAYED) {
+                    $scope.executionId = data.executionId;
+                }
+
+                if (data.name === WidgetConstants.STOPPED) {
+                    $scope.widgetStatus.state = STATE_STOPPED;
+                    _resetWidgetStatus();
+                }
+
             });
 
         });

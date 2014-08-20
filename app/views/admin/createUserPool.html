@@ -3,6 +3,8 @@
     <h3>Create new pool for user {{ accountId }}</h3>
     <!--<label for="poolSettingsTextarea">pool settings</label>-->
     <textarea placeholder="pool settings" id="poolSettingsTextarea" ng-model="newPoolSettings"></textarea>
+    <textarea placeholder="bootstrap script" id="bootstrapScriptTextarea" ng-model="bootstrapScript.value"></textarea>
+    <button ng-click="getBootstrapScript()">Get Default script</button>
     <br/>
-    <button ng-click="addAccountPool(accountId, newPoolSettings)">Add Pool</button>
+    <button ng-click="addAccountPool(accountId, newPoolSettings, bootstrapScript.value)">Add Pool</button>
 </div>

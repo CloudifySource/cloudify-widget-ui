@@ -9,9 +9,12 @@ angular.module('cloudifyWidgetUiApp')
             return $http.post('/backend/user/widgets/' + widget._id + '/delete');
         };
 
-
         this.listWidgets = function( ){
             return $http.get('/backend/user/widgets');
+        };
+
+        this.listPools = function() {
+            return $http.get('/backend/user/account/pools');
         };
 
         this.getPublicWidget = function( widgetId ){

@@ -301,7 +301,7 @@ exports.getStatus = function (req, res) {
             res.send(500, {message: 'get status failed', error: err});
             return;
         }
-        managers.widget.getOutput(req.params.executionId, function (err, output) {
+        managers.widget.getOutput(req.params.executionId, function (err, output) { //todo: this is redundant, WidgetManager.getStatus already takes care of it.
 //            if (!!err) {
 //                logger.error('get output failed', err);
 //                res.send(500, {message: 'get output failed', error: err});

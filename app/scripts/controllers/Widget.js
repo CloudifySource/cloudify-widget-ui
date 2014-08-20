@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window, $routeParams, PostParentService, $localStorage, $timeout) {
+    .controller('WidgetCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window, $routeParams, PostParentService, $localStorage, $timeout, WidgetConstants) {
 
-        $log.info('loading widget controller');
+        $log.info('loading widget controller : ' + new Date().getTime());
         // we need to hold the running state to determine when to stop sending status/output messages back
         $scope.widgetStatus = {};
         var STATE_RUNNING = 'RUNNING';
@@ -16,7 +16,7 @@ angular.module('cloudifyWidgetUiApp')
             if ( !!newValue && !oldValue ){
                 $log.info('detected executionId exists, starting poll');
                 $scope.widgetStatus.state = STATE_RUNNING;
-                _pollStatus(1, { '_id' : $scope.widgetId }, newValue);
+                _pollStatus(1, { '_id' : $scope.widget._id }, newValue.executionId);
             }
 
             if ( !newValue ){
@@ -28,7 +28,7 @@ angular.module('cloudifyWidgetUiApp')
         $scope.executionId = null;
 
         function saveState(){
-            localStorage.setItem( $scope.widget._id, $scope.executionId  );
+            localStorage.setItem( $scope.widget._id, JSON.stringify($scope.executionId) );
         }
 
         function deleteState(){
@@ -36,7 +36,7 @@ angular.module('cloudifyWidgetUiApp')
         }
 
         function loadState(){
-            var executionId = localStorage.getItem( $scope.widget._id );
+            var executionId = JSON.parse(localStorage.getItem( $scope.widget._id ));
             if ( !!executionId ){
                 $log.info('resuming execution.. found execution in local storage');
                 $scope.executionId = executionId;
@@ -54,7 +54,7 @@ angular.module('cloudifyWidgetUiApp')
                 .then(function (result) {
                     $log.info(['play result', result]);
 
-                    $scope.executionId = result.data.executionId;
+                    $scope.executionId = result.data;
                     saveState();
 
                     _postPlayed($scope.executionId);
@@ -91,7 +91,9 @@ angular.module('cloudifyWidgetUiApp')
             }
             $scope.widgetStatus = status;
             _postStatus(status);
-            $timeout( function(){ _pollStatus(false, widget, executionId); }, myTimeout || 3000);
+            $timeout(function () {
+                _pollStatus(false, widget, executionId);
+            }, myTimeout || 3000);
         }
 
         function _pollStatus(myTimeout, widget, executionId) {
@@ -139,26 +141,20 @@ angular.module('cloudifyWidgetUiApp')
                 $log.error('unable to handle posted message, no data was found');
                 return;
             }
-
             var data = e.data;
 
-            if ( typeof(data) === 'string'){
-                data = JSON.parse(data);
+            if (data.name === WidgetConstants.PLAY) {
+                play(data.widget, data.advancedParams, data.isRemoteBootstrap);
             }
 
-            switch (data.name) {
-                case 'widget_play':
-                    play($scope.widget/*, data.advancedParams, data.isRemoteBootstrap*/); // currently support only non remote execution
-                    break;
-                case 'widget_stop':
-                    stop();
-                    break;
-                case 'parent_loaded' :
-
-                    break;
-                default:
-                    break;
+            if (data.name === WidgetConstants.STOP) {
+                stop(data.widget, data.executionId, data.isRemoteBootstrap);
             }
+
+            // this is here because JSHint fails at switch case indentation so it was converted to if statements.
+            if (data.name === WidgetConstants.PARENT_LOADED) {
+            }
+
         });
 
         parentLoaded();

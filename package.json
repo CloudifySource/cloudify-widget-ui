@@ -26,7 +26,8 @@
     "passport-github": "~0.1.5",
     "passport-strategy": "~1.0.0",
     "download": "~0.1.17",
-    "fs-extra": "~0.10.0"
+    "fs-extra": "~0.10.0",
+    "aws-sdk": "~2.0.8"
   },
   "devDependencies": {
     "time-grunt": "~0.3.2",
@@ -92,7 +93,8 @@
     "passport",
     "download",
     "fs-extra",
-    "password"
+    "password",
+    "aws-sdk"
   ],
   "engines": {
     "node": ">=0.8.0"

@@ -9,6 +9,10 @@ angular.module('cloudifyWidgetUiApp')
                 return $http.get('/backend/admin/pools');
             };
 
+            this.getBootstrapScript = function () {
+                return $http.get('/backend/admin/pools/script');
+            };
+
             this.getUsers = function () {
                 return $http.get('/backend/admin/users');
             };

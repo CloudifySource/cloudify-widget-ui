@@ -163,7 +163,6 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
-
         $scope.update = function () {
             return WidgetsService.updateWidget($scope.widget).then(
                 function success() {
@@ -196,4 +195,14 @@ angular.module('cloudifyWidgetUiApp')
                 }
             );
         };
+
+        WidgetsService.listPools().then(
+            function success(result) {
+                $scope.userPools = result.data;
+            },
+            function error(cause) {
+                $scope.userPools = undefined;
+                $log.error('error getting pools list - ' + cause.data);
+            }
+        );
     });

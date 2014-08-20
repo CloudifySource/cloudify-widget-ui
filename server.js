@@ -98,6 +98,7 @@ domain.run(function () {
     app.post('/backend/admin/users', controllers.pool.createUsers);
     app.post('/backend/admin/users/:userId/setPoolKey', controllers.adminUsers.loadUser, controllers.adminUsers.setPoolKey);
     app.get('/backend/admin/pools', controllers.pool.adminReadPools);
+    app.get('/backend/admin/pools/script', controllers.pool.adminReadPoolBootstrapScript);
 
     app.get('/backend/admin/accounts', controllers.pool.readAccounts);
     app.post('/backend/admin/accounts/:accountId/description', controllers.pool.adminSetAccountDescription);
@@ -128,6 +129,7 @@ domain.run(function () {
 
     app.get('/backend/user/account/pools', controllers.pool.accountReadPools);
     app.post('/backend/user/account/pools', controllers.pool.createPool);
+    app.get('/backend/user/account/pools/script', controllers.pool.readPoolBootstrapScript);
     app.post('/backend/user/account/pools/:poolId', controllers.pool.updatePool);
     app.post('/backend/user/account/pools/:poolId/delete', controllers.pool.deletePool);
     app.get('/backend/user/account/pools/:poolId/status', controllers.pool.accountReadPoolStatus);

@@ -40,17 +40,17 @@ function _getWidget(curryParams, curryCallback) {
     });
 }
 
-function _getPoolKey( curryParams, curryCallback ){
+function _getPoolKey(curryParams, curryCallback) {
     logger.info('getting user from widget');
-    managers.db.connect('users', function( db, collection ){
-        collection.findOne({ '_id' : curryParams.widget.userId }, function(err, result){
-            if ( !!err ){
+    managers.db.connect('users', function (db, collection) {
+        collection.findOne({ '_id': curryParams.widget.userId }, function (err, result) {
+            if (!!err) {
                 logger.error('unable to find user from widget', err);
                 curryCallback(err, curryParams);
                 return;
             }
 
-            if ( !result ){
+            if (!result) {
                 logger.error('result is null for widget');
                 curryCallback(new Error('could not find user for widget'), curryParams);
                 return;
@@ -137,7 +137,6 @@ function _updateExecutionModelAddNodeModel(curryParams, curryCallback) {
 }
 
 
-
 function _downloadRecipe(curryParams, curryCallback) {
     logger.trace('-play- downloadRecipe');
 
@@ -175,7 +174,7 @@ function _occupyMachine(curryParams, curryCallback) {
             return;
         }
 
-        var resultObj = result;
+        var resultObj = result; // todo: callbackWrapper makes this obsolete
         if (typeof result === 'string') {
             try {
                 resultObj = JSON.parse(result);
@@ -194,7 +193,7 @@ function _runInstallCommand(curryParams, curryCallback) {
     logger.trace('-play- runInstallCommand');
 
     var installPath = curryParams.executionDownloadsPath;
-    if ( !!curryParams.widget.recipeRootPath ) {
+    if (!!curryParams.widget.recipeRootPath) {
         try {
             installPath = path.join(curryParams.executionDownloadsPath, curryParams.widget.recipeRootPath || ' ');
         } catch (e) {
@@ -305,16 +304,16 @@ function _overrideCloudPropertiesFile(curryParams, curryCallback) {
 }
 
 function _runBootstrapAndInstallCommands(curryParams, curryCallback) {
-    logger.info('-playRemote- runCliBootstrapCommand, executionLogsPath:', curryParams.executionLogsPath,'installCommand:', curryParams.widget.recipeType.installCommand);
-    logger.info('-playRemote- runCliBootstrapCommand, executionDownloadsPath:', curryParams.executionDownloadsPath,'recipeRootPath:', curryParams.widget.recipeRootPath);
+    logger.info('-playRemote- runCliBootstrapCommand, executionLogsPath:', curryParams.executionLogsPath, 'installCommand:', curryParams.widget.recipeType.installCommand);
+    logger.info('-playRemote- runCliBootstrapCommand, executionDownloadsPath:', curryParams.executionDownloadsPath, 'recipeRootPath:', curryParams.widget.recipeRootPath);
 
     var installPath = path.resolve(path.join(curryParams.executionDownloadsPath, curryParams.widget.recipeRootPath));
     var installTimeout = curryParams.widget.installTimeout;
 
-    logger.info('-playRemote waterfall- installTimeout:', installTimeout );
+    logger.info('-playRemote waterfall- installTimeout:', installTimeout);
 
-    logger.info('-playRemote waterfall- runCliBootstrapCommand, JOIN:', installPath );
-    logger.info('-installPath after handlingseparators:', installPath );
+    logger.info('-playRemote waterfall- runCliBootstrapCommand, JOIN:', installPath);
+    logger.info('-installPath after handlingseparators:', installPath);
     var command = {
         arguments: [
             'bootstrap-cloud',
@@ -487,12 +486,14 @@ exports.stop = function (widgetId, executionId, remote, stopCallback) {
     );
 };
 
-function getPublicExecutionDetails( execution ){
+function getPublicExecutionDetails(execution) {
     return {
-        'widget' : _.omit(execution.widget,['userId']),
-        'nodeModel' : _.merge(_.pick(execution.nodeModel,['id']), {'publicIp' : execution.nodeModel.machineSshDetails.publicIp }),
-        'exitStatus' : execution.exitStatus,
-        'output' : execution.output
+        'widget': _.omit(execution.widget, ['userId']),
+        'nodeModel': _.merge(_.pick(execution.nodeModel, ['id']),
+                             {'publicIp': execution.nodeModel.machineSshDetails.publicIp },
+                             {'expires': execution.nodeModel.expires}),
+        'exitStatus': execution.exitStatus,
+        'output': execution.output
     };
 }
 
@@ -507,7 +508,7 @@ exports.getStatus = function (executionId, callback) {
             }
 
             if (!execution) {
-                callback('execution not found',null);
+                callback('execution not found', null);
                 return;
             }
 
@@ -515,22 +516,21 @@ exports.getStatus = function (executionId, callback) {
             // if this exists on the execution status, we know execution ended.
             //
             logger.debug('reading status');
-            services.logs.readStatus(executionId, function(err, exitStatus){
+            services.logs.readStatus(executionId, function (err, exitStatus) {
                 logger.debug('read status');
-                if ( !err && !!exitStatus ){
-                    if ( typeof( exitStatus) === 'string'){
+                if (!err && !!exitStatus) {
+                    if (typeof( exitStatus) === 'string') {
                         exitStatus = JSON.parse(exitStatus);
                     }
                     execution.exitStatus = exitStatus;
                 }
-                services.logs.readOutput(executionId, function(err, output){
+                services.logs.readOutput(executionId, function (err, output) {
                     execution.output = output;
                     logger.debug('getting public details');
                     var publicExecutionDetails = getPublicExecutionDetails(execution);
-                    logger.debug('public details are', publicExecutionDetails) ;
+                    logger.debug('public details are', publicExecutionDetails);
                     callback(null, publicExecutionDetails);
                 });
-
             });
         });
     });
@@ -538,11 +538,11 @@ exports.getStatus = function (executionId, callback) {
 };
 
 exports.getOutput = function (executionId, callback) {
-    services.logs.readOutput(executionId,callback);
+    services.logs.readOutput(executionId, callback);
 };
 
 
-exports.findById = function( widgetId , callback ){
+exports.findById = function (widgetId, callback) {
     logger.info(widgetId);
     managers.db.connect('widgets', function (db, collection, done) {
         collection.findOne({ _id: managers.db.toObjectId(widgetId) }, function (err, result) {

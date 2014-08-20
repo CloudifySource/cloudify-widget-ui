@@ -15,7 +15,7 @@ angular.module('cloudifyWidgetUiApp')
             if (!$scope.widget) {
                 return '';
             } else {
-                $log.info('',$scope.widget.theme);
+                $log.info('widget theme is',$scope.widget.theme);
                 var widgetTheme = $routeParams.theme || $scope.widget.theme || 'default';
                 return 'views/widget/themes/' + widgetTheme + '.html?timestamp=' + timestamp ;
             }

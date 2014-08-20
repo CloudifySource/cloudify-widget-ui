@@ -31,7 +31,7 @@ exports.downloadRecipe = function (options, callback) {
             callback(e);
         });
     }catch(e){
-//        logger.error('error while downloading',e);
+        logger.error('error while downloading',e);
         callback(e);
     }
 };

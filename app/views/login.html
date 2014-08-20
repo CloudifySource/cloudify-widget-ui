@@ -5,11 +5,13 @@
     </div>
 
     <form ng-submit="login()">
-        Username : <input ng-model="page.email"/><br/>
-        Password: <input ng-model="page.password" type="password"/><br/>
-        <input type="submit" value="Submit"/>
-        <br/>
-        Don't have an account? <br/>
-        <a ng-href="#/signup">Signup</a>
+        {{ 'login.username' | i18n }} <input ng-model="page.email"/><br/>
+
+        {{ 'login.password' | i18n }} <input ng-model="page.password" type="password"/><br/>
+
+        <input type="submit" value="{{ 'global.buttons.submit' | i18n }}"/><br/>
+
+        {{ 'login.noAccount' | i18n}}<br/>
+        <a ng-href="#/signup">{{ 'login.signup' | i18n }}</a>
     </form>
 </div>

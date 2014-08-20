@@ -30,6 +30,10 @@ exports.adminReadPools = function ( req, res ){
     managers.poolClient.adminReadPools(req.user.poolKey, _callback(res));
 };
 
+exports.adminReadPoolBootstrapScript = function ( req, res ){
+    managers.poolClient.adminReadPoolBootstrapScript(req.user.poolKey, _callback(res));
+};
+
 exports.adminReadAccountPools = function( req, res ){
     managers.poolClient.adminReadAccountPools(req.user.poolKey, req.params.accountId, _callback(res));
 };
@@ -115,6 +119,10 @@ exports.readCloudNodes = function( req, res ){
 
 exports.accountReadPools = function( req, res ){
     managers.poolClient.accountReadPools(req.user.poolKey, _callback(res));
+};
+
+exports.readPoolBootstrapScript = function( req, res ){
+    managers.poolClient.readPoolBootstrapScript(req.user.poolKey, _callback(res));
 };
 
 exports.createPool = function( req, res ){

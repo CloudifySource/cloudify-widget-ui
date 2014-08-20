@@ -9,15 +9,38 @@ angular.module('cloudifyWidgetUiApp')
         AdminPoolCrudService.getAccountPool($scope.accountId, $scope.poolId).then(function (result) {
             $scope.pool = result.data;
             // indent the text file to better reading;
-            $scope.pool.poolSettingsStr = JSON.stringify( JSON.parse($scope.pool.poolSettingsStr), {}, 4);
+            var tempPool = JSON.parse($scope.pool.poolSettingsStr);
+            tempPool.bootstrapProperties.script ?
+                $scope.pool.bootstrapScript = JSON.stringify( JSON.parse(tempPool.bootstrapProperties.script), {}, 4) :
+                $scope.pool.bootstrapScript = '';
+            tempPool.bootstrapProperties.script = undefined;
+            $scope.pool.poolSettingsStr = JSON.stringify( tempPool, {}, 4);
         });
 
-        $scope.updateAccountPool = function( accountId, poolSettingsStr ){
-            $log.info('updateAccountPool, pool: ', poolSettingsStr);
+        $scope.updateAccountPool = function( accountId, poolSettingsStr, poolBootstrapScriptStr ){
+            var tempPool = JSON.parse(poolSettingsStr);
+            if (!tempPool.bootstrapProperties) {
+                tempPool.bootstrapProperties = {};
+            }
+            tempPool.bootstrapProperties.script = poolBootstrapScriptStr || '';
+            poolSettingsStr = JSON.stringify(tempPool);
+
             // update with new data
             AdminPoolCrudService.updateAccountPool($scope.accountId, $scope.pool.id, poolSettingsStr).then(function (/*result*/) {
                 toastr.success('updated successfully');
             });
+        };
+
+        $scope.getBootstrapScript = function() {
+            AdminPoolCrudService.getBootstrapScript().then(
+                function success(result) {
+                    $scope.pool.bootstrapProperties.script = result.data;
+                },
+                function error(/*cause*/) {
+                    $scope.pool.bootstrapProperties.script = '';
+                    $log.error('Retrieve default script failed.');
+                }
+            );
         };
 
 

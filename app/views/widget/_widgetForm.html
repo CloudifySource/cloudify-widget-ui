@@ -24,8 +24,8 @@
     
         Recipe Type (*): <select ng-model="widget.recipeType" ng-options="t.id as t.label for t in recipeTypes"></select><br/>
     
-        Pool Id (*): <input type="text" ng-model="widget.poolId"/><br/>
-    
+        Pool Id (*): <select ng-model="widget.poolId" ng-options="p.id as p.poolSettings.name for p in userPools"></select><br/>
+
         Installation timeout: (minutes): <input type="text" ng-model="widget.installTimeout" /><br/>
     </p>
 

@@ -188,6 +188,11 @@ exports.adminReadPools = function (poolKey, callback) {
     call.get('/admin/pools', _args().poolKey(poolKey), callback);
 };
 
+exports.adminReadPoolBootstrapScript = function (poolKey, callback) {
+    logger.info('reading pool default bootstrarp script');
+    call.get('/admin/pools/script', _args().poolKey(poolKey), callback);
+};
+
 exports.adminReadAccountPools = function (poolKey, accountId, callback) {
     logger.info('getting all pools for account : ' + accountId);
     call.get('/admin/accounts/${accountId}/pools', _args().poolKey(poolKey).accountId(accountId), callback);
@@ -260,7 +265,7 @@ exports.expirePoolNode = function (poolKey, poolId, nodeId, callback) {
     call.post('/account/pools/${poolId}/nodes/${nodeId}/expire', _args().poolKey(poolKey).poolId(poolId).nodeId(nodeId), callback);
 };
 exports.occupyPoolNode = function (poolKey, poolId, expires, callback) {
-    logger.info('occupying machine in pool');
+    logger.info('occupying machine in pool'); // todo: cahnge to post
     call.get('/account/pools/${poolId}/occupy', _args().poolKey(poolKey).poolId(poolId).data( expires + ''), callback);
 };
 
@@ -305,6 +310,11 @@ exports.readCloudNodes = function (poolKey, poolId, callback) {
 exports.accountReadPools = function (poolKey, callback) {
     logger.info('reading account pools');
     call.get('/account/pools', _args().poolKey(poolKey), callback);
+};
+
+exports.readPoolBootstrapScript = function (poolKey, callback) {
+    logger.info('reading pool default bootstrarp script');
+    call.get('/account/pools/script', _args().poolKey(poolKey), callback);
 };
 
 exports.createPool = function (poolKey, poolSettings, callback) {
