@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngResource', 'ngSanitize', 'gsUiInfraApp'])
+angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngResource', 'ngSanitize', 'gsUiInfraApp', 'widget-ui-tpls'])
 // register the interceptor as a service
     .factory('myHttpInterceptor', function ($q, $rootScope, $location) {
         var $scope = $rootScope;

@@ -304,6 +304,21 @@ module.exports = function (grunt) {
                 ]
             }
         },
+        html2js: {
+            options: {
+                htmlmin: {
+                    collapseWhitespace: true,
+                    collapseBooleanAttributes: true,
+                    removeComments: true
+                },
+                module: 'widget-ui-tpls',
+                base: 'app'
+            },
+            main: {
+                src: ['<%= yeoman.app %>/views/**/*.html'],
+                dest: '<%= yeoman.dist %>/scripts/templates.js'
+            }
+        },
         // Put files not handled in other tasks here
         copy: {
             dist: {
@@ -320,7 +335,9 @@ module.exports = function (grunt) {
                             'images/**/*.{gif,webp,svg}',
                             'styles/fonts/*',
                             'i18n/*',
-                            'scripts/controllers/Widget.js'
+                            'scripts/controllers/Widget.js',
+                            '.tmp/concat/scripts/templates.js',
+                            '*.html'
                         ]
                     },
                     {
@@ -372,7 +389,8 @@ module.exports = function (grunt) {
             dist: [
                 'compass:dist',
                 'imagemin',
-                'htmlmin'
+                'html2js'
+//                'htmlmin'
             ]
         },
         karma: {
