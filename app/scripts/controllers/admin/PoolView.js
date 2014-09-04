@@ -18,7 +18,8 @@ angular.module('cloudifyWidgetUiApp')
             users: [],
             poolStatus: {},
             poolsStatus: {},
-            nodes: []
+            nodes: [],
+            threadPoolStatus: []
         };
 
 
@@ -39,6 +40,7 @@ angular.module('cloudifyWidgetUiApp')
                 $scope.getPoolTasks($scope.model.poolId);
                 $scope.getPoolErrors($scope.model.poolId);
                 $scope.getPoolDecisions($scope.model.poolId);
+                $scope.getThreadPoolStatus($scope.model.poolId);
             }
 //            if (angular.isDefined($scope.model.accountId)) {
 //                $scope.getAccountPools($scope.model.accountId);
@@ -83,6 +85,12 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
+        $scope.getThreadPoolStatus = function () {
+            $log.debug('getThreadPoolStatus. ');
+            AdminPoolCrudService.getThreadPoolStatus().then(function (result) {
+                $scope.model.threadPoolStatus = JSON.stringify( result.data, {}, 4);
+            });
+        };
 
         $scope.deleteAccountPool = function (accountId, poolId) {
             $log.info('deleteAccountPool, accountId: ', accountId, ', poolId: ', poolId);

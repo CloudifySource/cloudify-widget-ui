@@ -89,6 +89,10 @@ angular.module('cloudifyWidgetUiApp')
                 return $http.get('/backend/admin/pools/' + poolId + '/decisions');
             };
 
+            this.getThreadPoolStatus = function () {
+                return $http.get('/backend/admin/threadpools');
+            };
+
             this.abortPoolDecision = function (poolId, decisionId) {
                 return $http.post('/backend/admin/pools/' + poolId + '/decisions/' + decisionId + '/abort');
             };

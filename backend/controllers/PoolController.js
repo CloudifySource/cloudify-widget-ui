@@ -103,6 +103,11 @@ exports.deletePoolTask = function( req, res ){
 exports.readPoolDecisions = function( req, res ){
     managers.poolClient.readPoolDecisions(req.user.poolKey, req.params.poolId, _callback(res));
 };
+
+exports.readThreadPools = function( req, res ){
+    managers.poolClient.readThreadPools(req.user.poolKey, _callback(res));
+};
+
 exports.abortPoolDecision = function ( req, res ) {
     managers.poolClient.abortPoolDecision(req.user.poolKey, req.params.poolId, req.params.decisionId, _callback(res));
 };

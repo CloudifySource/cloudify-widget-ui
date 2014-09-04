@@ -91,6 +91,7 @@ domain.run(function () {
     app.get('/backend/admin/myUser', function (req, res) {
         res.send(req.user);
     });
+    app.get('/backend/admin/threadpools', controllers.pool.readThreadPools);
     app.post('/backend/admin/myUser/setPoolKey', controllers.adminUsers.setAdminPoolKey);
     app.post('/backend/admin/myUser/testAdminPoolKey', controllers.adminUsers.testAdminPoolKey);
 //app.get('/backend/admin/users', function(req, res){ res.send('hello world!')});
