@@ -81,6 +81,10 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
                 templateUrl: 'views/admin/myUser.html',
                 controller: 'AdminMyUserCtrl'
             })
+            .when('/admin/system', {
+                templateUrl: 'views/admin/system.html',
+                controller: 'AdminSystemCtrl'
+            })
             .when('/admin/users/:userId/edit', {
                 templateUrl: 'views/admin/users/edit.html',
                 controller: 'AdminUsersEditCtrl'

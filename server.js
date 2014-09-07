@@ -92,6 +92,7 @@ domain.run(function () {
         res.send(req.user);
     });
     app.get('/backend/admin/threadpools', controllers.pool.readThreadPools);
+    app.get('/backend/admin/datasources', controllers.pool.readDataSourcesStatus);
     app.post('/backend/admin/myUser/setPoolKey', controllers.adminUsers.setAdminPoolKey);
     app.post('/backend/admin/myUser/testAdminPoolKey', controllers.adminUsers.testAdminPoolKey);
 //app.get('/backend/admin/users', function(req, res){ res.send('hello world!')});

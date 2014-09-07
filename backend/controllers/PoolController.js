@@ -108,6 +108,10 @@ exports.readThreadPools = function( req, res ){
     managers.poolClient.readThreadPools(req.user.poolKey, _callback(res));
 };
 
+exports.readDataSourcesStatus = function( req, res ){
+    managers.poolClient.readDataSourcesStatus(req.user.poolKey, _callback(res));
+};
+
 exports.abortPoolDecision = function ( req, res ) {
     managers.poolClient.abortPoolDecision(req.user.poolKey, req.params.poolId, req.params.decisionId, _callback(res));
 };
