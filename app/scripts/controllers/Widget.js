@@ -94,6 +94,11 @@ angular.module('cloudifyWidgetUiApp')
             $timeout(function () {
                 _pollStatus(false, widget, executionId);
             }, myTimeout || 3000);
+
+            // if expires < now, call stop()
+            if (status.nodeModel.expires < new Date().getTime()) {
+                stop(widget, executionId);
+            }
         }
 
         function _pollStatus(myTimeout, widget, executionId) {
