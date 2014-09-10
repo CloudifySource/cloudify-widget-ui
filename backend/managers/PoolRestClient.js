@@ -290,6 +290,17 @@ exports.readPoolDecisions = function (poolKey, poolId, callback) {
     logger.info('reading pool decisions in pool [%s]', poolId);
     call.get('/admin/pools/${poolId}/decisions', _args().poolKey(poolKey).poolId(poolId), callback);
 };
+
+exports.readThreadPools = function (poolKey, callback) {
+    logger.info('reading threadPools' );
+    call.get('/admin/pools/threadPools', _args().poolKey(poolKey), callback);
+};
+
+exports.readDataSourcesStatus = function (poolKey, callback) {
+    logger.info('reading DataSources status' );
+    call.get('/admin/datasources', _args().poolKey(poolKey), callback);
+};
+
 exports.abortPoolDecision = function (poolKey, poolId, decisionId, callback) {
     logger.info('aborting pool decision [%s] in pool [%s]', decisionId, poolId);
     call.post('/admin/pools/${poolId}/decisions/${decisionId}/abort', _args().poolKey(poolKey).poolId(poolId).decisionId(decisionId), callback);

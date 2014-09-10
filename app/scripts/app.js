@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngResource', 'ngSanitize', 'gsUiInfraApp'])
+angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngResource', 'ngSanitize', 'gsUiInfraApp', 'widget-ui-tpls'])
 // register the interceptor as a service
     .factory('myHttpInterceptor', function ($q, $rootScope, $location) {
         var $scope = $rootScope;
@@ -80,6 +80,10 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
             .when('/admin/myUser', {
                 templateUrl: 'views/admin/myUser.html',
                 controller: 'AdminMyUserCtrl'
+            })
+            .when('/admin/system', {
+                templateUrl: 'views/admin/system.html',
+                controller: 'AdminSystemCtrl'
             })
             .when('/admin/users/:userId/edit', {
                 templateUrl: 'views/admin/users/edit.html',

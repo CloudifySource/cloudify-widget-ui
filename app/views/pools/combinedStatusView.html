@@ -26,4 +26,7 @@
 
     <a href="#/admin/pools/{{ pool.id }}/cloud/nodes">see cloud node mappings</a>
     <div ng-include src="'views/admin/poolCloudNodes.html'" ng-controller="AdminPoolCrudCtrl"></div>
+
+    <h3>Thread Pools stats</h3>
+    <pre>{{ model.threadPoolStatus }}</pre>
 </div>

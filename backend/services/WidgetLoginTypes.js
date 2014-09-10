@@ -22,50 +22,50 @@ var loginTypes = [
         'data' : {
             'mailchimp' : true
         }
-    },
-    {
-        'id' : 'github',
-        'label' : 'GitHub',
-        'size' : {
-            'width' : 100,
-            'height' : 100
-        },
-        'data' : {
-            'mailchimp' : false
-        }
-    },
-    {
-        'id': 'facebook',
-        'label': 'Facebook',
-        'size': {
-            'width': 100,
-            'height': 100
-        },
-        'data' : {
-            'mailchimp' : true
-        }
-    },
-    {
-        'id': 'twitter',
-        'label': 'Twitter',
-        'size': {
-            'width': 100,
-            'height': 100
-        },
-        'data' : {
-            'mailchimp' : false
-        }
-    },
-    {
-        'id': 'linkedin',
-        'label': 'LinkedIn',
-        'size': {
-            'width': 100,
-            'height': 100
-        },
-        'data' : {
-            'mailchimp' : true
-        }
+//    },
+//    {
+//        'id' : 'github',
+//        'label' : 'GitHub',
+//        'size' : {
+//            'width' : 100,
+//            'height' : 100
+//        },
+//        'data' : {
+//            'mailchimp' : false
+//        }
+//    },
+//    {
+//        'id': 'facebook',
+//        'label': 'Facebook',
+//        'size': {
+//            'width': 100,
+//            'height': 100
+//        },
+//        'data' : {
+//            'mailchimp' : true
+//        }
+//    },
+//    {
+//        'id': 'twitter',
+//        'label': 'Twitter',
+//        'size': {
+//            'width': 100,
+//            'height': 100
+//        },
+//        'data' : {
+//            'mailchimp' : false
+//        }
+//    },
+//    {
+//        'id': 'linkedin',
+//        'label': 'LinkedIn',
+//        'size': {
+//            'width': 100,
+//            'height': 100
+//        },
+//        'data' : {
+//            'mailchimp' : true
+//        }
     }
 ];
 

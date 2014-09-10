@@ -69,7 +69,7 @@ angular.module('cloudifyWidgetUiApp')
         }
 
         function stop (widget, executionId) {
-            WidgetsService.stopWidget($scope.widget, $scope.executionId ).then(function () {
+            WidgetsService.stopWidget($scope.widget, $scope.executionId.executionId).then(function () {
                 deleteState();
                 _postStopped(executionId);
                 _resetWidgetStatus();
@@ -94,6 +94,11 @@ angular.module('cloudifyWidgetUiApp')
             $timeout(function () {
                 _pollStatus(false, widget, executionId);
             }, myTimeout || 3000);
+
+            // if expires < now, call stop()
+            if (status.nodeModel.expires < new Date().getTime()) {
+                stop(widget, executionId);
+            }
         }
 
         function _pollStatus(myTimeout, widget, executionId) {
@@ -141,14 +146,19 @@ angular.module('cloudifyWidgetUiApp')
                 $log.error('unable to handle posted message, no data was found');
                 return;
             }
+
             var data = e.data;
 
+            if (typeof(data) === 'string') {
+                data = JSON.parse(data);
+            }
+
             if (data.name === WidgetConstants.PLAY) {
-                play(data.widget, data.advancedParams, data.isRemoteBootstrap);
+                play($scope.widget/*, data.advancedParams, data.isRemoteBootstrap*/); // currently support only non remote execution
             }
 
             if (data.name === WidgetConstants.STOP) {
-                stop(data.widget, data.executionId, data.isRemoteBootstrap);
+                stop();
             }
 
             // this is here because JSHint fails at switch case indentation so it was converted to if statements.

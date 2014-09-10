@@ -11,7 +11,7 @@ angular.module('cloudifyWidgetUiApp')
             // indent the text file to better reading;
             var tempPool = JSON.parse($scope.pool.poolSettingsStr);
             tempPool.bootstrapProperties.script ?
-                $scope.pool.bootstrapScript = JSON.stringify( JSON.parse(tempPool.bootstrapProperties.script), {}, 4) :
+                $scope.pool.bootstrapScript = tempPool.bootstrapProperties.script :
                 $scope.pool.bootstrapScript = '';
             tempPool.bootstrapProperties.script = undefined;
             $scope.pool.poolSettingsStr = JSON.stringify( tempPool, {}, 4);
@@ -34,10 +34,10 @@ angular.module('cloudifyWidgetUiApp')
         $scope.getBootstrapScript = function() {
             AdminPoolCrudService.getBootstrapScript().then(
                 function success(result) {
-                    $scope.pool.bootstrapProperties.script = result.data;
+                    $scope.pool.bootstrapScript = result.data;
                 },
                 function error(/*cause*/) {
-                    $scope.pool.bootstrapProperties.script = '';
+                    $scope.pool.bootstrapScript = '';
                     $log.error('Retrieve default script failed.');
                 }
             );

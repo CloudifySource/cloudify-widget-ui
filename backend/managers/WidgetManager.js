@@ -119,8 +119,9 @@ function _updateExecutionModel(data, curryParams, curryCallback) {
 function _updateExecutionModelAddPaths(curryParams, curryCallback) {
     logger.trace('-play- updateExecutionModelAddPath');
 
-    curryParams.executionDownloadsPath = path.join(conf.downloadsDir, curryParams.executionObjectId.toHexString());
-    curryParams.executionLogsPath = path.join(conf.logsDir, curryParams.executionObjectId.toHexString());
+    curryParams.executionId = curryParams.executionObjectId.toHexString();
+    curryParams.executionDownloadsPath = path.join(conf.downloadsDir, curryParams.executionId);
+    curryParams.executionLogsPath = path.join(conf.logsDir, curryParams.executionId);
 
     _updateExecutionModel({
         downloadsPath: curryParams.executionDownloadsPath,
@@ -148,9 +149,17 @@ function _downloadRecipe(curryParams, curryCallback) {
         recipeUrl: curryParams.widget.recipeUrl
     };
 
-    services.dl.downloadRecipe(options, function (e) {
-        curryCallback(e, curryParams);
-    });
+    if (!options.recipeUrl) {
+        curryParams.shouldInstall = false;
+        curryCallback(null, curryParams);
+
+    } else {
+        curryParams.shouldInstall = true;
+        services.dl.downloadRecipe(options, function (e) {
+            curryCallback(e, curryParams);
+        });
+
+    }
 }
 
 function _occupyMachine(curryParams, curryCallback) {
@@ -191,6 +200,15 @@ function _occupyMachine(curryParams, curryCallback) {
 
 function _runInstallCommand(curryParams, curryCallback) {
     logger.trace('-play- runInstallCommand');
+
+    if (!curryParams.shouldInstall) {
+        var status = {'code' : 0};
+
+        services.logs.writeStatus(JSON.stringify(status, null, 4) + '\n', curryParams.executionId);
+        services.logs.appendOutput('Install finished successfully.\n', curryParams.executionId);
+        curryCallback(null, curryParams);
+        return;
+    }
 
     var installPath = curryParams.executionDownloadsPath;
     if (!!curryParams.widget.recipeRootPath) {

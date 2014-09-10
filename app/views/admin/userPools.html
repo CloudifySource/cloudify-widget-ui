@@ -15,7 +15,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr ng-repeat="pool in pools">
+        <tr ng-repeat="pool in pools track by $index">
             <td>{{ pool.id }}</td>
             <td>{{ pool.accountId }}</td>
             <td>
