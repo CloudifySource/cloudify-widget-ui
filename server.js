@@ -118,6 +118,7 @@ domain.run(function () {
     app.post('/backend/admin/pools/:poolId/nodes', controllers.pool.createPoolNode);
     app.post('/backend/admin/pools/:poolId/nodes/:nodeId/delete', controllers.pool.deletePoolNode);
     app.post('/backend/admin/pools/:poolId/nodes/:nodeId/bootstrap', controllers.pool.bootstrapPoolNode);
+    app.post('/backend/admin/pools/:poolId/nodes/:nodeId/ping', controllers.pool.pingNode);
 
     app.get('/backend/admin/pools/:poolId/errors', controllers.pool.readPoolErrors);
     app.post('/backend/admin/pools/:poolId/errors/delete', controllers.pool.deletePoolErrors);

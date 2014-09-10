@@ -3,7 +3,7 @@
 angular.module('cloudifyWidgetUiApp')
     .controller('AdminPoolCrudCtrl', function ($scope, $log, $routeParams, $interval, AdminPoolCrudService) {
 
-
+        $scope.pingResults = {};
 
         $scope.getUsers = function () {
             AdminPoolCrudService.getUsers().then(function (result) {
@@ -35,15 +35,6 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
-
-
-
-
-
-
-
-
-
         $scope.getPoolsStatus = function () {
             AdminPoolCrudService.getPoolsStatus().then(function (result) {
                 $log.debug('got pools general status ', result.data);
@@ -72,6 +63,13 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
+        $scope.pingNode = function (poolId, nodeId) {
+            $log.debug('Pinging node, poolId: ', poolId, ' nodeId: ', nodeId);
+            AdminPoolCrudService.pingNode(poolId, nodeId).then(function (result) {
+                $log.debug('machine ping result is ', result.data);
+                $scope.pingResults[nodeId] = result.data;
+            });
+        };
 
         $scope.deletePoolErrors = function (poolId) {
             $log.debug('deletePoolErrors, poolId: ', poolId);

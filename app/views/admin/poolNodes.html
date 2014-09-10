@@ -12,7 +12,7 @@
                 <th class="sortable" ng-click="predicate = 'nodeStatus'; reverse=!reverse"><a href="">Machine Status</a></th>
                 <th>Machine SSH Details</th>
                 <th class="sortable" ng-click="predicate = 'expires'; reverse=!reverse"><a href="">Expires in</a></th>
-                <th colspan="2">Actions</th>
+                <th colspan="3">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -24,10 +24,14 @@
                 <td><pre>{{ asJson(node.machineSshDetails) | json }}</pre></td>
                 <td>{{ node.expires | date:"medium" }} </td>
                 <td>
-                    <button ng-if="node.id" ng-click="bootstrapPoolNode(model.poolId, node.id)">bootstrap node</button>
+                    <button ng-if="node.id" ng-click="pingNode(model.poolId, node.id)">ping</button><br>
+                    Ping result is {{ pingResults[node.id] }}
                 </td>
                 <td>
-                    <button ng-if="node.id" ng-click="deletePoolNode(model.poolId, node.id)">delete node</button>
+                    <button ng-if="node.id" ng-click="bootstrapPoolNode(model.poolId, node.id)">bootstrap</button>
+                </td>
+                <td>
+                    <button ng-if="node.id" ng-click="deletePoolNode(model.poolId, node.id)">delete</button>
                 </td>
             </tr>
         </tbody>
