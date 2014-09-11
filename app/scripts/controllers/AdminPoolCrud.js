@@ -65,10 +65,8 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.pingNode = function (poolId, nodeId) {
             $log.debug('Pinging node, poolId: ', poolId, ' nodeId: ', nodeId);
-            $scope.pingResults[nodeId] = '...';
             AdminPoolCrudService.pingNode(poolId, nodeId).then(function (result) {
                 $log.debug('machine ping result is ', result.data);
-                $scope.pingResults[nodeId] = result.data;
             });
         };
 
