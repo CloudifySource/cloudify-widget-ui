@@ -25,7 +25,7 @@
                 <td>{{ node.expires | date:"medium" }} </td>
                 <td>
                     <button ng-if="node.id" ng-click="pingNode(model.poolId, node.id)">ping</button><br>
-                    Ping result is {{ pingResults[node.id] }}
+                    <span ng-if="pingResults[node.id]">Ping {{ pingResults[node.id] }}</span>
                 </td>
                 <td>
                     <button ng-if="node.id" ng-click="bootstrapPoolNode(model.poolId, node.id)">bootstrap</button>
