@@ -87,6 +87,10 @@ exports.bootstrapPoolNode = function( req, res ){
     managers.poolClient.bootstrapPoolNode(req.user.poolKey, req.params.poolId, req.params.nodeId, _callback(res));
 };
 
+exports.pingNode = function (req, res) {
+    managers.poolClient.pingNode(req.user.poolKey, req.params.poolId, req.params.nodeId, _callback(res));
+};
+
 exports.readPoolErrors = function( req, res ){
     managers.poolClient.readPoolErrors(req.user.poolKey, req.params.poolId, _callback(res));
 };
