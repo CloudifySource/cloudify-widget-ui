@@ -6,6 +6,7 @@ var fs = require('fs-extra');
 var path = require('path');
 var conf = require('../Conf');
 var files = require('../services/FilesService');
+var managers = require('../managers');
 
 /**
  * safe callback invocation
@@ -33,7 +34,7 @@ function _getStatusFilePath(relativePath) {
     return _getLogFilePath(relativePath, 'status.log');
 }
 
-function _readLog (logFilePath, callback) {
+function _readLog(logFilePath, callback) {
 
     if (!logFilePath) {
         _call(callback, new Error('unable to get output, cannot build log file path'));
@@ -47,7 +48,7 @@ function _readLog (logFilePath, callback) {
             return;
         }
 
-        fs.readFile(logFilePath, 'utf8' ,function (err, data) {
+        fs.readFile(logFilePath, 'utf8', function (err, data) {
             if (!!err) {
                 _call(callback, err);
                 return;
@@ -57,7 +58,7 @@ function _readLog (logFilePath, callback) {
     });
 }
 
-function _writeLog (data, logsDir, logFilePath, callback) {
+function _writeLog(data, logsDir, logFilePath, callback) {
     files.mkdirp(logsDir); // make sure dir exists
     fs.writeFile(logFilePath, data, function (err) {
         if (!!err) {
@@ -69,7 +70,49 @@ function _writeLog (data, logsDir, logFilePath, callback) {
     });
 }
 
-function _appendLog (data, logsDir, logFilePath, callback) {
+function _appendToDB(data, executionId, field, callback) {
+    managers.db.connect('widgetExecutions', function (db, collection, done) {
+        collection.findOne(
+            { _id: managers.db.toObjectId(executionId) },
+            function (err, execution) {
+                if (!!err) {
+                    _call(callback, err);
+                    done();
+                    return;
+                }
+
+                var update = {};
+
+                if (!execution[field]) {
+                    update[field] = data;
+                } else {
+                    update[field] = execution[field] + data;
+                }
+
+                collection.update(
+                    { _id: managers.db.toObjectId(executionId) },
+                    { $set: update },
+                    function(err, nUpdated) {
+                        if (!!err) {
+                            _call(callback, err);
+                            done();
+                            return;
+                        }
+                        if (!nUpdated) {
+                            _call(callback, new Error('no widget execution docs updated in the database'));
+                            done();
+                            return;
+                        }
+                        _call(callback);
+                        done();
+                    }
+                );
+
+            });
+    });
+}
+
+function _appendLog(data, logsDir, logFilePath, callback) {
     files.mkdirp(logsDir); // make sure dir exists
     fs.appendFile(logFilePath, data, function (err) {
         if (!!err) {
@@ -94,14 +137,17 @@ exports.readStatus = function (relativePath, callback) {
 
 exports.writeOutput = function (data, relativePath, callback) {
     _writeLog(data, _getLogDirPath(relativePath), _getOutputFilePath(relativePath), callback);
+//    _appendToDB(data, relativePath, 'output', callback);
 };
 
 exports.appendOutput = function (data, relativePath, callback) {
     _appendLog(data, _getLogDirPath(relativePath), _getOutputFilePath(relativePath), callback);
+//    _appendToDB(data, relativePath, 'output', callback);
 };
 
 exports.writeStatus = function (data, relativePath, callback) {
     _writeLog(data, _getLogDirPath(relativePath), _getStatusFilePath(relativePath), callback);
+//    _appendToDB(data, relativePath, 'status', callback);
 };
 
 
