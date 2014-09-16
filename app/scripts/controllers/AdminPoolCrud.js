@@ -3,8 +3,6 @@
 angular.module('cloudifyWidgetUiApp')
     .controller('AdminPoolCrudCtrl', function ($scope, $log, $routeParams, $interval, AdminPoolCrudService) {
 
-        $scope.pingResults = {};
-
         $scope.getUsers = function () {
             AdminPoolCrudService.getUsers().then(function (result) {
                 $scope.model.users = result.data;
