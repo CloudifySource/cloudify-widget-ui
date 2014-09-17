@@ -69,7 +69,7 @@ angular.module('cloudifyWidgetUiApp')
         }
 
         function stop (widget, executionId) {
-            //first, stop polling for status.
+            //first, stop polling for status (resolves race condition - getStatus before stop finished).
             _resetWidgetStatus();
 
             // now stop widget
