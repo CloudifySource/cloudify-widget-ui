@@ -19,7 +19,7 @@
 
     <ul id="log">
         <!--<li ng-repeat="output in getOutput()" ng-class="output {{output.class}}">Acquiring machine. This might take a few seconds, please wait...</li>-->
-        <li ng-repeat="line in widgetStatus.output track by $index">{{ line }}</li>
+        <li ng-repeat="line in output track by $index">{{ line }}</li>
     </ul>
 
     <ul id="links">

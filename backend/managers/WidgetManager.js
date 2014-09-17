@@ -359,7 +359,7 @@ function _playFinally(err, curryParams) {
 
     if (!!err) {
 //        logger.error('failed to play widget with id [%s]', curryParams.widgetId);
-        curryParams.playCallback(err);
+        curryParams.playCallback(err, curryParams.executionId);
         return;
     }
     logger.trace('-play- finished !');
@@ -394,7 +394,11 @@ function _getExecutionModel(curryParams, curryCallback) {
 }
 
 function _expireNode(curryParams, curryCallback) {
-
+    if (!curryParams.executionModel.nodeModel) {
+        // nothing to expire
+        curryCallback(null, curryParams);
+        return;
+    }
 
     managers.poolClient.expirePoolNode(curryParams.poolKey, curryParams.executionModel.widget.poolId, curryParams.executionModel.nodeModel.id, function (err/*, result*/) {
 
@@ -505,14 +509,15 @@ exports.stop = function (widgetId, executionId, remote, stopCallback) {
 };
 
 function getPublicExecutionDetails(execution) {
-    return {
-        'widget': _.omit(execution.widget, ['userId']),
-        'nodeModel': _.merge(_.pick(execution.nodeModel, ['id']),
+    var retVal = {};
+    retVal.widget =  _.omit(execution.widget, ['userId']);
+    retVal.nodeModel =  execution.nodeModel ? _.merge(_.pick(execution.nodeModel, ['id']),
                              {'publicIp': execution.nodeModel.machineSshDetails.publicIp },
-                             {'expires': execution.nodeModel.expires}),
-        'exitStatus': execution.exitStatus,
-        'output': execution.output
-    };
+                             {'expires': execution.nodeModel.expires}) : undefined;
+    retVal.exitStatus = execution.exitStatus;
+    retVal.output = execution.output;
+
+    return retVal;
 }
 
 exports.getStatus = function (executionId, callback) {
