@@ -75,26 +75,25 @@ function clearOutputBufferString(executionId) {
     delete outputBuffer[executionId];
 }
 
-exports.readOutput = function (relativePath, callback) {
-    readFromDB(relativePath, 'output', callback);
+exports.readOutput = function (executionId, callback) {
+    readFromDB(executionId, 'output', callback);
 };
 
-exports.readStatus = function (relativePath, callback) {
-    readFromDB(relativePath, 'status', callback);
+exports.readStatus = function (executionId, callback) {
+    readFromDB(executionId, 'status', callback);
 };
 
-exports.writeOutput = function (data, relativePath, callback) {
-    var buffer = appendOutputBufferString(relativePath, data);
-    writeToDB(buffer, relativePath, 'output', callback);
+exports.writeOutput = function (data, executionId, callback) {
+    var buffer = appendOutputBufferString(executionId, data);
+    writeToDB(buffer, executionId, 'output', callback);
 };
 
-exports.appendOutput = function (data, relativePath, callback) {
-    var buffer = appendOutputBufferString(relativePath, data);
-    writeToDB(buffer, relativePath, 'output', callback);
+exports.appendOutput = function (data, executionId, callback) {
+    exports.writeOutput(data, executionId, callback);
 };
 
-exports.writeStatus = function (data, relativePath, callback) {
-    writeToDB(data, relativePath, 'status', callback);
+exports.writeStatus = function (data, executionId, callback) {
+    writeToDB(data, executionId, 'status', callback);
 };
 
 exports.clearOutputBuffer = function (executionId) {
