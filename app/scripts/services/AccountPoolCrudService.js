@@ -11,6 +11,10 @@ angular.module('cloudifyWidgetUiApp')
             this.getPools = function () {
                 return $http.get('/backend/user/pools');
             };
+
+            this.getPool = function (poolId) {
+                return $http.get('/backend/user/pools/' + poolId);
+            };
         }
 
         return new AccountPoolCrudService();

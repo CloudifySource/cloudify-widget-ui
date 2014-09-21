@@ -72,6 +72,7 @@ domain.run(function () {
     app.post('/backend/login', controllers.session.login);
     app.post('/backend/logout', controllers.session.logout);
     app.get('/backend/user/pools', controllers.pool.accountReadPools);
+    app.get('/backend/user/pools/:poolId', controllers.pool.accountReadPool);
     app.get('/backend/user/widgets', controllers.widgets.list);
     app.post('/backend/user/widgets', controllers.widgets.create);
     app.post('/backend/user/widgets/:widgetId/delete', controllers.widgets.delete);
