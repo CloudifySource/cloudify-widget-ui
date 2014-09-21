@@ -1,7 +1,11 @@
 <div layout>
 
-This is pool id {{ poolId }} edit screen.
-
-
+    <form name="poolForm" class="pool-form">
+        Min nodes : <input name="minNodes" class="minmax" type="number" ng-model="pool.poolSettings.minNodes" ng-change="validate(poolForm)"><br/>
+        Max nodes : <input name="maxNodes" class="minmax" type="number" ng-model="pool.poolSettings.maxNodes" ng-change="validate(poolForm)"><br/>
+        <span ng-show="poolForm.$error.minmax">Min nodes must be lower than Max nodes.</span>
+        <span ng-show="poolForm.$error.number">Min and Max nodes are numeric values only.</span>
+    </form>
+    <button ng-click="save()" ng-disabled="poolForm.$invalid">Save</button>
 
 </div>

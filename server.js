@@ -71,8 +71,6 @@ domain.run(function () {
     app.post('/backend/signup', controllers.session.signup);
     app.post('/backend/login', controllers.session.login);
     app.post('/backend/logout', controllers.session.logout);
-    app.get('/backend/user/pools', controllers.pool.accountReadPools);
-    app.get('/backend/user/pools/:poolId', controllers.pool.accountReadPool);
     app.get('/backend/user/widgets', controllers.widgets.list);
     app.post('/backend/user/widgets', controllers.widgets.create);
     app.post('/backend/user/widgets/:widgetId/delete', controllers.widgets.delete);
@@ -133,13 +131,13 @@ domain.run(function () {
     app.get('/backend/admin/pools/:poolId/cloud/nodes', controllers.pool.readCloudNodes);
 
     app.get('/backend/user/account/pools', controllers.pool.accountReadPools);
+    app.get('/backend/user/account/pools/:poolId', controllers.pool.accountReadPool);
     app.post('/backend/user/account/pools', controllers.pool.createPool);
     app.get('/backend/user/account/pools/script', controllers.pool.readPoolBootstrapScript);
     app.post('/backend/user/account/pools/:poolId', controllers.pool.updatePool);
     app.post('/backend/user/account/pools/:poolId/delete', controllers.pool.deletePool);
     app.get('/backend/user/account/pools/:poolId/status', controllers.pool.accountReadPoolStatus);
     app.get('/backend/user/account/pools/status', controllers.pool.accountReadPoolsStatus);
-
 
     app.get('/backend/widgets/:widgetId', controllers.widgets.getPublicInfo);
     app.get('/backend/widgets/login/types', controllers.widgetLogin.getTypes);

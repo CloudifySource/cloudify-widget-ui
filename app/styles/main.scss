@@ -1,5 +1,4 @@
 //@import "bootstrap-sass/lib/bootstrap";
-
 @import "./baseline";
 @import "./widgetView";
 @import "./widgetThemeDefault";
@@ -9,17 +8,23 @@
 // hide multiple layouts layers for "logged-in-layout" - means that if I have 2 pages one within another with the layout, the other layout will be hidden.
 #logged-in-layout {
 
- .logged-in-layout .logged-in-layout.nested-hidden{
+  .logged-in-layout .logged-in-layout.nested-hidden {
 
-  display:none;
+    display: none;
 
- }
-  .require-login{ display:none }
+  }
+  .require-login {
+    display: none
+  }
 
-  &.logged-in{
-    display:default;
-    .require-login{ display:block}
-    .logged-out{ display:none}
+  &.logged-in {
+    display: default;
+    .require-login {
+      display: block
+    }
+    .logged-out {
+      display: none
+    }
 
   }
 
@@ -29,13 +34,21 @@
 
 }
 
-.hidden{
-  display:none;
+.hidden {
+  display: none;
 }
 
 .pool-nodes {
-   .sortable {
-       cursor: pointer;
+  .sortable {
+    cursor: pointer;
 
-   }
+  }
+}
+
+.pool-form {
+  &.ng-invalid.ng-dirty {
+    input.minmax {
+      background: rgba(255, 0, 0, 0.4);
+    }
+  }
 }
