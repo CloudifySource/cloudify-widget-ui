@@ -1,17 +1,17 @@
 'use strict';
 
-describe('Controller: PoolsIndexCtrl', function () {
+describe('Controller: AccountPoolCtrl', function () {
 
     // load the controller's module
     beforeEach(module('cloudifyWidgetUiApp'));
 
-    var PoolsIndexCtrl,
+    var AccountPoolCtrl,
         scope;
 
     // Initialize the controller and a mock scope
     beforeEach(inject(function ($controller, $rootScope) {
         scope = $rootScope.$new();
-        PoolsIndexCtrl = $controller('PoolsIndexCtrl', {
+        AccountPoolCtrl = $controller('AccountPoolCtrl', {
             $scope: scope
         });
     }));
