@@ -1,6 +1,6 @@
 <div class="container" id="logged-in-layout" ng-class="{'logged-in' : !!$root.user}">
 <div class="require-login">
-<div class="logged-in-layout nested-hidden">
+<div class="logged-in-layout nested-hidden navbar navbar-inverse">
     hello {{user.email}},
     <button ng-click="logout()">logout</button>
     <a admin ng-href="#/admin/users">manage users</a>
