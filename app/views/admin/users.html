@@ -1,40 +1,53 @@
 <div layout>
-    <h3>Users</h3>
-    <button ng-click="addUser()">Create New User</button>
-    <table ng-init="getUsers()">
-        <thead>
+    <div class="row" style="margin-bottom: 10px">
+        <h3>Users</h3>
+        <button ng-click="addUser()">Create New User</button>
+    </div>
+    <div class="col-md-6">
+        <table class="table table-bordered table-striped" ng-init="getUsers()">
+            <thead>
             <tr>
                 <th>ID</th>
                 <th>Pool Key</th>
                 <th>Description</th>
                 <th colspan="1">Actions</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             <tr ng-repeat="user in users">
-                <td>{{ user.email }}</td>
-                <td>
-                    {{ user.poolKey }} <br/>
-                    <input ng-model="manualPoolKey" type="text"/><br/>
-                    <button ng-click="assignNewPoolKey(user)">Assign New Pool Key</button><br/>
-                    <button ng-click="setPoolKey(user,manualPoolKey)">Set Pool Key From Input</button><br/>
-                    <button ng-click="removePoolKey(user)">Remove Pool Key</button><br/>
-                </td>
-                <td>
-                    <div ng-show="!!user.poolKey">
-                        <div ng-show="!getAccount(user)">**This user is from another manager.<br/> It has a pool key but it does not match any uuid from the manager</div>
-                        <div style="max-width:200px;">{{ getAccount(user).description }}</div><br/>
-                        <input type="text" ng-model="newDescription"/><br/>
-                        <button ng-click="setDescription( user , newDescription )">Set Description</button>
+                <td style="vertical-align: middle;">{{ user.email }}</td>
+                <td style="vertical-align: middle;">
+                    <div class="row">{{ user.poolKey }}</div>
+                    <div class="row">
+                        <input ng-model="manualPoolKey" type="text" placeholder="Assign New Pool Key"/>
+                        <button ng-click="assignNewPoolKey(user)">Set</button>
+                    </div>
+                    <div class="row">
+                        <button ng-click="setPoolKey(user,manualPoolKey)">Set From Input</button>
+                        <button ng-click="removePoolKey(user)">Remove</button>
                     </div>
                 </td>
-                <td>
+                <td style="vertical-align: middle;">
+                    <div ng-show="!!user.poolKey">
+                        <div class="row" ng-show="!getAccount(user)">**This user is from another manager.<br/> It has a pool key but
+                            it does not match any uuid from the manager
+                        </div>
+                        <div class="row" style="max-width:200px;">{{ getAccount(user).description }}</div>
+                        <div class="row" >
+                            <input type="text" ng-model="newDescription" placeholder="Enter custom description here"/>
+                            <button ng-click="setDescription( user , newDescription )">Set</button>
+                        </div>
+                    </div>
+                </td>
+                <td style="vertical-align: middle;">
 
-                    <a ng-show="!!getAccount(user)" ng-href="#/admin/accounts/{{ getAccount(user).id }}/pools">see pools</a>
+                    <a ng-show="!!getAccount(user)" ng-href="#/admin/accounts/{{ getAccount(user).id }}/pools">see
+                        pools</a>
 
 
                 </td>
             </tr>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 </div>
