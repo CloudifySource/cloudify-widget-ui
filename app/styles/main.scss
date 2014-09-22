@@ -7,9 +7,7 @@
 
 // hide multiple layouts layers for "logged-in-layout" - means that if I have 2 pages one within another with the layout, the other layout will be hidden.
 #logged-in-layout {
-
   .logged-in-layout .logged-in-layout.nested-hidden {
-
     display: none;
 
   }
@@ -17,8 +15,20 @@
     display: none
   }
 
+  .header {
+    background-color: #181818;
+  }
+
+  .hello {
+    color: white;
+    float: left;
+    margin: 12px 12px 12px 24px;
+  }
+
   &.logged-in {
     display: default;
+    width: 100%;
+
     .require-login {
       display: block
     }
@@ -51,4 +61,12 @@
       background: rgba(255, 0, 0, 0.4);
     }
   }
+}
+
+.nav {
+
+  li {
+    display: inline-block;
+  }
+
 }

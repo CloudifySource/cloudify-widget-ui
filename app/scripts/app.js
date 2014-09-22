@@ -190,7 +190,7 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
                 controller: 'EmbedDemoCtrl'
             })
             .otherwise({
-                redirectTo: '/demo'
+                redirectTo: '/login'
             });
 
         $httpProvider.interceptors.push('myHttpInterceptor');
