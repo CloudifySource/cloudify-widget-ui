@@ -1,0 +1,37 @@
+<div layout>
+
+    <table>
+        <thead>
+        <tr>
+            <!--<th>{{ model }}</th>-->
+            <th>Pool ID</th>
+            <th>Account ID</th>
+            <th>Pool Settings</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="pool in pools track by $index">
+            <td>{{ pool.id }}</td>
+            <td>{{ pool.accountId }}</td>
+            <td>
+                <a href="#/pools/{{pool.id}}/edit">
+                    <span ng-show="!!pool.poolSettings.name && pool.poolSettings.name.trim().length > 0">{{pool.poolSettings.name}}</span>
+                    <span ng-show="!pool.poolSettings.name || pool.poolSettings.name.trim().length <= 0">[[No Name]]</span>
+                </a>
+                <!--<textarea json-binder ng-readonly="!editModeStatusArray[$index]" ng-model="pool.poolSettings"></textarea>-->
+            </td>
+            <!--<td>-->
+
+            <!--<label>-->
+            <!--<input type="checkbox"-->
+            <!--ng-model="editModeStatusArray[$index]"-->
+            <!--ng-change="callUpdateAccountPool(editModeStatusArray[$index], pool)">-->
+            <!--edit pool-->
+            <!--</label>-->
+            <!--</td>-->
+
+        </tr>
+        </tbody>
+    </table>
+
+</div>

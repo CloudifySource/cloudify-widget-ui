@@ -131,13 +131,13 @@ domain.run(function () {
     app.get('/backend/admin/pools/:poolId/cloud/nodes', controllers.pool.readCloudNodes);
 
     app.get('/backend/user/account/pools', controllers.pool.accountReadPools);
+    app.get('/backend/user/account/pools/:poolId', controllers.pool.accountReadPool);
     app.post('/backend/user/account/pools', controllers.pool.createPool);
     app.get('/backend/user/account/pools/script', controllers.pool.readPoolBootstrapScript);
     app.post('/backend/user/account/pools/:poolId', controllers.pool.updatePool);
     app.post('/backend/user/account/pools/:poolId/delete', controllers.pool.deletePool);
     app.get('/backend/user/account/pools/:poolId/status', controllers.pool.accountReadPoolStatus);
     app.get('/backend/user/account/pools/status', controllers.pool.accountReadPoolsStatus);
-
 
     app.get('/backend/widgets/:widgetId', controllers.widgets.getPublicInfo);
     app.get('/backend/widgets/login/types', controllers.widgetLogin.getTypes);

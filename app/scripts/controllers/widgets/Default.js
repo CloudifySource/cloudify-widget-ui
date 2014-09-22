@@ -14,8 +14,14 @@
  */
 angular.module('cloudifyWidgetUiApp')
     .controller('WidgetsDefaultCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window, $routeParams, $sce, WidgetConstants) {
+        var STATE_RUNNING = 'RUNNING';
+        var STATE_STOPPED = 'STOPPED';
+        var ellipsisIndex = 0;
+
         $scope.widgetId = $routeParams.widgetId;
         $scope.currentTime = new Date().getTime();
+        $scope.widgetState = STATE_STOPPED;
+        $scope.output = '';
 
         // this controller will handle post/receive messages !
         // it will also hold the state for the view (which is now coupled inside Widget.js controller, and should be extracted from there)
@@ -25,37 +31,23 @@ angular.module('cloudifyWidgetUiApp')
 
             return '/#/widgets/' + $routeParams.widgetId + '/blank?timestamp=' + new Date().getTime();
         };
-//        $scope.$watch('widget', function (n/*, o, s*/) {
-//            n && ($scope.blankIframeSrc = $sce.trustAsResourceUrl(window.location.origin + ));
-//        });
-
 
         // todo : move to "blank"
 //        $window.$windowScope = $scope;   // used to close the login dialog
 
 //        $scope.collapseAdvanced = false;
 
-        $scope.widgetStatus = {};
-
-        var STATE_RUNNING = 'RUNNING';
-        var STATE_STOPPED = 'STOPPED';
-        var ellipsisIndex = 0;
-
-
         $scope.showPlay = function () {
-            return $scope.widgetStatus.state === STATE_STOPPED;
+            return $scope.widgetState === STATE_STOPPED;
         };
 
         $scope.showStop = function () {
-            return $scope.widgetStatus.state === STATE_RUNNING;
+            return $scope.widgetState === STATE_RUNNING;
         };
 
 
         function _resetWidgetStatus() {
-            $scope.widgetStatus = {
-                'state': STATE_STOPPED,
-                'reset': true
-            };
+            $scope.widgetState = STATE_STOPPED;
         }
 
         _resetWidgetStatus();
@@ -78,7 +70,7 @@ angular.module('cloudifyWidgetUiApp')
             $log.debug(['got status', status]);
 
             ellipsisIndex = ellipsisIndex + 1;
-            $scope.widgetStatus = status;
+            $scope.output = status.output ? status.output : '';
             _scrollLog();
         }
 
@@ -113,7 +105,8 @@ angular.module('cloudifyWidgetUiApp')
 //            }
 
             _resetWidgetStatus();
-            $scope.widgetStatus.state = STATE_RUNNING;
+            $scope.output = '';
+            $scope.widgetState = STATE_RUNNING;
 //            var advancedParams = _hasAdvanced() ? _getAdvanced() : null;
 //            console.log('advanced params: ', advancedParams, '_hasAdvanced()=', _hasAdvanced());
 
@@ -140,14 +133,6 @@ angular.module('cloudifyWidgetUiApp')
 
 
 //        var emptyList = [];
-
-//        function _handleOutput(widget, output) {
-//
-//            if (!widget || !$scope.executionId) {
-//                $scope.output = emptyList;
-//            }
-//            $scope.output = output;
-//        }
 
 //        function _isRemoteBootstrap() {
 //            return $scope.widget.remoteBootstrap && $scope.widget.remoteBootstrap.active;
@@ -190,7 +175,6 @@ angular.module('cloudifyWidgetUiApp')
                 }
 
                 if (data.name === WidgetConstants.STOPPED) {
-                    $scope.widgetStatus.state = STATE_STOPPED;
                     _resetWidgetStatus();
                 }
 
