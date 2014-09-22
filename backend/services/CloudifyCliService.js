@@ -83,6 +83,7 @@ exports.executeCommand = function (options, onExit) {
 
     myCmd.on('exit', function (code, signal) {
         logger.info('finished running command. exit code is [%s], exit signal is [%s]', code, signal);
+        logs.clearOutputBuffer(_options.executionId);
         if (onExit) {
             if (code !== 0) {
                 onExit(new Error('command failed with exit code [' + code + '] and exit signal [' + signal + ']'));
