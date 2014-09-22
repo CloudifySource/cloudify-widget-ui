@@ -1,5 +1,6 @@
 'use strict';
 var managers = require('../managers');
+var services = require('../services');
 var _ = require('lodash');
 var logger = require('log4js').getLogger('WidgetController');
 
@@ -111,8 +112,10 @@ exports.play = function (req, res) {
 
     var playCallback = function playCallback (err, result) {
         if (!!err) {
-            logger.error('play failed', err);
-            res.send(500, {message: 'play failed', error: err});
+            var errorStr = 'Play failed!\n' + err;
+            logger.error(errorStr);
+            services.logs.appendOutput(errorStr, result);
+            res.send(200, { 'executionId' : result });
             return;
         }
 

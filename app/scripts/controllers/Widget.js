@@ -69,18 +69,24 @@ angular.module('cloudifyWidgetUiApp')
         }
 
         function stop (widget, executionId) {
+            //first, stop polling for status (resolves race condition - getStatus before stop finished).
+            _resetWidgetStatus();
+
+            // now stop widget
             WidgetsService.stopWidget($scope.widget, $scope.executionId.executionId).then(function () {
                 deleteState();
                 _postStopped(executionId);
-                _resetWidgetStatus();
                 $scope.executionId = null;
             });
         }
 
         function _resetWidgetStatus() {
+            var output = $scope.widgetStatus.output;
+
             $scope.widgetStatus = {
                 'state': STATE_STOPPED,
-                'reset': true
+                'reset': true,
+                'output': output
             };
         }
 
@@ -96,7 +102,7 @@ angular.module('cloudifyWidgetUiApp')
             }, myTimeout || 3000);
 
             // if expires < now, call stop()
-            if (status.nodeModel.expires < new Date().getTime()) {
+            if (!status.nodeModel || status.nodeModel.expires < new Date().getTime()) {
                 stop(widget, executionId);
             }
         }
