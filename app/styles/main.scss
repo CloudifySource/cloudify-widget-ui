@@ -82,7 +82,23 @@
 
 }
 
-.actions {
-  padding: 15px;
-  height: 55px;
+#accountPools, #dashboard {
+  .actions {
+    padding: 15px;
+    height: 55px;
+  }
+
+}
+
+#accountPoolEdit {
+  input {
+    padding-right: 0px;
+  }
+
+  .row {
+    &.actions {
+      margin-left: 55px;
+      margin-top: 10px;
+    }
+  }
 }

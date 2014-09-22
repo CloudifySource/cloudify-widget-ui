@@ -1,64 +1,112 @@
-<div id="widgetForm">
-    <p>
-        Product Name(*) : <input type="text" ng-model="widget.productName"/><br/>
-        Product Version(*) : <input type="text" ng-model="widget.productVersion"/><br/>
-        Title (*) : <input type="text" ng-model="widget.title"/><br/>
-        Recipe Name (*) : <input type="text" ng-model="widget.recipeName"/><br/>
-        Recipe URL : <input type="text" ng-model="widget.recipeUrl"/><br/>
-        Provider URL (*) : <input type="text" ng-model="widget.providerUrl"/><br/>
-    </p>
-
-    <p>
-        Embed Video Snippet : <input type="text" ng-model="widget.embedVideoSnippet"/><br/>
-        Console Link Title : <input type="text" ng-model="widget.consoleLink.title"/><br/>
-        Console Link URL : <input type="text" ng-model="widget.consoleLink.url"/><br/>
-    
-        Console URL Service : <input type="text" ng-model="widget.urlService"/><br/>
-        <sup>required for the link on remote bootstrap</sup><br/>
-    
-        Uninstall name: <input type="text" ng-model="widget.uninstallName"/><br/>
-        <sup>To enable the widget to stop on remote bootstrap</sup><br/>
-    
-        Recipe Root Path (*): <input type="text" ng-model="widget.recipeRootPath"/><br/>
-        <sup>the path to the recipe folder inside the downloaded zip</sup><br/>
-    
-        Recipe Type (*): <select ng-model="widget.recipeType" ng-options="t.id as t.label for t in recipeTypes"></select><br/>
-    
-        Pool Id (*): <select ng-model="widget.poolId" ng-options="p.id as p.poolSettings.name for p in userPools"></select><br/>
-
-        Installation timeout: (minutes): <input type="text" ng-model="widget.installTimeout" /><br/>
-    </p>
-
-    <p>
-        Show advanced : <input type="checkbox" ng-model="widget.showAdvanced"/><br/>
-        Theme : <select ng-model="widget.theme" ng-options="c.id as c.label for c in themes"></select><br/>
-    </p>
-    
-    <p>
-        HTML Snippet in Advanced Location ( Use only if show advanced is false, this HTML will display once the widget is played in the same location advanced form is displayed ):<br/>
-        <textarea ng-model="widget.advancedMessage"></textarea>
-    </p>
-
-
-
-    <p>
-        Require Login : <input type="checkbox" ng-model="widget.login.require"/><br/>
-    <span>
-        If "proprietary" login is selected, the widget will do nothing on "play" but send a PostMessage event. <br/>
+<div id="widgetForm" class="col-md-4">
+    <div class="row">
+        <span class="col-md-4">Product Name(*) : </span>
+        <input class="col-md-8" type="text" ng-model="widget.productName"/>
+    </div>
+    <div class="row">
+        <span class="col-md-4">Product Version(*) : </span>
+        <input class="col-md-8" type="text" ng-model="widget.productVersion"/>
+    </div>
+    <div class="row">
+        <span class="col-md-4">Title (*) : </span>
+        <input class="col-md-8" type="text" ng-model="widget.title"/>
+    </div>
+    <div class="row">
+        <span class="col-md-4">Recipe Name (*) : </span>
+        <input class="col-md-8" type="text" ng-model="widget.recipeName"/>
+    </div>
+    <div class="row">
+        <span class="col-md-4">Recipe URL : </span>
+        <input class="col-md-8" type="text" ng-model="widget.recipeUrl"/>
+    </div>
+    <div class="row">
+        <span class="col-md-4">Provider URL (*) : </span>
+        <input class="col-md-8" type="text" ng-model="widget.providerUrl"/>
+    </div>
+    <br/>
+    <div class="row">
+        <span class="col-md-4">Embed Video Snippet : </span>
+        <input class="col-md-8" type="text" ng-model="widget.embedVideoSnippet"/>
+    </div>
+    <div class="row">
+        <span class="col-md-4">Console Link Title : </span>
+        <input class="col-md-8" type="text" ng-model="widget.consoleLink.title"/>
+    </div>
+    <div class="row">
+        <span class="col-md-4">Console Link URL : </span>
+        <input class="col-md-8" type="text" ng-model="widget.consoleLink.url"/>
+    </div>
+    <div class="row">
+        <span class="col-md-4">Console URL Service : </span>
+        <input class="col-md-8" type="text" ng-model="widget.urlService"/>
+        <sup class="col-md-12">required for the link on remote bootstrap</sup>
+    </div>
+    <div class="row">
+        <span class="col-md-4">Uninstall name: </span>
+        <input class="col-md-8" type="text" ng-model="widget.uninstallName"/>
+        <sup class="col-md-12">To enable the widget to stop on remote bootstrap</sup>
+    </div>
+    <div class="row">
+        <span class="col-md-4">Recipe Root Path (*): </span>
+        <input class="col-md-8" type="text" ng-model="widget.recipeRootPath"/>
+        <sup class="col-md-12">the path to the recipe folder inside the downloaded zip</sup>
+    </div>
+    <div class="row">
+        <span class="col-md-4">Recipe Type (*): </span>
+        <select class="col-md-8"> ng-model="widget.recipeType" ng-options="t.id as t.label for t in recipeTypes"></select>
+    </div>
+    <div class="row">
+        <span class="col-md-4">Pool Id (*): </span>
+        <select class="col-md-8" ng-model="widget.poolId" ng-options="p.id as p.poolSettings.name for p in userPools"></select>
+    </div>
+    <div class="row">
+        <span class="col-md-4">Installation timeout: (minutes): </span>
+        <input class="col-md-8" type="text" ng-model="widget.installTimeout"/>
+    </div>
+    <br/>
+    <div class="row">
+        <span class="col-md-4">Show advanced : </span>
+        <input class="col-md-1" type="checkbox" ng-model="widget.showAdvanced"/>
+    </div>
+    <div class="row">
+        <span class="col-md-4">Theme : </span>
+        <select class="col-md-8" ng-model="widget.theme" ng-options="c.id as c.label for c in themes"></select>
+    </div>
+    <div class="row">
+        <span class="col-md-12">HTML Snippet in Advanced Location ( Use only if show advanced is false, this HTML will display once the widget is played in the same location advanced form is displayed ):</span>
+        <textarea class="col-md-12" ng-model="widget.advancedMessage"></textarea>
+    </div>
+    <br/>
+    <div class="row">
+        <span class="col-md-4">Require Login : </span>
+        <input class="col-md-1" type="checkbox" ng-model="widget.login.require"/>
+    </div>
+    <div class="row">
+        <span class="col-md-12">If "proprietary" login is selected, the widget will do nothing on "play" but send a PostMessage event. <br/>
         It will wait for the embedding page to invoke the play.<br/>
-        It will look for userId and userKey to verify with Verification URL and Web Service Private Key that the<br/>
-        credentials are legitimate<br/>
-    </span>
-        Login Type: <select ng-model="widget.login.type" ng-options="c.label for c in loginTypes"></select><br/>
-    </p>
-    <strong> proprietary login details</strong>
-    <p>
-        Verification URL : <input ng-model="widget.login.propVerificationUrl" type="text"/><br/>
-        Web Service Private Key : <input ng-model="widget.login.propServicePrivateKey" type="text"/><br/>
-    </p>
+        It will look for userId and userKey to verify with Verification URL and Web Service Private Key that the
+        credentials are legitimate
+        </span>
+        <span class="col-md-4">Login Type: </span>
+        <select class="col-md-8" ng-model="widget.login.type" ng-options="c.label for c in loginTypes"></select>
+    </div>
+    <br/>
 
+    <div class="row">
+        <strong> proprietary login details</strong>
+    </div>
+    <div class="row">
+        <span class="col-md-4">Verification URL : </span>
+        <input class="col-md-8" ng-model="widget.login.propVerificationUrl" type="text"/>
+    </div>
+    <div class="row">
+        <span class="col-md-4">Web Service Private Key : </span>
+        <input class="col-md-8" ng-model="widget.login.propServicePrivateKey" type="text"/>
+    </div>
 
-    <h1> Social Login </h1>
+<!--
+
+    <h2> Social Login </h2>
     <p>
         The social login feature is intended for conversion purposes. <br/>
         The goal is to get contact information of potential future customers.<br/>
@@ -92,7 +140,9 @@
 
         <br/>
     </p>
+-->
 
+<!--
     <h2> Login Details Handlers </h2>
 
     Please specify what you want us to do with the login details. <br/>
@@ -118,41 +168,42 @@
     <p>
         <input type="checkbox" ng-model="widget.socialLogin.handlers.postMessage.enabled"/>Enabled
     </p>
+-->
 
 
-    <h1> proprietary login details</h1>
-    <p>
-        Require Login : <input type="checkbox" ng-model="widget.login.require"/><br/>
-        <span>
-            If "proprietary" login is selected, the widget will do nothing on "play" but send a PostMessage event. <br/>
-            It will wait for the embedding page to invoke the play.<br/>
-            It will look for userId and userKey to verify with Verification URL and Web Service Private Key that the<br/>
-            credentials are legitimate<br/>
-        </span>
-    </p>
-    <p>
-        Verification URL : <input ng-model="widget.login.propVerificationUrl" type="text"/><br/>
-        Web Service Private Key : <input ng-model="widget.login.propServicePrivateKey" type="text"/><br/>
-    </p>
+    <!--<h1> proprietary login details</h1>-->
+    <!--<p>-->
+        <!--Require Login : <input type="checkbox" ng-model="widget.login.require"/><br/>-->
+        <!--<span>-->
+            <!--If "proprietary" login is selected, the widget will do nothing on "play" but send a PostMessage event. <br/>-->
+            <!--It will wait for the embedding page to invoke the play.<br/>-->
+            <!--It will look for userId and userKey to verify with Verification URL and Web Service Private Key that the<br/>-->
+            <!--credentials are legitimate<br/>-->
+        <!--</span>-->
+    <!--</p>-->
+    <!--<p>-->
+        <!--Verification URL : <input ng-model="widget.login.propVerificationUrl" type="text"/><br/>-->
+        <!--Web Service Private Key : <input ng-model="widget.login.propServicePrivateKey" type="text"/><br/>-->
+    <!--</p>-->
 
-    <p>
-        An HTML snippet for description
-        <textarea ng-model="widget.description"></textarea>
-    </p>
+    <!--<p>-->
+        <!--An HTML snippet for description-->
+        <!--<textarea ng-model="widget.description"></textarea>-->
+    <!--</p>-->
 
-    <p>
-        An HTML snippet for 'end of trial'
-        <textarea ng-model="widget.endOfTrialSnippet"></textarea>
-    </p>
+    <!--<p>-->
+        <!--An HTML snippet for 'end of trial'-->
+        <!--<textarea ng-model="widget.endOfTrialSnippet"></textarea>-->
+    <!--</p>-->
 
-    <strong>Bootstrap</strong>
+    <!--<strong>Bootstrap</strong>-->
 
-    <p>
-        Active : <input type="checkbox" ng-model="widget.remoteBootstrap.active"/><br/>
-        Form : <select ng-model="widget.remoteBootstrap.cloudifyForm"
-                       ng-options="c.id as c.label for c in remoteBootstrapForms"></select><br/>
-        Cloudify Cloud : <input ng-model="widget.remoteBootstrap.cloudifyCloud" type="text"/><br/>
-    </p>
+    <!--<p>-->
+        <!--Active : <input type="checkbox" ng-model="widget.remoteBootstrap.active"/><br/>-->
+        <!--Form : <select ng-model="widget.remoteBootstrap.cloudifyForm"-->
+                       <!--ng-options="c.id as c.label for c in remoteBootstrapForms"></select><br/>-->
+        <!--Cloudify Cloud : <input ng-model="widget.remoteBootstrap.cloudifyCloud" type="text"/><br/>-->
+    <!--</p>-->
 
 
 </div>
