@@ -6,12 +6,15 @@
 
     <div class="col-md-6">
         <table class="table table-bordered table-striped">
+            <thead>
             <tr>
-                <td>Product</td>
-                <td>Recipe</td>
-                <td>Title</td>
-                <td>Actions</td>
+                <th>Product</th>
+                <th>Recipe</th>
+                <th>Title</th>
+                <th>Actions</th>
             </tr>
+            </thead>
+            <tbody>
             <tr ng-repeat="widget in widgets">
                 <td>
                     {{widget.productName}}
@@ -28,6 +31,7 @@
                     <button ng-click="delete( widget )">Delete</button>
                 </td>
             </tr>
+            </tbody>
         </table>
     </div>
 </div>
