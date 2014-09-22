@@ -17,18 +17,18 @@ function _call() {
 
 function readFromDB(executionId, field, callback) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
-           collection.findOne(
-               { _id: managers.db.toObjectId(executionId) },
-               function (err, execution) {
-                   if (!!err) {
-                       _call(callback, err);
-                       done();
-                       return;
-                   }
+        collection.findOne(
+            { _id: managers.db.toObjectId(executionId) },
+            function (err, execution) {
+                if (!!err) {
+                    _call(callback, err);
+                    done();
+                    return;
+                }
 
-                   _call(callback, null, execution[field]);
-               }
-           );
+                _call(callback, null, execution[field]);
+            }
+        );
     });
 }
 
@@ -41,7 +41,7 @@ function writeToDB(data, executionId, field, callback) {
         collection.update(
             { _id: managers.db.toObjectId(executionId) },
             { $set: update },
-            function(err, nUpdated) {
+            function (err, nUpdated) {
                 if (!!err) {
                     _call(callback, err);
                     done();

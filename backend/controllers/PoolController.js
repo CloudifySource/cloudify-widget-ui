@@ -134,6 +134,10 @@ exports.accountReadPools = function( req, res ){
     managers.poolClient.accountReadPools(req.user.poolKey, _callback(res));
 };
 
+exports.accountReadPool = function( req, res ){
+    managers.poolClient.accountReadPool(req.user.poolKey, req.params.poolId, _callback(res));
+};
+
 exports.readPoolBootstrapScript = function( req, res ){
     managers.poolClient.readPoolBootstrapScript(req.user.poolKey, _callback(res));
 };

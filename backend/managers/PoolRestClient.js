@@ -327,6 +327,11 @@ exports.accountReadPools = function (poolKey, callback) {
     call.get('/account/pools', _args().poolKey(poolKey), callback);
 };
 
+exports.accountReadPool = function (poolKey, poolId, callback) {
+    logger.info('reading account pool [%s]', poolId);
+    call.get('/account/pools/${poolId}', _args().poolKey(poolKey).poolId(poolId), callback);
+};
+
 exports.readPoolBootstrapScript = function (poolKey, callback) {
     logger.info('reading pool default bootstrarp script');
     call.get('/account/pools/script', _args().poolKey(poolKey), callback);
