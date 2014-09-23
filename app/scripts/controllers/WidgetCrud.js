@@ -3,12 +3,9 @@
 angular.module('cloudifyWidgetUiApp')
     .controller('WidgetCrudCtrl', function ($scope, $routeParams, $log, LoginTypesService, WidgetsService, $location, WidgetThemesService, $window /*,$timeout*/) {
 
-
-
         $scope.availableLoginTypes = function () {
             return LoginTypesService.getAll();
         };
-
 
         function _getSocialLoginById(id) {
             if (!!$scope.widget && !!$scope.widget.socialLogin && !!$scope.widget.socialLogin.data) {
@@ -23,7 +20,6 @@ angular.module('cloudifyWidgetUiApp')
             return null;
 
         }
-
 
         // use this with the following from the popup window:
         //
@@ -205,4 +201,8 @@ angular.module('cloudifyWidgetUiApp')
                 $log.error('error getting pools list - ' + cause.data);
             }
         );
+
+        $scope.navigateTo = function(section) {
+            $location.search('section', section);
+        };
     });
