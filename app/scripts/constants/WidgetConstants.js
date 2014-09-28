@@ -15,5 +15,6 @@ angular.module('cloudifyWidgetUiApp')
     })
     .value('PoolConstants', {
         APPROVAL: [
-            'MANUAL_APPROVAL', 'AUTO_APPROVAL']
+            'MANUAL_APPROVAL', 'AUTO_APPROVAL'
+        ]
     });
