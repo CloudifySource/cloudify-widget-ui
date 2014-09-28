@@ -389,8 +389,8 @@ module.exports = function (grunt) {
             dist: [
                 'compass:dist',
                 'imagemin',
-                'html2js'
-//                'htmlmin'
+//                'html2js'
+                'htmlmin'
             ]
         },
         karma: {
