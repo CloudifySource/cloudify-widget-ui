@@ -1,207 +1,207 @@
 <div id="widgetForm" class="col-md-6">
 
-<div class="jumbotron">
+    <div class="jumbotron">
 
-    <tabset>
-        <tab heading="General" select="navigateTo('general')">
-            <div class="row">
-                <span class="col-md-4">Product Name(*) : </span>
-                <input class="col-md-8" type="text" ng-model="widget.productName"/>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Product Version(*) : </span>
-                <input class="col-md-8" type="text" ng-model="widget.productVersion"/>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Title (*) : </span>
-                <input class="col-md-8" type="text" ng-model="widget.title"/>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Recipe Name (*) : </span>
-                <input class="col-md-8" type="text" ng-model="widget.recipeName"/>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Recipe URL : </span>
-                <input class="col-md-8" type="text" ng-model="widget.recipeUrl"/>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Provider URL (*) : </span>
-                <input class="col-md-8" type="text" ng-model="widget.providerUrl"/>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Pool Id (*): </span>
-                <select class="col-md-8" ng-model="widget.poolId"
-                        ng-options="p.id as p.poolSettings.name for p in userPools"></select>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Installation timeout: (minutes): </span>
-                <input class="col-md-8" type="text" ng-model="widget.installTimeout"/>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Recipe Root Path (*): </span>
-                <input class="col-md-8" type="text" ng-model="widget.recipeRootPath"/>
-                <sup class="col-md-12">the path to the recipe folder inside the downloaded zip</sup>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Recipe Type (*): </span>
-                <select class="col-md-8"> ng-model="widget.recipeType" ng-options="t.id as t.label for t in
-                    recipeTypes"></select>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Uninstall name: </span>
-                <input class="col-md-8" type="text" ng-model="widget.uninstallName"/>
-                <sup class="col-md-12">To enable the widget to stop on remote bootstrap</sup>
-            </div>
-            <br/>
-
-            <div class="row">
-                <strong>Bootstrap</strong>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Active : </span>
-                <input class="col-md-1" type="checkbox" ng-model="widget.remoteBootstrap.active"/>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Form : </span>
-                <select class="col-md-8" ng-model="widget.remoteBootstrap.cloudifyForm"
-                        ng-options="c.id as c.label for c in remoteBootstrapForms"></select>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Cloudify Cloud : </span>
-                <input class="col-md-8" ng-model="widget.remoteBootstrap.cloudifyCloud" type="text"/>
-            </div>
-        </tab>
-        <tab heading="Theme" select="navigateTo('theme')">
-            <div class="row">
-                <span class="col-md-4">Theme : </span>
-                <select class="col-md-8" ng-model="widget.theme" ng-options="c.id as c.label for c in themes"></select>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Embed Video Snippet : </span>
-                <input class="col-md-8" type="text" ng-model="widget.embedVideoSnippet"/>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Show advanced : </span>
-                <input class="col-md-1" type="checkbox" ng-model="widget.showAdvanced"/>
-            </div>
-            <div class="row">
-                <span class="col-md-12">HTML Snippet in Advanced Location ( Use only if show advanced is false, this HTML will display once the widget is played in the same location advanced form is displayed ):</span>
-                <textarea class="col-md-12" ng-model="widget.advancedMessage"></textarea>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Console Link Title : </span>
-                <input class="col-md-8" type="text" ng-model="widget.consoleLink.title"/>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Console Link URL : </span>
-                <input class="col-md-8" type="text" ng-model="widget.consoleLink.url"/>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Console URL Service : </span>
-                <input class="col-md-8" type="text" ng-model="widget.urlService"/>
-                <sup class="col-md-12">required for the link on remote bootstrap</sup>
-            </div>
-
-        </tab>
-        <tab heading="Login" select="navigateTo('login')">
-            <div class="row">
-                <span class="col-md-4">Require Login : </span>
-                <input class="col-md-1" type="checkbox" ng-model="widget.login.require"/>
-            </div>
-            <div class="row">
-                <span class="col-md-12">If "proprietary" login is selected, the widget will do nothing on "play" but send a PostMessage event. <br/>
-                It will wait for the embedding page to invoke the play.<br/>
-                It will look for userId and userKey to verify with Verification URL and Web Service Private Key that the
-                credentials are legitimate
-                </span>
-                <span class="col-md-4">Login Type: </span>
-                <select class="col-md-8" ng-model="widget.login.type" ng-options="c.label for c in loginTypes"></select>
-            </div>
-            <div class="row">
-                <strong> proprietary login details</strong>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Verification URL : </span>
-                <input class="col-md-8" ng-model="widget.login.propVerificationUrl" type="text"/>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Web Service Private Key : </span>
-                <input class="col-md-8" ng-model="widget.login.propServicePrivateKey" type="text"/>
-            </div>
-            <div class="row">
-                <span class="col-md-12">An HTML snippet for description</span>
-                <textarea class="col-md-12" ng-model="widget.description"></textarea>
-            </div>
-            <div class="row">
-                <span class="col-md-12">An HTML snippet for 'end of trial'</span>
-                <textarea class="col-md-12" ng-model="widget.endOfTrialSnippet"></textarea>
-            </div>
-        </tab>
-        <tab heading="Social" select="navigateTo('social')">
-            <div class="row">
-                <span class="col-md-12">
-                    The social login feature is intended for conversion purposes. <br/>
-                    The goal is to get contact information of potential future customers.<br/>
-                    Select which types you want this widget to support
-                </span>
-            </div>
-
-            <p>
-            <div ng-repeat="loginType in availableLoginTypes()">
-                <button class="loginTypeButton" ng-click="addLoginType(loginType)"
-                        ng-class="{'hidden' : loginTypeSelected(loginType) }">
-                    Add {{loginType.label}} Support For Widget
-                </button>
-            </div>
-            <button ng-click="tryItNow(null, widget)">Try Login Now!</button>
-            <i>Please note you should save changes before clicking 'Try Login now'.</i>
-            </p>
-
-            <p>
-            <div ng-repeat="socialLogin in widget.socialLogin.data">
-                <h2>{{getSocialLoginLabel(socialLogin)}}</h2>
-                <input type="checkbox" ng-model="socialLogin.enabled"> Enabled
-                <div ng-show="!isTypeSupportsMailchimp(socialLogin)">
-                    ** This login type does not support mailchimp integration.
+        <tabset>
+            <tab heading="General" select="navigateTo('general')">
+                <div class="row">
+                    <span class="col-md-4">Product Name(*) : </span>
+                    <input class="col-md-8" type="text" ng-model="widget.productName"/>
                 </div>
-                <div ng-show="!!isTypeSupportsMailchimp(socialLogin)">
-                    <input type="checkbox" ng-model="socialLogin.mailchimp"> Send data to mailchimp
+                <div class="row">
+                    <span class="col-md-4">Product Version(*) : </span>
+                    <input class="col-md-8" type="text" ng-model="widget.productVersion"/>
                 </div>
-                <button ng-click="removeSocialLogin(socialLogin)">Remove Social Login</button>
+                <div class="row">
+                    <span class="col-md-4">Title (*) : </span>
+                    <input class="col-md-8" type="text" ng-model="widget.title"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Recipe Name (*) : </span>
+                    <input class="col-md-8" type="text" ng-model="widget.recipeName"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Recipe URL : </span>
+                    <input class="col-md-8" type="text" ng-model="widget.recipeUrl"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Provider URL (*) : </span>
+                    <input class="col-md-8" type="text" ng-model="widget.providerUrl"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Pool Id (*): </span>
+                    <select class="col-md-8" ng-model="widget.poolId"
+                            ng-options="p.id as p.poolSettings.name for p in userPools"></select>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Installation timeout: (minutes): </span>
+                    <input class="col-md-8" type="text" ng-model="widget.installTimeout"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Recipe Root Path (*): </span>
+                    <input class="col-md-8" type="text" ng-model="widget.recipeRootPath"/>
+                    <sup class="col-md-12">the path to the recipe folder inside the downloaded zip</sup>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Recipe Type (*): </span>
+                    <select class="col-md-8" ng-model="widget.recipeType" ng-options="t.id as t.label for t in recipeTypes"></select>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Uninstall name: </span>
+                    <input class="col-md-8" type="text" ng-model="widget.uninstallName"/>
+                    <sup class="col-md-12">To enable the widget to stop on remote bootstrap</sup>
+                </div>
                 <br/>
-                <button ng-click="tryItNow(socialLogin, widget)">Try {{getSocialLoginLabel(socialLogin)}} Login Now!
-                </button>
-            </div>
-            </p>
-        </tab>
-        <tab heading="Mail" select="navigateTo('mail')">
-            <div class="row">
-                <strong> Mailchimp</strong>
-            </div>
-            <div class="row">
-                <span class="col-md-12">
-                    Fill in mailchimp details so we will subscribe users to your list. <br/>
-                    We subscribe the following fields : NAME, LASTNAME. <br/>
-                    All other fields should be optional or otherwise we will fail to publish them.
-                </span>
-            </div>
-            <p>
-            <div class="row">
-                <span class="col-md-4">Enabled : </span>
-                <input class="col-md-1" type="checkbox" ng-model="widget.socialLogin.handlers.mailchimp.enabled"/>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Api Key : </span>
-                <input class="col-md-8" type="text" ng-model="widget.socialLogin.handlers.mailchimp.apiKey"/>
-            </div>
-            <div class="row">
-                <span class="col-md-4">List Id : </span>
-                <input class="col-md-8" type="text" ng-model="widget.socialLogin.handlers.mailchimp.listId"/>
-            </div>
-            <div class="row">
-                <span class="col-md-4">Pass it to parent IFrame using PostMessage : </span>
-                <input class="col-md-1" type="checkbox" ng-model="widget.socialLogin.handlers.postMessage.enabled"/>
-            </div>
-        </tab>
-    </tabset>
+
+                <div class="row">
+                    <strong>Bootstrap</strong>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Active : </span>
+                    <input class="col-md-1" type="checkbox" ng-model="widget.remoteBootstrap.active"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Form : </span>
+                    <select class="col-md-8" ng-model="widget.remoteBootstrap.cloudifyForm"
+                            ng-options="c.id as c.label for c in remoteBootstrapForms"></select>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Cloudify Cloud : </span>
+                    <input class="col-md-8" ng-model="widget.remoteBootstrap.cloudifyCloud" type="text"/>
+                </div>
+            </tab>
+            <tab heading="Theme" select="navigateTo('theme')">
+                <div class="row">
+                    <span class="col-md-4">Theme : </span>
+                    <select class="col-md-8" ng-model="widget.theme" ng-options="c.id as c.label for c in themes"></select>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Embed Video Snippet : </span>
+                    <input class="col-md-8" type="text" ng-model="widget.embedVideoSnippet"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Show advanced : </span>
+                    <input class="col-md-1" type="checkbox" ng-model="widget.showAdvanced"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-12">HTML Snippet in Advanced Location ( Use only if show advanced is false, this HTML will display once the widget is played in the same location advanced form is displayed ):</span>
+                    <textarea class="col-md-12" ng-model="widget.advancedMessage"></textarea>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Console Link Title : </span>
+                    <input class="col-md-8" type="text" ng-model="widget.consoleLink.title"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Console Link URL : </span>
+                    <input class="col-md-8" type="text" ng-model="widget.consoleLink.url"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Console URL Service : </span>
+                    <input class="col-md-8" type="text" ng-model="widget.urlService"/>
+                    <sup class="col-md-12">required for the link on remote bootstrap</sup>
+                </div>
+
+            </tab>
+            <tab heading="Login" select="navigateTo('login')">
+                <div class="row">
+                    <span class="col-md-4">Require Login : </span>
+                    <input class="col-md-1" type="checkbox" ng-model="widget.login.require"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-12">If "proprietary" login is selected, the widget will do nothing on "play" but send a PostMessage event. <br/>
+                    It will wait for the embedding page to invoke the play.<br/>
+                    It will look for userId and userKey to verify with Verification URL and Web Service Private Key that the
+                    credentials are legitimate
+                    </span>
+                    <span class="col-md-4">Login Type: </span>
+                    <select class="col-md-8" ng-model="widget.login.type" ng-options="c.label for c in loginTypes"></select>
+                </div>
+                <div class="row">
+                    <strong> proprietary login details</strong>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Verification URL : </span>
+                    <input class="col-md-8" ng-model="widget.login.propVerificationUrl" type="text"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Web Service Private Key : </span>
+                    <input class="col-md-8" ng-model="widget.login.propServicePrivateKey" type="text"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-12">An HTML snippet for description</span>
+                    <textarea class="col-md-12" ng-model="widget.description"></textarea>
+                </div>
+                <div class="row">
+                    <span class="col-md-12">An HTML snippet for 'end of trial'</span>
+                    <textarea class="col-md-12" ng-model="widget.endOfTrialSnippet"></textarea>
+                </div>
+            </tab>
+            <tab heading="Social" select="navigateTo('social')">
+                <div class="row">
+                    <span class="col-md-12">
+                        The social login feature is intended for conversion purposes. <br/>
+                        The goal is to get contact information of potential future customers.<br/>
+                        Select which types you want this widget to support
+                    </span>
+                </div>
+
+                <p>
+                <div ng-repeat="loginType in availableLoginTypes()">
+                    <button class="loginTypeButton" ng-click="addLoginType(loginType)"
+                            ng-class="{'hidden' : loginTypeSelected(loginType) }">
+                        Add {{loginType.label}} Support For Widget
+                    </button>
+                </div>
+                <button ng-click="tryItNow(null, widget)">Try Login Now!</button>
+                <i>Please note you should save changes before clicking 'Try Login now'.</i>
+                </p>
+
+                <p>
+                <div ng-repeat="socialLogin in widget.socialLogin.data">
+                    <h2>{{getSocialLoginLabel(socialLogin)}}</h2>
+                    <input type="checkbox" ng-model="socialLogin.enabled"> Enabled
+                    <div ng-show="!isTypeSupportsMailchimp(socialLogin)">
+                        ** This login type does not support mailchimp integration.
+                    </div>
+                    <div ng-show="!!isTypeSupportsMailchimp(socialLogin)">
+                        <input type="checkbox" ng-model="socialLogin.mailchimp"> Send data to mailchimp
+                    </div>
+                    <button ng-click="removeSocialLogin(socialLogin)">Remove Social Login</button>
+                    <br/>
+                    <button ng-click="tryItNow(socialLogin, widget)">Try {{getSocialLoginLabel(socialLogin)}} Login Now!
+                    </button>
+                </div>
+                </p>
+            </tab>
+            <tab heading="Mail" select="navigateTo('mail')">
+                <div class="row">
+                    <strong> Mailchimp</strong>
+                </div>
+                <div class="row">
+                    <span class="col-md-12">
+                        Fill in mailchimp details so we will subscribe users to your list. <br/>
+                        We subscribe the following fields : NAME, LASTNAME. <br/>
+                        All other fields should be optional or otherwise we will fail to publish them.
+                    </span>
+                </div>
+                <p>
+                <div class="row">
+                    <span class="col-md-4">Enabled : </span>
+                    <input class="col-md-1" type="checkbox" ng-model="widget.socialLogin.handlers.mailchimp.enabled"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Api Key : </span>
+                    <input class="col-md-8" type="text" ng-model="widget.socialLogin.handlers.mailchimp.apiKey"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">List Id : </span>
+                    <input class="col-md-8" type="text" ng-model="widget.socialLogin.handlers.mailchimp.listId"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Pass it to parent IFrame using PostMessage : </span>
+                    <input class="col-md-1" type="checkbox" ng-model="widget.socialLogin.handlers.postMessage.enabled"/>
+                </div>
+            </tab>
+        </tabset>
+    </div>
 </div>
