@@ -5,9 +5,10 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('AccountPoolEditCtrl', function ($scope, AccountPoolCrudService, $routeParams, $location, $log) {
+    .controller('AccountPoolEditCtrl', function ($scope, AccountPoolCrudService, $routeParams, $location, $log, PoolConstants) {
         $scope.name = 'pools page';
         $scope.poolId = $routeParams.poolId;
+        $scope.poolApprovalModes = PoolConstants.APPROVAL;
 
         $scope.getPool = function () {
             AccountPoolCrudService.getPool($scope.poolId).then(function (result) {
