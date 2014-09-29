@@ -24,7 +24,7 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.save = function() {
             AccountPoolCrudService.updatePool($scope.poolId, $scope.pool.poolSettings).then(function () {
-                $location.path('/pools');
+                $location.path('/pools/' + $scope.poolId);
             }, function(error) {
                 $log.error('Update pool settings failed. ', error);
             });
