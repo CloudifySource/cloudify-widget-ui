@@ -67,6 +67,10 @@
 }
 
 .pool-form {
+  input, select {
+    max-width: 150px;
+  }
+
   &.ng-invalid.ng-dirty {
     input.minmax {
       background: rgba(255, 0, 0, 0.4);
