@@ -69,10 +69,6 @@
 .pool-form {
   margin-top: 20px;
 
-  input, select {
-    max-width: 150px;
-  }
-
   &.ng-invalid.ng-dirty {
     input.minmax {
       background: rgba(255, 0, 0, 0.4);
@@ -92,6 +88,7 @@
   .actions {
     padding: 15px;
     height: 55px;
+
   }
 
 }
@@ -104,15 +101,19 @@
   }
 }
 
-#accountPoolEdit {
+#accountPoolEdit, #accountPoolCreate {
   input {
     padding-right: 0px;
   }
 
   .row {
     &.actions {
-      margin-left: 55px;
+      margin-left: 30px;
       margin-top: 10px;
+
+      button:disabled {
+        opacity: 0.5;
+      }
     }
   }
 }

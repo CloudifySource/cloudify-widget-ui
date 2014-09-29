@@ -75,13 +75,19 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
                 templateUrl: 'views/accountPools.html',
                 controller: 'AccountPoolCtrl'
             })
+            .when('/pools/create', {
+                templateUrl: 'views/accountPoolCreate.html',
+                controller: 'AccountPoolCrudCtrl',
+                reloadOnSearch: false
+            })
             .when('/pools/:poolId', {
                 templateUrl: 'views/accountPool.html',
                 controller: 'AccountPoolCrudCtrl'
             })
             .when('/pools/:poolId/edit', {
                 templateUrl: 'views/accountPoolEdit.html',
-                controller: 'AccountPoolCrudCtrl'
+                controller: 'AccountPoolCrudCtrl',
+                reloadOnSearch: false
             })
 
             .when('/admin/users', {
