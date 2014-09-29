@@ -21,6 +21,12 @@
                 <select class="col-md-7" ng-model="pool.poolSettings.nodeManagement.mode" ng-options="c for c in poolApprovalModes"></select>
             </div>
         </form>
+        <form name="bootstrapScriptForm" class="col-md-5">
+            <div class="row">
+                <span class="col-md-12">Bootstrap script : </span>
+                <textarea class="col-md-12" ng-model="pool.poolSettings.bootstrapProperties.script"></textarea>
+            </div>
+        </form>
     </div>
     <div class="row actions">
         <button ng-click="save()" ng-disabled="poolForm.$invalid">Save</button>
