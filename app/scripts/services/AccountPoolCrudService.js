@@ -19,6 +19,11 @@ angular.module('cloudifyWidgetUiApp')
             this.updatePool = function (poolId, poolSettings) {
                 return $http.post('/backend/user/account/pools/' + poolId, poolSettings);
             };
+
+            this.getPoolStatus = function (poolId) {
+                return $http.get('/backend/user/account/pools/' + poolId + '/status');
+            };
+
         }
 
         return new AccountPoolCrudService();

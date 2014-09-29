@@ -5,7 +5,7 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('AccountPoolEditCtrl', function ($scope, AccountPoolCrudService, $routeParams, $location, $log, PoolConstants) {
+    .controller('AccountPoolCrudCtrl', function ($scope, AccountPoolCrudService, $routeParams, $location, $log, PoolConstants) {
         $scope.name = 'pools page';
         $scope.poolId = $routeParams.poolId;
         $scope.poolApprovalModes = PoolConstants.APPROVAL;
@@ -13,6 +13,12 @@ angular.module('cloudifyWidgetUiApp')
         $scope.getPool = function () {
             AccountPoolCrudService.getPool($scope.poolId).then(function (result) {
                 $scope.pool = result.data;
+            });
+        };
+
+        $scope.getPoolStatus = function () {
+            AccountPoolCrudService.getPoolStatus($scope.poolId).then(function (result) {
+                $scope.poolStatus = result.data;
             });
         };
 
@@ -33,5 +39,5 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         $scope.getPool();
-
+        $scope.getPoolStatus();
     });

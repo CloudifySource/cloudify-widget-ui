@@ -19,7 +19,7 @@
                 <td>{{ pool.id }}</td>
                 <td>{{ pool.accountId }}</td>
                 <td>
-                    <a href="#/pools/{{pool.id}}/edit">
+                    <a href="#/pools/{{pool.id}}">
                         <span ng-show="!!pool.poolSettings.name && pool.poolSettings.name.trim().length > 0">{{pool.poolSettings.name}}</span>
                         <span ng-show="!pool.poolSettings.name || pool.poolSettings.name.trim().length <= 0">[[No Name]]</span>
                     </a>
