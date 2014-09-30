@@ -69,7 +69,7 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         $scope.createPool = function () {
-            AccountPoolCrudService.createPool($scope.pool.poolSettings).then(function (result) {
+            AccountPoolCrudService.createPool($scope.pool.poolSettings).then(function (/*result*/) {
                 $location.path('/pools/');
             }, function(error) {
                 $log.error('Update pool settings failed. ', error);
