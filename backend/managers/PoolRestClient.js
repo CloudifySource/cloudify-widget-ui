@@ -339,7 +339,7 @@ exports.readPoolBootstrapScript = function (poolKey, callback) {
 
 exports.createPool = function (poolKey, poolSettings, callback) {
     logger.info('creating pool for account');
-    call.post('/account/pools', _args().poolKey(poolKey), callback);
+    call.post('/account/pools', _args().poolKey(poolKey).data(poolSettings), callback);
 };
 
 exports.updatePool = function (poolKey, poolId, poolSettings, callback) {
