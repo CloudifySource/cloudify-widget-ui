@@ -27,7 +27,9 @@
                     <button ng-if="node.id" ng-click="pingNode(model.poolId, node.id)">ping</button><br>
                     <div ng-if="node.pingStatus">
                         <span>{{ node.pingStatus.pingStatus }} at {{ node.pingStatus.timestamp | date:"medium" }}</span>
-                        <pre ng-if="node.pingStatus.pingResponses.length > 0">{{ asJson(node.pingStatus.pingResponses) | json }}</pre>
+                        <pre ng-if="node.pingStatus.pingResponses.length > 0 && node.pingStatus.pingStatus != 'PING_SUCCESS'">
+                            {{ asJson(node.pingStatus.pingResponses) | json }}
+                        </pre>
                     </div>
                 </td>
                 <td>
