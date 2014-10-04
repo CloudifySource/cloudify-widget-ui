@@ -10,6 +10,70 @@ var managers = require('../managers');
 var conf = require('../Conf');
 var models = require('../models');
 
+
+/**
+ *
+ *
+ *  This class takes care of playing a widget
+ *
+ *
+ *  it uses the async library and maintains 'curry params' for each request.
+ *
+ *  this 'curry params' look like so:
+ *
+ *
+ *  {
+ *
+ *      'widgetId' : 'the widget id',
+ *      'widget' : 'the widget untouched',
+ *      'poolKey' : 'the pool key',
+ *      'executionObjectId' : 'the execution object id',
+ *      'executionId' : 'the execution id as string',
+ *      'executionDownloadsPath' : 'the download path to download stuff to',
+ *      'executionLogsPath' : 'the logs path for the execution'
+ *      'shouldInstall' : 'whether or not we should install',
+ *      'nodeModel' : 'the node model we are occupying',
+ *
+ *
+ *      'cloudDistFolderName' : 'the clouds folder inside cloudify',
+ *      'cloudDistFolder' : 'the clouds folder',
+ *      'advancedParams' : 'adavnced params to send to the cloud properties'
+ *
+ *      'stopCallback' : 'callback for stop',
+ *      'executionModel' : 'the execution model',
+ *      'playCallback' : 'callback for playing'
+ *
+ *  }
+ *
+ *
+ *
+ *
+ *
+ */
+
+
+/**
+ *
+ *
+ *  if specified on curry params:
+ *      - Send email after installation.
+ *      - update execution model whether email sent successfully or not.
+ *
+ */
+function sendEmailAfterInstall(){
+
+
+    //todo : fill in here the rest of the data
+    var data = {
+        async:true
+    };
+
+    services.mandrill.sendMandrillTemplate( data,
+        function(/*err, result*/){
+            // todo : fill in here whether email sent successfully or not
+    });
+}
+
 function getTempSuffix() {
     var currTime = '' + new Date().getTime();
     return currTime.substring(currTime.length - 4);
@@ -206,9 +270,14 @@ function _runInstallCommand(curryParams, curryCallback) {
 
         services.logs.writeStatus(JSON.stringify(status, null, 4) + '\n', curryParams.executionId);
         services.logs.appendOutput('Install finished successfully.\n', curryParams.executionId);
+
+        sendEmailAfterInstall( curryParams );
+
         curryCallback(null, curryParams);
         return;
     }
+
+    // else - !!curryParams.shouldInstall
 
     var installPath = curryParams.executionDownloadsPath;
     if (!!curryParams.widget.recipeRootPath) {
@@ -235,8 +304,11 @@ function _runInstallCommand(curryParams, curryCallback) {
     // we want to remove the execution model when the execution is over
     services.cloudifyCli.executeCommand(command, function (exErr/*, exResult*/) {
         if (!!exErr) {
-            logger.error(exErr);
+            logger.error('error while running install from cli',exErr);
+            return;
         }
+
+        sendEmailAfterInstall( curryParams );
         // TODO change execution status
     });
 
