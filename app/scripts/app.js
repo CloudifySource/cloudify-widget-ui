@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngResource', 'ngSanitize', 'ui.bootstrap', 'gsUiInfraApp', 'widget-ui-tpls'])
+angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngResource', 'ngSanitize', 'ui.bootstrap', 'gsUiInfraApp'])
 // register the interceptor as a service
     .factory('myHttpInterceptor', function ($q, $rootScope, $location) {
         var $scope = $rootScope;
@@ -75,9 +75,19 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
                 templateUrl: 'views/accountPools.html',
                 controller: 'AccountPoolCtrl'
             })
+            .when('/pools/create', {
+                templateUrl: 'views/accountPoolCreate.html',
+                controller: 'AccountPoolCrudCtrl',
+                reloadOnSearch: false
+            })
+            .when('/pools/:poolId', {
+                templateUrl: 'views/accountPool.html',
+                controller: 'AccountPoolCrudCtrl'
+            })
             .when('/pools/:poolId/edit', {
-                templateUrl: 'views/accountPoolsEdit.html',
-                controller: 'AccountPoolEditCtrl'
+                templateUrl: 'views/accountPoolEdit.html',
+                controller: 'AccountPoolCrudCtrl',
+                reloadOnSearch: false
             })
 
             .when('/admin/users', {

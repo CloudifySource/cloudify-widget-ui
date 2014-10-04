@@ -18,12 +18,12 @@
 
 // hide multiple layouts layers for "logged-in-layout" - means that if I have 2 pages one within another with the layout, the other layout will be hidden.
 #logged-in-layout {
-  .logged-in-layout .logged-in-layout.nested-hidden {
-    display: none;
+  .logged-in-layout .require-login {
+    display: none !important;
 
   }
   .require-login {
-    display: none
+    display: none;
   }
 
   .header {
@@ -41,10 +41,11 @@
     width: 100%;
 
     .require-login {
-      display: block
+      display: block;
+
     }
     .logged-out {
-      display: none
+      display: none;
     }
 
   }
@@ -67,6 +68,8 @@
 }
 
 .pool-form {
+  margin-top: 20px;
+
   &.ng-invalid.ng-dirty {
     input.minmax {
       background: rgba(255, 0, 0, 0.4);
@@ -86,19 +89,32 @@
   .actions {
     padding: 15px;
     height: 55px;
+
   }
 
 }
 
-#accountPoolEdit {
+#accountPoolDetails {
+  .jumbotron {
+    padding: 24px 30px 24px 30px;
+    border-radius: 10px;
+    margin-top: 10px;
+  }
+}
+
+#accountPoolEdit, #accountPoolCreate {
   input {
     padding-right: 0px;
   }
 
   .row {
     &.actions {
-      margin-left: 55px;
+      margin-left: 30px;
       margin-top: 10px;
+
+      button:disabled {
+        opacity: 0.5;
+      }
     }
   }
 }

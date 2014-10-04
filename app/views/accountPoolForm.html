@@ -1,0 +1,77 @@
+<div class="row">
+    <form name="poolForm" class="pool-form col-md-5">
+        <tabset>
+            <tab heading="General" select="navigateTo('general')">
+                <div class="row">
+                    <span class="col-md-5">Pool name (*) : </span>
+                    <input name="name" class="col-md-7" ng-model="poolSettings.name" placeholder="Pool name" required>
+                </div>
+                <div class="row">
+                    <span class="col-md-5">Min nodes : </span>
+                    <input name="minNodes" class="minmax col-md-7" type="number" ng-model="poolSettings.minNodes"
+                           ng-change="validate(poolForm)" required>
+                </div>
+                <div class="row">
+                    <span class="col-md-5">Max nodes : </span>
+                    <input name="maxNodes" class="minmax col-md-7" type="number" ng-model="poolSettings.maxNodes"
+                           ng-change="validate(poolForm)" required>
+                </div>
+                <div class="row">
+                    <span class="col-md-5">Approval mode : </span>
+                    <select class="col-md-7" ng-model="poolSettings.nodeManagement.mode"
+                            ng-options="c for c in poolApprovalModes"></select>
+                </div>
+            </tab>
+
+            <tab heading="Connection Details" select="navigateTo('connection')">
+                <div class="row">
+                    <span class="col-md-5">User name (*) : </span>
+                    <input name="userName" class="col-md-7" ng-model="poolSettings.provider.connectDetails.username" required>
+                </div>
+                <div class="row">
+                    <span class="col-md-5">Key (*) : </span>
+                    <input name="key" class="col-md-7" ng-model="poolSettings.provider.connectDetails.key" required>
+                </div>
+                <div class="row">
+                    <span class="col-md-5">Network ID (*) : </span>
+                    <input name="networkId" class="col-md-7" ng-model="poolSettings.provider.connectDetails.networkId" required>
+                </div>
+            </tab>
+            <tab heading="Machine Options" select="navigateTo('machine')">
+                <div class="row">
+                    <span class="col-md-5">Pool prefix : </span>
+                    <input name="prefix" class="col-md-7" ng-model="poolSettings.provider.machineOptions.mask">
+                </div>
+                <div class="row">
+                    <span class="col-md-5">OS Family (*) : </span>
+                    <input name="osFamily" class="col-md-7" ng-model="poolSettings.provider.machineOptions.osFamily" required>
+                </div>
+                <div class="row">
+                    <span class="col-md-5">Location ID (*) : </span>
+                    <input name="locationId" class="col-md-7" ng-model="poolSettings.provider.machineOptions.locationId" required>
+                </div>
+                <div class="row">
+                    <span class="col-md-5">Hardware ID (*) : </span>
+                    <input name="hardwareId" class="col-md-7" ng-model="poolSettings.provider.machineOptions.hardwareId" required>
+                </div>
+            </tab>
+
+        </tabset>
+    </form>
+    <form name="bootstrapScriptForm" class="col-md-5">
+        <div class="row">
+            <span class="col-md-12">Bootstrap script : </span>
+            <textarea class="col-md-12" ng-model="poolSettings.bootstrapProperties.script"></textarea>
+        </div>
+    </form>
+</div>
+
+<div class="row">
+    <span class="col-md-12" ng-show="poolForm.$error.required">Please make sure all required fields are not empty.</span>
+    <span class="col-md-12" ng-show="poolForm.$error.minmax">Min nodes must be lower than Max nodes.</span>
+    <span class="col-md-12" ng-show="poolForm.$error.number">Min and Max nodes are numeric values only.</span>
+</div>
+
+<div class="row actions">
+    <button ng-click="actionClicked()" ng-disabled="poolForm.$invalid">{{actionCaption}}</button>
+</div>
