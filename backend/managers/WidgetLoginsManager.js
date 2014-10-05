@@ -157,19 +157,7 @@ exports.handleWidgetLogin = function (loginTypeId, widgetId, loginDetails, callb
         exports.saveLoginToDb({  'type': loginType.id, 'timestamp': new Date().getTime(), 'widgetId': widget._id, 'userId': widget.userId, 'uid': uid, 'loginDetails': loginDetails }, callback);
 
         // get login configuration from widget
-
-        var socialLogin = null;
-        if (!!widget.socialLogin && !!widget.socialLogin.data && widget.socialLogin.data.hasOwnProperty('length') && widget.socialLogin.data.length > 0) {
-            var loginDataArray = widget.socialLogin.data;
-            for (var i = 0; i < loginDataArray.length; i++) {
-                if (loginDataArray[i].id === loginType.id) {
-                    socialLogin = loginDataArray[i];
-                    break;
-                }
-            }
-        }
-
-        if (!!loginType && !!loginType.data && !!loginType.data.mailchimp && !!socialLogin && !!socialLogin.mailchimp) {
+        if (!!loginType && !!loginType.data && !!loginType.data.mailchimp) {
             _sendToMailchimp(widget, { 'NAME': name, 'LASTNAME': lastName, 'email': email});
         } else {
             logger.info('socialLogin ' + loginType.id + ' either does not support mailchimp or is configured to not send data to mailchimp. skipping mailchimp');

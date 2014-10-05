@@ -20,6 +20,26 @@ function createMailchimpAPI( apiKey ){
     return api;
 }
 
+function callListsApi (method, command, callback) {
+    logger.info('mailchimp API method', method, ' with command', command);
+
+    callback = typeof(callback) === 'function' && callback || function(){};
+
+    var api = createMailchimpAPI( command.apikey, command.id );
+
+    api.call('lists', method, command, function (error, data) {
+        if (!!error) {
+            logger.error('unable to ', method, error);
+            callback(error);
+
+        } else {
+            logger.info('------- ', method, ' successfully completed:');
+            logger.info(JSON.stringify(data, null, 2)); // Do something with your data!
+            callback(error, data);
+        }
+    });
+}
+
 /**
  * This method allows to associate(subscribe) new member
  * @param command, is JSON, example:
@@ -40,24 +60,12 @@ function createMailchimpAPI( apiKey ){
  * @param callback funaction
  */
 exports.subscribe = function( command, callback ){
-    logger.info('subscribing', command);
-
-    callback = typeof(callback) === 'function' && callback || function(){};
-
-    var api = createMailchimpAPI( command.apikey, command.id );
-
-    api.call('lists', 'subscribe', command, function (error, data) {
-        if (!!error){
-            logger.error('unable to subscribe', error);
-            callback(error);
-        }
-        else {
-            logger.info('----subscribe successfully completed:');
-            logger.info(JSON.stringify(data, null, 2)); // Do something with your data!
-        }
-    });
+    callListsApi('subscribe', command, callback);
 };
 
+exports.list = function(command, callback) {
+    callListsApi('list', command, callback);
+};
 /**
  * This method allows to diassociate(unsubscribe) assiciated member
  * @param command, is JSON, example: { "apikey":"Your_api_key","id":"Your_list_id","email":{"email": "Your_proper_mail" } }
@@ -66,24 +74,7 @@ exports.subscribe = function( command, callback ){
  * @param callback funaction
  */
 exports.unsubscribe = function( command, callback ){
-
-    var api = createMailchimpAPI( command.apikey, command.id );
-
-    callback = typeof(callback) === 'function' ? callback : function(){};
-
-    api.call('lists', 'unsubscribe', command, function (err/*, data*/) {
-        if (err) {
-            logger.error('unable to unsubscribe from mailchimp',err);
-            callback(err);
-            return;
-        }
-        else {
-            logger.info('unsubscribed from mailchimp successfully');
-            callback();
-//            logger.debug(JSON.stringify(data, null, 2)); // Do something with your data!
-        }
-
-    });
+    callListsApi('unsubscribe', command, callback);
 };
 
 if ( require.main === module ) {
