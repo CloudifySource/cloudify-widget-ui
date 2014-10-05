@@ -27,7 +27,8 @@
         "passport-strategy": "~1.0.0",
         "download": "~0.1.17",
         "fs-extra": "~0.10.0",
-        "aws-sdk": "~2.0.8"
+        "aws-sdk": "~2.0.8",
+        "mandrill-api": "~1.0.40"
     },
     "devDependencies": {
         "time-grunt": "~0.3.2",
@@ -96,7 +97,8 @@
         "download",
         "fs-extra",
         "password",
-        "aws-sdk"
+        "aws-sdk",
+        "mandrill-api"
     ],
     "engines": {
         "node": ">=0.8.0"
