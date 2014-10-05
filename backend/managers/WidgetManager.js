@@ -60,7 +60,7 @@ var models = require('../models');
  *      - update execution model whether email sent successfully or not.
  *
  */
-function sendEmailAfterInstall(){
+function sendEmailAfterInstall(curryParams){
 
 
     //todo : fill in here the rest of the data

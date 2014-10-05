@@ -1,4 +1,4 @@
-
+'use strict';
 var logger = require('log4js').getLogger('testMandrillService');
 
 var conf = require('../backend/Conf');
