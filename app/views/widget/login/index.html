@@ -3,7 +3,7 @@
 <div>
     <div ng-repeat="login in loginTypes(widget.socialLogin.data)" class="thumb">
         <a ng-href="/backend/widgets/{{widget._id}}/login/{{login.id}}">
-            <img src="images/login/{{login.id}}.png">
+            <div class="social-login-icon login-{{login.id}}"></div>
         </a>
     </div>
 </div>

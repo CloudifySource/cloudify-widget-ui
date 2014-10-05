@@ -21,3 +21,35 @@
       height: 64px;
     }
   }
+
+  .social-login-icon {
+    background-repeat: no-repeat;
+    background-size: 96px 96px;
+    width: 96px;
+    height: 96px;
+
+    &.login-google {
+      background-image: url('../images/login/google.png');
+    }
+
+    &.login-custom {
+      background-image: url('../images/login/custom.png');
+    }
+
+    &.login-facebook {
+      background-image: url('../images/login/facebook.png');
+    }
+
+    &.login-github {
+      background-image: url('../images/login/github.png');
+    }
+
+    &.login-linkedin {
+      background-image: url('../images/login/linkedin.png');
+    }
+
+    &.login-twitter {
+      background-image: url('../images/login/twitter.png');
+    }
+
+  }
