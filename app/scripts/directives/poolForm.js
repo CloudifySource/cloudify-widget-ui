@@ -7,7 +7,7 @@
 angular.module('cloudifyWidgetUiApp')
     .directive('poolForm', function ( $log, $location, PoolConstants) {
         return {
-            templateUrl: 'views/accountPoolForm.html',
+            templateUrl: 'views/directives/accountPoolForm.html',
             restrict: 'A',
             scope: { poolSettings: '=', actionCallback:'&', actionCaption:'@' },
             link: function (scope/*, element, attrs*/) {
