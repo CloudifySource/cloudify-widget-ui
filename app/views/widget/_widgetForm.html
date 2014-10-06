@@ -201,6 +201,25 @@
                     <span class="col-md-4">Pass it to parent IFrame using PostMessage : </span>
                     <input class="col-md-1" type="checkbox" ng-model="widget.socialLogin.handlers.postMessage.enabled"/>
                 </div>
+                <div class="row">
+                    <strong> Mandrill</strong>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Enabled : </span>
+                    <input class="col-md-1" type="checkbox" ng-model="widget.socialLogin.handlers.mandrill.enabled"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Template name (*): </span>
+                    <input class="col-md-8" type="text" ng-model="widget.socialLogin.handlers.mandrill.templateName"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Api Key (*): </span>
+                    <input class="col-md-8" type="text" ng-model="widget.socialLogin.handlers.mandrill.apiKey"/>
+                </div>
+                <div class="row">
+                    <span class="col-md-4">Email link title : </span>
+                    <input class="col-md-8" type="text" ng-model="widget.socialLogin.handlers.mandrill.emailLinkTitle"/>
+                </div>
             </tab>
         </tabset>
     </div>
