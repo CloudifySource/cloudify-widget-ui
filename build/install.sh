@@ -36,6 +36,7 @@ upgrade_main(){
     fi
 
     AVAILABLE_BUILD_ID=`wget --no-cache --no-check-certificate -O - $BUILD_ID_URL`
+    INSTALL_LOCATION=/var/www/cloudify-widget-ui/package
 
     if [ "$AVAILABLE_BUILD_ID" != "$CURRENT_BUILD_ID" ];then
         PACKAGE_URL=http://get.gsdev.info/cloudify-widget-ui/1.0.0/cloudify-widget-ui-1.0.0.tgz
@@ -58,7 +59,6 @@ upgrade_main(){
 
 
         echo "installing initd script"
-        INSTALL_LOCATION=/var/www/cloudify-widget-ui/package
         echo "installing service script under widget-ui"
         SERVICE_NAME=widget-ui SERVICE_FILE=$INSTALL_LOCATION/build/service.sh install_initd_script
 
