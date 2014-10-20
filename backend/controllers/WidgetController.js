@@ -132,7 +132,7 @@ exports.play = function (req, res) {
     if (req.body.remote) {
         managers.widget.playRemote(req.params.widgetId, req.body.advancedParams, playCallback);
     } else {
-        managers.widget.play(req.params.widgetId, playCallback);
+        managers.widget.play(req.params.widgetId, req.body.loginDetailsId, playCallback);
     }
 };
 

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetCrudCtrl', function ($scope, $routeParams, $log, LoginTypesService, WidgetsService, $location, WidgetThemesService, $window /*,$timeout*/) {
+    .controller('WidgetCrudCtrl', function ($scope, $routeParams, $log, LoginTypesService, WidgetsService, $location, WidgetThemesService, LoginService/*,$timeout*/) {
 
         $scope.availableLoginTypes = function () {
             return LoginTypesService.getAll();
@@ -23,8 +23,10 @@ angular.module('cloudifyWidgetUiApp')
 
         // use this with the following from the popup window:
         //
-        $scope.loginDone = function () {
+        $scope.loginDone = function (loginDetailsId) {
             $log.info('login is done');
+            $scope.loginDetailsId = loginDetailsId;
+
             if (popupWindow !== null) {
                 popupWindow.close();
                 popupWindow = null;
@@ -34,21 +36,7 @@ angular.module('cloudifyWidgetUiApp')
         var popupWindow = null;
 
         $scope.tryItNow = function (socialLogin, widget) {
-            $window.$windowScope = $scope;
-
-            var size = LoginTypesService.getIndexSize();
-
-            var left = (screen.width / 2) - (size.width / 2);
-            var top = (screen.height / 2) - (size.height / 2);
-
-            var url = null;
-            if (socialLogin === null) {
-                url = '/#/widgets/' + $scope.widget._id + '/login/index';
-            } else {
-                url = '/backend/widgets/' + widget._id + '/login/' + socialLogin.id;
-            }
-
-            popupWindow = window.open(url, 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + size.width + ', height=' + size.height + ', top=' + top + ', left=' + left);
+            popupWindow = LoginService.performSocialLogin(socialLogin, widget, $scope);
         };
 
         $scope.isTypeSupportsMailchimp = function (socialLogin) {

@@ -1,14 +1,15 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window, $routeParams, PostParentService, $localStorage, $timeout, WidgetConstants) {
+    .controller('WidgetCtrl', function ($scope, LoginService, LoginTypesService, WidgetsService, $log, $window, $routeParams, PostParentService, $localStorage, $timeout, $interval, WidgetConstants) {
 
         $log.info('loading widget controller : ' + new Date().getTime());
         // we need to hold the running state to determine when to stop sending status/output messages back
         $scope.widgetStatus = {};
         var STATE_RUNNING = 'RUNNING';
         var STATE_STOPPED = 'STOPPED';
-
+        var step;
+        var popupWindow = null;
 
         // when there's an executionId, lets start polling...
         $scope.$watch('executionId', function( newValue, oldValue ){
@@ -24,7 +25,13 @@ angular.module('cloudifyWidgetUiApp')
             }
         });
 
+        // this is to first init the widget on the scope with the bare minimum - the id.
+        // then, async, go fetch the entire thing and override.
         $scope.widget =  {  '_id' : $routeParams.widgetId };
+        WidgetsService.getPublicWidget($routeParams.widgetId).then(function (result) {
+            $scope.widget = result.data;
+        });
+
         $scope.executionId = null;
 
         function saveState(){
@@ -43,14 +50,57 @@ angular.module('cloudifyWidgetUiApp')
             }
         }
 
+        // use this with the following from the popup window:
+        // this is called when social logic is complete to close the popup and store the loginDetailsId.
+        $scope.loginDone = function (loginDetailsId) {
+            $log.info('login is done');
+            $scope.loginDetailsId = loginDetailsId;
 
+            if (popupWindow !== null) {
+                popupWindow.close();
+                popupWindow = null;
+            }
+        };
 
         function play (widget, advancedParams, isRemoteBootstrap) {
+            //check if social login is required
+            var socialLoginRequired = false;
+            if (widget.socialLogin && widget.socialLogin.data && widget.socialLogin.data.length !== 0) {
+                for (var i = 0; i < widget.socialLogin.data.length; i++) {
+                    // if any of those is enabled, then social login is required.
+                    var sl = widget.socialLogin.data[i];
+                    if (sl.enabled) {
+                        socialLoginRequired = true;
+                        break;
+                    }
+                }
+            }
+
+            if (socialLoginRequired) {
+                // show the social login popup
+                popupWindow = LoginService.performSocialLogin(/*socialLogin*/null, widget, $scope);
+            }
+
+            step = $interval(function() {
+                // because social login is async, we test here every second if authenticated or login not required.
+                if (!socialLoginRequired || $scope.loginDetailsId) {
+                    // no login is required or already authenticated.
+                    playInternal(widget, advancedParams, isRemoteBootstrap);
+
+                    // stop interval
+                    $interval.cancel(step);
+                    step = undefined;
+                }
+            }, 1000);
+
+        }
+
+        function playInternal (widget, advancedParams, isRemoteBootstrap) {
             $log.info('playing widget');
             _resetWidgetStatus();
             $scope.widgetStatus.state = STATE_RUNNING;
 
-            WidgetsService.playWidget(widget, advancedParams, isRemoteBootstrap)
+            WidgetsService.playWidget(widget, advancedParams, isRemoteBootstrap, $scope.loginDetailsId)
                 .then(function (result) {
                     $log.info(['play result', result]);
 
@@ -62,6 +112,14 @@ angular.module('cloudifyWidgetUiApp')
                     $log.info(['play error', err]);
                 });
         }
+
+        // stop interval on destroy
+        $scope.$on('$destroy', function() {
+            if (angular.isDefined(step)) {
+                $interval.cancel(step);
+                step = undefined;
+            }
+        });
 
         function parentLoaded(){
             $log.info('posting widget_loaded message');

@@ -60,18 +60,74 @@ var models = require('../models');
  *      - update execution model whether email sent successfully or not.
  *
  */
-function sendEmailAfterInstall(/*curryParams*/){
+function sendEmailAfterInstall(curryParams){
+    if (!curryParams.widget.socialLogin.handlers.mandrill || !curryParams.widget.socialLogin.handlers.mandrill.enabled) {
+        // noop
+        return;
+    }
 
+    var mandrillConfig = curryParams.widget.socialLogin.handlers.mandrill;
+    var publicIp = curryParams.nodeModel.machineSshDetails.publicIp;
+    var link = '<a href="http://"' + publicIp + '> http://' + publicIp + '</a>';
 
-    //todo : fill in here the rest of the data
-    var data = {
-        async:true
-    };
+    managers.widgetLogins.getWidgetLoginById(curryParams.loginDetailsId, function(err, result) {
+        if (!!err) {
+            logger.error('unable to find login details, email send failed', err);
+            return;
+        }
 
-    services.mandrill.sendMandrillTemplate( data,
-        function(/*err, result*/){
-            // todo : fill in here whether email sent successfully or not
+        if (!result) {
+            logger.error('result is null for login details find, email send failed');
+            return;
+        }
+
+        var fullname = result.loginDetails.name + ' ' + result.loginDetails.lastName;
+
+        var data = {
+            'apiKey': mandrillConfig.apiKey,
+            'template_name': mandrillConfig.templateName,
+            'template_content': [
+                {
+                    'name': 'link',
+                    'content': link
+                },
+                {
+                    'name': 'name',
+                    'content': fullname
+                },
+                {
+                    'name': 'randomValue',
+                    'content': curryParams.nodeModel.randomValue
+                },
+                {
+                    'name' : 'publicIp',
+                    'content' : publicIp
+                }
+            ],
+            'message': {
+                'to':[
+                    {
+                        'email':result.loginDetails.email,
+                        'name': fullname,
+                        'type': 'to'
+                    }
+                ]
+            },
+            'async':true
+        };
+
+        services.mandrill.sendMandrillTemplate( data,
+            function(err, result){
+                if (!!err) {
+                    curryParams.widget.socialLogin.handlers.mandrill.status = err;
+                } else {
+                    curryParams.widget.socialLogin.handlers.mandrill.status = result;
+                }
+            });
+
     });
+
+
 }
 
 function getTempSuffix() {
@@ -133,6 +189,8 @@ function _createExecutionModel(curryParams, curryCallback) {
         // instantiate the execution model with the widget data, and remove the _id - we want mongodb to generate a unique id
         var executionModel = {};
         executionModel.widget = curryParams.widget;
+        executionModel.loginDetailsId = curryParams.loginDetailsId;
+
         collection.insert(executionModel, function (err, docsInserted) {
             if (!!err) {
                 logger.error('failed creating widget execution model', err);
@@ -360,7 +418,7 @@ function _overrideCloudPropertiesFile(curryParams, curryCallback) {
         var username = advancedParams.SOFTLAYER.params.username;
         var apiKey = advancedParams.SOFTLAYER.params.apiKey;
         updateLine =
-            'user="' + username + '"\n' +
+            'user=' + username + '\n' +
             'apiKey="' + apiKey + '"';
     }
     else if (advancedParams.HP) {
@@ -497,14 +555,14 @@ function _stopFinally(err, curryParams) {
     curryParams.stopCallback(null, {});
 }
 
-exports.play = function (widgetId, playCallback) {
+exports.play = function (widgetId, loginDetailsId, playCallback) {
 
     async.waterfall([
 
             function initCurryParams(callback) {
                 var initialCurryParams = {
                     widgetId: widgetId,
-
+                    loginDetailsId: loginDetailsId,
                     playCallback: playCallback
                 };
                 callback(null, initialCurryParams);

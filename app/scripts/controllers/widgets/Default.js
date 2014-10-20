@@ -103,7 +103,6 @@ angular.module('cloudifyWidgetUiApp')
 //                popupWindow = $window.open('/#/widgets/' + $scope.widget._id + '/login/index', 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + size.width + ', height=' + size.height + ', top=' + top + ', left=' + left);
 //                return;
 //            }
-
             _resetWidgetStatus();
             $scope.output = '';
             $scope.widgetState = STATE_RUNNING;
@@ -111,7 +110,6 @@ angular.module('cloudifyWidgetUiApp')
 //            console.log('advanced params: ', advancedParams, '_hasAdvanced()=', _hasAdvanced());
 
             _postPlay($scope.widget, /*advancedParams*/null, /*_isRemoteBootstrap()*/false);
-
         };
 
         $scope.stop = function () {
