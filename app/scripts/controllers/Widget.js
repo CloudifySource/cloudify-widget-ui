@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetCtrl', function ($scope, LoginService, LoginTypesService, WidgetsService, $log, $window, $routeParams, PostParentService, $localStorage, $timeout, $interval, WidgetConstants) {
+    .controller('WidgetCtrl', function ($scope, LoginService, LoginTypesService, WidgetsService, $log, $window, $routeParams, PostParentService, $localStorage, $timeout, WidgetConstants) {
 
         $log.info('loading widget controller : ' + new Date().getTime());
         // we need to hold the running state to determine when to stop sending status/output messages back
@@ -51,7 +51,7 @@ angular.module('cloudifyWidgetUiApp')
         }
 
         // use this with the following from the popup window:
-        // this is called when social logic is complete to close the popup and store the loginDetailsId.
+        // this is called when social logic is complete.
         $scope.loginDone = function (loginDetailsId) {
             $log.info('login is done');
             $scope.loginDetailsId = loginDetailsId;
@@ -60,6 +60,9 @@ angular.module('cloudifyWidgetUiApp')
                 popupWindow.close();
                 popupWindow = null;
             }
+
+            // social login is complete, now play.
+            playInternal();
         };
 
         function play (widget, advancedParams, isRemoteBootstrap) {
@@ -76,31 +79,25 @@ angular.module('cloudifyWidgetUiApp')
                 }
             }
 
+            $scope.widget = widget;
+            $scope.advancedParams = advancedParams;
+            $scope.isRemoteBootstrap = isRemoteBootstrap;
+
             if (socialLoginRequired) {
                 // show the social login popup
                 popupWindow = LoginService.performSocialLogin(/*socialLogin*/null, widget, $scope);
+            } else {
+                // no social login, just play.
+                playInternal();
             }
-
-            step = $interval(function() {
-                // because social login is async, we test here every second if authenticated or login not required.
-                if (!socialLoginRequired || $scope.loginDetailsId) {
-                    // no login is required or already authenticated.
-                    playInternal(widget, advancedParams, isRemoteBootstrap);
-
-                    // stop interval
-                    $interval.cancel(step);
-                    step = undefined;
-                }
-            }, 1000);
-
         }
 
-        function playInternal (widget, advancedParams, isRemoteBootstrap) {
+        function playInternal () {
             $log.info('playing widget');
             _resetWidgetStatus();
             $scope.widgetStatus.state = STATE_RUNNING;
 
-            WidgetsService.playWidget(widget, advancedParams, isRemoteBootstrap, $scope.loginDetailsId)
+            WidgetsService.playWidget($scope.widget, $scope.advancedParams, $scope.isRemoteBootstrap, $scope.loginDetailsId)
                 .then(function (result) {
                     $log.info(['play result', result]);
 
@@ -112,14 +109,6 @@ angular.module('cloudifyWidgetUiApp')
                     $log.info(['play error', err]);
                 });
         }
-
-        // stop interval on destroy
-        $scope.$on('$destroy', function() {
-            if (angular.isDefined(step)) {
-                $interval.cancel(step);
-                step = undefined;
-            }
-        });
 
         function parentLoaded(){
             $log.info('posting widget_loaded message');

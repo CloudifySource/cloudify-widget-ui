@@ -105,7 +105,7 @@ angular.module('cloudifyWidgetUiApp')
 //            }
             _resetWidgetStatus();
             $scope.output = '';
-            $scope.widgetState = STATE_RUNNING;
+//            $scope.widgetState = STATE_RUNNING;
 //            var advancedParams = _hasAdvanced() ? _getAdvanced() : null;
 //            console.log('advanced params: ', advancedParams, '_hasAdvanced()=', _hasAdvanced());
 
@@ -169,6 +169,7 @@ angular.module('cloudifyWidgetUiApp')
                 }
 
                 if (data.name === WidgetConstants.PLAYED) {
+                    $scope.widgetState = STATE_RUNNING;
                     $scope.executionId = data.executionId;
                 }
 
