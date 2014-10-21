@@ -69,14 +69,7 @@ angular.module('cloudifyWidgetUiApp')
             //check if social login is required
             var socialLoginRequired = false;
             if (widget.socialLogin && widget.socialLogin.data && widget.socialLogin.data.length !== 0) {
-                for (var i = 0; i < widget.socialLogin.data.length; i++) {
-                    // if any of those is enabled, then social login is required.
-                    var sl = widget.socialLogin.data[i];
-                    if (sl.enabled) {
-                        socialLoginRequired = true;
-                        break;
-                    }
-                }
+                socialLoginRequired = $scope.find( widget.socialLogin.data, { 'enabled' : true} ) !== undefined;
             }
 
             $scope.widget = widget;
