@@ -8,7 +8,6 @@ angular.module('cloudifyWidgetUiApp')
         $scope.widgetStatus = {};
         var STATE_RUNNING = 'RUNNING';
         var STATE_STOPPED = 'STOPPED';
-        var step;
         var popupWindow = null;
 
         // when there's an executionId, lets start polling...
