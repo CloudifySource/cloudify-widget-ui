@@ -91,7 +91,7 @@ module.exports = function (grunt) {
                     host: '127.0.0.1',
                     port: 9001,
                     https: false,
-                    changeOrigin: true,
+                    changeOrigin: false,
                     xforward: false
                 }
             ],

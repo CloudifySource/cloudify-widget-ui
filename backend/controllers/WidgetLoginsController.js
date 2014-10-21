@@ -232,7 +232,7 @@ exports.getTypes = function (req, res/*, next */) {
     res.send(managers.widgetLogins.getLoginTypes());
 };
 
-var closePopupResponse = '<html><body><script>window.opener.$windowScope.loginDone( );</script></body></html>';
+var closePopupResponse = '<html><body><script>window.opener.$windowScope.loginDone("__id__");</script></body></html>';
 
 function _loginCallback(req, res) {
     return function (err, loginModel) {
@@ -246,8 +246,7 @@ function _loginCallback(req, res) {
             return;
         }
 
-        req.session.socialLoginId = loginModel._id;
-        res.send(200, closePopupResponse);
+        res.send(200, closePopupResponse.replace('__id__', loginModel._id));
     };
 }
 

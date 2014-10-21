@@ -79,6 +79,16 @@ exports.getWidgetLoginsByType = function (userId, type, callback) {
     });
 };
 
+exports.getWidgetLoginById = function (loginDetailsId, callback) {
+    dbManager.connect('widgetLogin', function (db, collection, done) {
+        collection.findOne({ '_id': dbManager.toObjectId(loginDetailsId) }, function (err, result) {
+            done();
+            callback(err, result);
+            return;
+        });
+    });
+};
+
 exports.getWidgetLogins = function (userId, callback) {
     dbManager.connect('widgetLogin', function (db, collection, done) {
         collection.find({ 'userId': userId }).toArray(function (err, result) {
