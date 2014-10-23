@@ -129,6 +129,7 @@ domain.run(function () {
     app.post('/backend/admin/pools/:poolId/decisions/:decisionId/approved/:approved', controllers.pool.updatePoolDecisionApproval);
 
     app.get('/backend/admin/pools/:poolId/cloud/nodes', controllers.pool.readCloudNodes);
+    app.post('/backend/admin/pools/:poolId/cloud/nodes/:machineId/delete', controllers.pool.deleteCloudNode);
 
     app.get('/backend/user/account/pools', controllers.pool.accountReadPools);
     app.get('/backend/user/account/pools/:poolId', controllers.pool.accountReadPool);

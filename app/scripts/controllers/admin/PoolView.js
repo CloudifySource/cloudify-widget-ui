@@ -37,6 +37,7 @@ angular.module('cloudifyWidgetUiApp')
             if (angular.isDefined($scope.model.poolId)) {
                 $scope.getPoolStatus($scope.model.poolId);
                 $scope.getPoolNodes($scope.model.poolId);
+                $scope.getCloudNodes($scope.model.poolId);
                 $scope.getPoolTasks($scope.model.poolId);
                 $scope.getPoolErrors($scope.model.poolId);
                 $scope.getPoolDecisions($scope.model.poolId);
@@ -67,6 +68,13 @@ angular.module('cloudifyWidgetUiApp')
             AdminPoolCrudService.getPoolNodes(poolId).then(function (result) {
                 $log.debug('got machines, result data is ', result.data);
                 $scope.model.nodes = result.data;
+            });
+        };
+
+        $scope.getCloudNodes = function (poolId) {
+            AdminPoolCrudService.getCloudNodes(poolId).then(function(result) {
+                $log.debug('got all cloud nodes, result data is ', result.data);
+                $scope.model.poolCloudNodes = result.data;
             });
         };
 

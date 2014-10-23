@@ -66,6 +66,11 @@ function ArgsBuilder() {
         return this;
     };
 
+    this.machineId = function (_machineId) {
+        this.path({'machineId': _machineId});
+        return this;
+    };
+
     this.taskId = function (_taskId) {
         this.path({'taskId': _taskId});
         return this;
@@ -255,6 +260,10 @@ exports.createPoolNode = function (poolKey, poolId, callback) {
 exports.deletePoolNode = function (poolKey, poolId, nodeId, callback) {
     logger.info('deleting machine from pool');
     call.post('/admin/pools/${poolId}/nodes/${nodeId}/delete', _args().poolKey(poolKey).poolId(poolId).nodeId(nodeId), callback);
+};
+exports.deleteCloudNode = function (poolKey, poolId, machineId, callback) {
+    logger.info('deleting machine from cloud');
+    call.post('/admin/pools/${poolId}/cloud/nodes/${machineId}/delete', _args().poolKey(poolKey).poolId(poolId).machineId(machineId), callback);
 };
 exports.bootstrapPoolNode = function (poolKey, poolId, nodeId, callback) {
     logger.info('bootstrapping machine');

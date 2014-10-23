@@ -85,6 +85,19 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
+        $scope.deleteCloudNode = function (poolId, cloudNode) {
+            $log.debug('delete cloud node: ', cloudNode);
+
+            if (cloudNode.nodeId !== -1) {
+                // node is in db and not in cloud.
+                $scope.deletePoolNode(poolId, cloudNode.nodeId);
+            } else {
+                // node is in cloud and not in db.
+                AdminPoolCrudService.deleteCloudNode(poolId, cloudNode.machineId).then(function (result) {
+                    $log.debug('cloud node deleted, result data is ', result.data);
+                });
+            }
+        };
 
         $scope.abortPoolDecision = function (poolId, decisionId) {
             $log.info('abortPoolDecision, poolId: ', poolId, ', decisionId: ', decisionId);
