@@ -61,7 +61,7 @@ var models = require('../models');
  *
  */
 function sendEmailAfterInstall(curryParams){
-    if (!curryParams.widget.socialLogin.handlers.mandrill || !curryParams.widget.socialLogin.handlers.mandrill.enabled) {
+    if (!curryParams.widget.socialLogin || !curryParams.widget.socialLogin.handlers || !curryParams.widget.socialLogin.handlers.mandrill || !curryParams.widget.socialLogin.handlers.mandrill.enabled) {
         // noop
         return;
     }
