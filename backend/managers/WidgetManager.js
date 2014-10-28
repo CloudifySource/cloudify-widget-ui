@@ -301,7 +301,7 @@ function _occupyMachine(curryParams, curryCallback) {
 
         if (!result) {
             logger.error('occupy node result is null');
-            curryCallback(new Error('could not occupy node, no bootstrapped nodes found'), curryParams);
+            curryCallback(new Error('We\'re so hot, that all machines are occupied! Please try again in a few minutes.'), curryParams);
             return;
         }
 

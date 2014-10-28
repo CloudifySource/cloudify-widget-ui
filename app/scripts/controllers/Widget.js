@@ -141,7 +141,7 @@ angular.module('cloudifyWidgetUiApp')
             }, myTimeout || 3000);
 
             // if expires < now, call stop()
-            if (!status.nodeModel || status.nodeModel.expires < new Date().getTime()) {
+            if (status.nodeModel && status.nodeModel.expires < new Date().getTime()) {
                 stop(widget, executionId);
             }
         }
