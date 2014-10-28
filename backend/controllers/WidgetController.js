@@ -112,7 +112,7 @@ exports.play = function (req, res) {
 
     var playCallback = function playCallback (err, result) {
         if (!!err) {
-            var errorStr = 'Play failed!\nInfo: ' + err.message;
+            var errorStr = err.message;
             logger.error(errorStr);
             services.logs.appendOutput(errorStr, result);
             res.send(200, { 'executionId' : result });
