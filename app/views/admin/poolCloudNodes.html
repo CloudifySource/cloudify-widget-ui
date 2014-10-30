@@ -9,13 +9,18 @@
                 <th>Node ID</th>
                 <th>Machine ID</th>
                 <th>Machine IP</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody ng-show="model.poolCloudNodes">
-            <tr ng-repeat="cloudNode in model.poolCloudNodes">
+            <tr ng-repeat="cloudNode in model.poolCloudNodes" ng-show="cloudNode.nodeId === -1 || cloudNode.ip === null">
+                <!-- Show only 'problematic' nodes -->
                 <td>{{ cloudNode.nodeId }}</td>
                 <td>{{ cloudNode.machineId }}</td>
                 <td><pre>{{ cloudNode.ip | json }}</pre></td>
+                <td>
+                    <button ng-click="deleteCloudNode(model.poolId, cloudNode)">Delete</button>
+                </td>
             </tr>
         </tbody>
         <tbody ng-show="model.poolCloudNodes === 0">

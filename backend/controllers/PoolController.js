@@ -83,6 +83,9 @@ exports.createPoolNode = function( req, res ){
 exports.deletePoolNode = function( req, res ){
     managers.poolClient.deletePoolNode(req.user.poolKey, req.params.poolId, req.params.nodeId, _callback(res));
 };
+exports.deleteCloudNode = function( req, res ){
+    managers.poolClient.deleteCloudNode(req.user.poolKey, req.params.poolId, req.params.machineId, _callback(res));
+};
 exports.bootstrapPoolNode = function( req, res ){
     managers.poolClient.bootstrapPoolNode(req.user.poolKey, req.params.poolId, req.params.nodeId, _callback(res));
 };
