@@ -1,6 +1,7 @@
 <div layout>
 
     <h3>Cloud node mappings for pool {{ model.poolId }}</h3>
+    <span>This section will only show nodes with discrepancy between DB and Cloud provider. If there are none - none will be shown.</span><br>
     <button ng-click="getCloudNodes(model.poolId)">refresh</button>
 
     <table>
@@ -13,7 +14,7 @@
             </tr>
         </thead>
         <tbody ng-show="model.poolCloudNodes">
-            <tr ng-repeat="cloudNode in model.poolCloudNodes" ng-show="cloudNode.nodeId === -1 || cloudNode.ip === null">
+            <tr ng-repeat="cloudNode in model.poolCloudNodes track by cloudNode.machineId" ng-show="cloudNode.nodeId === -1 || cloudNode.ip === null">
                 <!-- Show only 'problematic' nodes -->
                 <td>{{ cloudNode.nodeId }}</td>
                 <td>{{ cloudNode.machineId }}</td>
@@ -25,7 +26,7 @@
         </tbody>
         <tbody ng-show="model.poolCloudNodes === 0">
             <tr>
-                <td colspan="3">Loading...</td>
+                <td colspan="4">Loading...</td>
             </tr>
         </tbody>
     </table>
