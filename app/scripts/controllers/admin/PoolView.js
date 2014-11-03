@@ -9,6 +9,8 @@ angular.module('cloudifyWidgetUiApp')
         $scope.predicate = 'id';
         $scope.reverse = true;
 
+        var cloudNodesRefreshInterval = 360;
+
         $scope.model = {
             accountId: $routeParams.accountId,
             poolId: $routeParams.poolId,
@@ -37,11 +39,17 @@ angular.module('cloudifyWidgetUiApp')
             if (angular.isDefined($scope.model.poolId)) {
                 $scope.getPoolStatus($scope.model.poolId);
                 $scope.getPoolNodes($scope.model.poolId);
-                $scope.getCloudNodes($scope.model.poolId);
                 $scope.getPoolTasks($scope.model.poolId);
                 $scope.getPoolErrors($scope.model.poolId);
                 $scope.getPoolDecisions($scope.model.poolId);
                 $scope.getThreadPoolStatus($scope.model.poolId);
+
+                cloudNodesRefreshInterval--;
+                if (cloudNodesRefreshInterval <= 0) {
+                    // this will only get polled once every 360*5s (30 min).
+                    $scope.getCloudNodes($scope.model.poolId);
+                    cloudNodesRefreshInterval = 360;
+                }
             }
 //            if (angular.isDefined($scope.model.accountId)) {
 //                $scope.getAccountPools($scope.model.accountId);
@@ -50,7 +58,6 @@ angular.module('cloudifyWidgetUiApp')
 //                $scope.getAccountPool($scope.model.accountId, $scope.model.poolId);
 //            }
         }, 5000);
-
 
         $scope.$on('$destroy', function () {
             $interval.cancel(refreshInterval);
