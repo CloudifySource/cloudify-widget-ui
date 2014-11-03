@@ -10,6 +10,11 @@ var common = require('../common.js');
 var utils = require('../utils.js');
 var webDriver = require('selenium-webdriver');
 
+process.on('exit', function () {
+    console.log('terminating');
+    log4js.shutdown();
+});
+
 //sanity test
 var sanityDriver = common.getChromeDriver();
 sanityDriver.get('http://www.google.com');
