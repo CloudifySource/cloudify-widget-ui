@@ -1,5 +1,5 @@
 {
-    "serverLocation": "http://localhost:4444/wd/hub",
+    "serverLocation": "__http://host:port/wd/hub__",
     "login": {
         "widget": {
             "admin": {
