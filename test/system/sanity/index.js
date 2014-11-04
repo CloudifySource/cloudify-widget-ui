@@ -47,7 +47,7 @@ describe('Cloudify Widget System Tests', function () {
         });
     });
 
-    xdescribe('Pool Health', function () {
+    describe('Pool Health', function () {
         var poolHealthDriver;
 
         beforeEach(function (done) {
