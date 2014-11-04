@@ -54,7 +54,7 @@ describe('Cloudify Widget System Tests', function () {
 
         it('Should verify that there are bootstrapped nodes', function (done) {
             var url = 'http://thewidget.staging.gsdev.info/backend/admin/pools/4/status';
-            common.performREST(poolHealthDriver, url, function (status) {
+            common.performRESTGet(poolHealthDriver, url, function (status) {
                 assert.notEqual(0, status['4'].countPerNodeStatus.BOOTSTRAPPED);
                 done();
             });

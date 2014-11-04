@@ -19,7 +19,7 @@ try {
     var overrideConf = require(overrideJSON);
     lodash.merge(conf, overrideConf);
 } catch (e) {
-    logger.debug('There is no me-override.json file', e);
+    logger.debug('There is no conf-override.json file', e);
 }
 
 exports.getChromeDriver = function () {
@@ -112,7 +112,7 @@ exports.performLogin = function (driver, done, validationFunctions) {
     });
 };
 
-exports.performREST = function (driver, url, callback) {
+exports.performRESTGet = function (driver, url, callback) {
     driver.executeAsyncScript(function () {
         var callback = arguments[arguments.length - 1];
         var xhr = new XMLHttpRequest();
