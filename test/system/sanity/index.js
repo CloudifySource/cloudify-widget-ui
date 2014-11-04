@@ -18,16 +18,16 @@ var webDriver = require('selenium-webdriver');
 
 describe('Cloudify Widget System Tests', function () {
 
-    xdescribe('Sanity tests', function() {
+    xdescribe('Sanity tests', function () {
         var sanityDriver;
 
-        beforeEach(function(done) {
+        beforeEach(function (done) {
             sanityDriver = common.getChromeDriver();
             sanityDriver.get('http://www.google.com');
             done();
         });
 
-        afterEach(function() {
+        afterEach(function () {
             setTimeout(function () {
                 sanityDriver.close().then(function () {
                     logger.info('Closing web browser');
@@ -37,10 +37,10 @@ describe('Cloudify Widget System Tests', function () {
             }, 10000);
         });
 
-        it('should verify sanity against google', function(done) {
+        it('should verify sanity against google', function (done) {
             var searchBox = sanityDriver.findElement(webDriver.By.name('q'));
             searchBox.sendKeys('webDriver');
-            searchBox.getAttribute('value').then(function(value) {
+            searchBox.getAttribute('value').then(function (value) {
                 assert.equal(value, 'webDriver');
                 done();
             });
@@ -66,30 +66,24 @@ describe('Cloudify Widget System Tests', function () {
         });
 
         it('Should verify that there are bootstrapped nodes', function (done) {
-            poolHealthDriver.executeAsyncScript(function () {
-                var callback = arguments[arguments.length - 1];
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', 'http://thewidget.staging.gsdev.info/backend/admin/pools/4/status', false);
-                xhr.send('');
-                callback(xhr.responseText);
-            }).then(function (str) {
-                var status = JSON.parse(str);
+            var url = 'http://thewidget.staging.gsdev.info/backend/admin/pools/4/status';
+            common.performREST(poolHealthDriver, url, function (status) {
                 assert.notEqual(0, status['4'].countPerNodeStatus.BOOTSTRAPPED);
                 done();
             });
         });
     });
 
-    describe('XAP Demo', function() {
+    describe('XAP Demo', function () {
         var xapDemoDriver;
 
-        beforeEach(function(done) {
+        beforeEach(function (done) {
             xapDemoDriver = common.getChromeDriver();
             xapDemoDriver.get('http://docs.gigaspaces.com/tutorials/xap_cloud_management.html');
             done();
         });
 
-        afterEach(function(done) {
+        afterEach(function (done) {
             webDriver.promise.delayed(2000).then(function () {
                 xapDemoDriver.close().then(function () {
                     logger.info('Closing web browser');
@@ -99,7 +93,7 @@ describe('Cloudify Widget System Tests', function () {
             });
         });
 
-        it('Should be a successful execution', function(done) {
+        it('Should be a successful execution', function (done) {
             utils.waitForElementEnabledById(xapDemoDriver, 'launch', function (launchBtn) {
                 logger.debug('Clicking on launch btn');
                 launchBtn.click();

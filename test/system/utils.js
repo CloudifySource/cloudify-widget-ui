@@ -46,7 +46,7 @@ exports.waitForElementDisplayedById = function (driver, elementId, callback, del
     });
 };
 
-exports.waitForHttpResponse = function(driver, url, callback, delay) {
+exports.waitForHttpResponse = function (driver, url, callback, delay) {
     logger.debug('Waiting for get response.');
 
     if (!delay) {
@@ -54,11 +54,11 @@ exports.waitForHttpResponse = function(driver, url, callback, delay) {
     }
 
     var response;
-    http.get(url, function(res) {
+    http.get(url, function (res) {
         response = res;
     });
 
-    driver.wait(function() {
+    driver.wait(function () {
         if (response) {
             return response;
         }

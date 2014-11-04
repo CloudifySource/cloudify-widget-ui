@@ -100,16 +100,29 @@ exports.performLogin = function (driver, done, validationFunctions) {
             }
         ]);
 
-    async.waterfall(steps, function(err) {
+    async.waterfall(steps, function (err) {
         if (err) {
             logger.error('Login failed!', err);
             return;
         }
 
         logger.info('Login successful.');
-        webDriver.promise.delayed(5000).then(function() {
+        webDriver.promise.delayed(5000).then(function () {
             //wait for redirect after login.
             done();
         });
+    });
+};
+
+exports.performREST = function (driver, url, callback) {
+    driver.executeAsyncScript(function () {
+        var callback = arguments[arguments.length - 1];
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', arguments[0], false);
+        xhr.send('');
+        callback(xhr.responseText);
+    }, url).then(function (str) {
+        var status = JSON.parse(str);
+        callback(status);
     });
 };
