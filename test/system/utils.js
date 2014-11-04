@@ -8,6 +8,20 @@ var logger = log4js.getLogger('index');
 var webDriver = require('selenium-webdriver');
 var http = require('http');
 
+exports.closeBrowser = function(driver, done, delay) {
+    if (!delay) {
+        delay = 2000;
+    }
+
+    webDriver.promise.delayed(delay).then(function () {
+        driver.close().then(function () {
+            logger.info('Closing web browser');
+            driver.quit();
+            done();
+        });
+    });
+}
+
 exports.waitForElementEnabledById = function (driver, elementId, callback, delay) {
     logger.debug('Waiting for element [', elementId, '] to be enabled');
 

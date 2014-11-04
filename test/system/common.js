@@ -17,8 +17,6 @@ var conf = require(meJson);
 try {
     var overrideJSON = path.resolve(__dirname, 'conf/dev/conf-override.json');
     var overrideConf = require(overrideJSON);
-    console.log(conf);
-    console.log(overrideConf);
     lodash.merge(conf, overrideConf);
 } catch (e) {
     logger.debug('There is no me-override.json file', e);

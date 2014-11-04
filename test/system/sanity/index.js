@@ -18,23 +18,16 @@ var webDriver = require('selenium-webdriver');
 
 describe('Cloudify Widget System Tests', function () {
 
-    xdescribe('Sanity tests', function () {
+    describe('Sanity tests', function () {
         var sanityDriver;
 
         beforeEach(function (done) {
             sanityDriver = common.getChromeDriver();
-            sanityDriver.get('http://www.google.com');
-            done();
+            sanityDriver.get('http://www.google.com').then(done);
         });
 
-        afterEach(function () {
-            setTimeout(function () {
-                sanityDriver.close().then(function () {
-                    logger.info('Closing web browser');
-                    sanityDriver.quit();
-                    done();
-                });
-            }, 10000);
+        afterEach(function (done) {
+            utils.closeBrowser(sanityDriver, done);
         });
 
         it('should verify sanity against google', function (done) {
@@ -56,13 +49,7 @@ describe('Cloudify Widget System Tests', function () {
         });
 
         afterEach(function (done) {
-            webDriver.promise.delayed(2000).then(function () {
-                poolHealthDriver.close().then(function () {
-                    logger.info('Closing web browser');
-                    poolHealthDriver.quit();
-                    done();
-                });
-            });
+            utils.closeBrowser(poolHealthDriver, done);
         });
 
         it('Should verify that there are bootstrapped nodes', function (done) {
@@ -79,18 +66,11 @@ describe('Cloudify Widget System Tests', function () {
 
         beforeEach(function (done) {
             xapDemoDriver = common.getChromeDriver();
-            xapDemoDriver.get('http://docs.gigaspaces.com/tutorials/xap_cloud_management.html');
-            done();
+            xapDemoDriver.get('http://docs.gigaspaces.com/tutorials/xap_cloud_management.html').then(done);
         });
 
         afterEach(function (done) {
-            webDriver.promise.delayed(2000).then(function () {
-                xapDemoDriver.close().then(function () {
-                    logger.info('Closing web browser');
-                    xapDemoDriver.quit();
-                    done();
-                });
-            });
+            utils.closeBrowser(xapDemoDriver, done);
         });
 
         it('Should be a successful execution', function (done) {
