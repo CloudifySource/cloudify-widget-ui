@@ -1,3 +1,11 @@
 {
-    "serverLocation": "http://localhost:4444/wd/hub"
+    "serverLocation": "http://localhost:4444/wd/hub",
+    "login": {
+        "widget": {
+            "admin": {
+                "email": "__email__",
+                "password": "__password__"
+            }
+        }
+    }
 }

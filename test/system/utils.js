@@ -6,6 +6,7 @@
 var log4js = require('log4js');
 var logger = log4js.getLogger('index');
 var webDriver = require('selenium-webdriver');
+var http = require('http');
 
 exports.waitForElementEnabledById = function (driver, elementId, callback, delay) {
     logger.info('Waiting for element [', elementId, '] to be enabled');
@@ -42,5 +43,27 @@ exports.waitForElementDisplayedById = function (driver, elementId, callback, del
     }, delay, 'Waited too long').then(function () {
         logger.info('Done, element is displayed');
         callback(element);
+    });
+};
+
+exports.waitForHttpResponse = function(driver, url, callback, delay) {
+    logger.info('Waiting for get response.');
+
+    if (!delay) {
+        delay = 10000;
+    }
+
+    var response;
+    http.get(url, function(res) {
+        response = res;
+    });
+
+    driver.wait(function() {
+        if (response) {
+            return response;
+        }
+    }, delay, 'Waited too long').then(function () {
+        logger.info('Done, response received');
+        callback(response);
     });
 };
