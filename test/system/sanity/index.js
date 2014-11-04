@@ -101,12 +101,12 @@ describe('Cloudify Widget System Tests', function () {
 
         it('Should be a successful execution', function(done) {
             utils.waitForElementEnabledById(xapDemoDriver, 'launch', function (launchBtn) {
-                logger.info('Clicking on launch btn');
+                logger.debug('Clicking on launch btn');
                 launchBtn.click();
 
                 utils.waitForElementEnabledById(xapDemoDriver, 'use', function (useLink) {
                     useLink.getAttribute('href').then(function (href) {
-                        logger.info('href = ', href);
+                        logger.debug('href = ', href);
                         assert(href.indexOf('#') === -1);
                         done();
                     });

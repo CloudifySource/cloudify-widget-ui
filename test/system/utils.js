@@ -9,7 +9,7 @@ var webDriver = require('selenium-webdriver');
 var http = require('http');
 
 exports.waitForElementEnabledById = function (driver, elementId, callback, delay) {
-    logger.info('Waiting for element [', elementId, '] to be enabled');
+    logger.debug('Waiting for element [', elementId, '] to be enabled');
 
     if (!delay) {
         delay = 15000;
@@ -22,13 +22,13 @@ exports.waitForElementEnabledById = function (driver, elementId, callback, delay
             return value !== 'none';
         });
     }, delay, 'Waited too long').then(function () {
-        logger.info('Done, element is enabled.');
+        logger.debug('Done, element is enabled.');
         callback(element);
     });
 };
 
 exports.waitForElementDisplayedById = function (driver, elementId, callback, delay) {
-    logger.info('Waiting for element [', elementId, '] to be displayed.');
+    logger.debug('Waiting for element [', elementId, '] to be displayed.');
 
     if (!delay) {
         delay = 10000;
@@ -41,13 +41,13 @@ exports.waitForElementDisplayedById = function (driver, elementId, callback, del
             return element;
         }
     }, delay, 'Waited too long').then(function () {
-        logger.info('Done, element is displayed');
+        logger.debug('Done, element is displayed');
         callback(element);
     });
 };
 
 exports.waitForHttpResponse = function(driver, url, callback, delay) {
-    logger.info('Waiting for get response.');
+    logger.debug('Waiting for get response.');
 
     if (!delay) {
         delay = 10000;
@@ -63,7 +63,7 @@ exports.waitForHttpResponse = function(driver, url, callback, delay) {
             return response;
         }
     }, delay, 'Waited too long').then(function () {
-        logger.info('Done, response received');
+        logger.debug('Done, response received');
         callback(response);
     });
 };
