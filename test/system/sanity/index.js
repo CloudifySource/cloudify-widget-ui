@@ -116,23 +116,3 @@ describe('Cloudify Widget System Tests', function () {
         });
     });
 });
-
-
-////xap demo test
-//var driver = common.getChromeDriver();
-//driver.get('http://docs.gigaspaces.com/tutorials/xap_cloud_management.html');
-//
-//utils.waitForElementEnabledById(driver, 'launch', function (launchBtn) {
-//    logger.info('Clicking on launch btn');
-//    launchBtn.click();
-//
-//    utils.waitForElementEnabledById(driver, 'use', function (useLink) {
-//        useLink.getAttribute('href').then(function (href) {
-//            logger.info('href = ', href);
-//            assert(href.indexOf('#') === -1);
-//        });
-//
-//    });
-//});
-//
-//driver.quit();
