@@ -112,10 +112,11 @@ exports.performLogin = function (driver, done, validationFunctions) {
     });
 };
 
-exports.performRESTGet = function (driver, url, callback) {
+exports.performSyncRESTGet = function (driver, url, callback) {
     driver.executeAsyncScript(function () {
         var callback = arguments[arguments.length - 1];
         var xhr = new XMLHttpRequest();
+        // this xhr is NOT ASYNC!!!
         xhr.open('GET', arguments[0], false);
         xhr.send('');
         callback(xhr.responseText);
