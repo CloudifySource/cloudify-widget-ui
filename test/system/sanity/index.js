@@ -15,10 +15,13 @@ var common = require('../common.js');
 var utils = require('../utils.js');
 var path = require('path');
 var webDriver = require('selenium-webdriver');
+var meJson = process.env.ME_JSON && path.resolve(process.env.ME_JSON) || path.resolve(__dirname, '../conf.json');
+var conf = require(meJson);
+
 
 describe('Cloudify Widget System Tests', function () {
 
-    describe('Sanity tests', function () {
+    xdescribe('Sanity tests', function () {
         var sanityDriver;
 
         beforeEach(function (done) {
@@ -53,9 +56,9 @@ describe('Cloudify Widget System Tests', function () {
         });
 
         it('Should verify that there are bootstrapped nodes', function (done) {
-            var url = 'http://thewidget.staging.gsdev.info/backend/admin/pools/4/status';
+            var url = 'http://thewidget.staging.gsdev.info/backend/admin/pools/'+conf.widget.poolId+'/status';
             common.performSyncRESTGet(poolHealthDriver, url, function (status) {
-                assert.notEqual(0, status['4'].countPerNodeStatus.BOOTSTRAPPED);
+                assert.notEqual(0, status[conf.widget.poolId].countPerNodeStatus.BOOTSTRAPPED);
                 done();
             });
         });

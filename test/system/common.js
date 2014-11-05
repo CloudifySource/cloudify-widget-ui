@@ -24,7 +24,7 @@ try {
 
 exports.getChromeDriver = function () {
     var driver = new webDriver.Builder()
-        .usingServer(conf.serverLocation)
+        .usingServer(conf.seleniumServerLocation)
         .withCapabilities(webDriver.Capabilities.chrome())
         .build();
 
@@ -34,8 +34,8 @@ exports.getChromeDriver = function () {
 exports.getLoginCredentials = function () {
     var args = {
         data: {
-            email: conf.login.widget.admin.email,
-            password: conf.login.widget.admin.password
+            email: conf.widget.login.admin.email,
+            password: conf.widget.login.admin.password
         },
         headers: {'Content-Type': 'application/json'}
     };
@@ -80,8 +80,8 @@ exports.performLogin = function (driver, done, validationFunctions) {
         },
         function fillForm(elements, callback) {
             logger.debug('Fill inputs with login data.');
-            elements[0].sendKeys(conf.login.widget.admin.email);
-            elements[1].sendKeys(conf.login.widget.admin.password);
+            elements[0].sendKeys(conf.widget.login.admin.email);
+            elements[1].sendKeys(conf.widget.login.admin.password);
             callback(null, elements[2]);
         },
         function submitForm(submitBtn, callback) {
@@ -112,6 +112,13 @@ exports.performLogin = function (driver, done, validationFunctions) {
     });
 };
 
+/**
+ * This is a synced REST get request because of selenium limitation.
+ *
+ * @param driver
+ * @param url
+ * @param callback
+ */
 exports.performSyncRESTGet = function (driver, url, callback) {
     driver.executeAsyncScript(function () {
         var callback = arguments[arguments.length - 1];
