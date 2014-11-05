@@ -30,7 +30,7 @@ describe('Cloudify Widget System Tests', function () {
         });
 
         afterEach(function (done) {
-            utils.closeBrowser(sanityDriver, done);
+            common.driverCleanup(sanityDriver, done);
         });
 
         it('should verify sanity against google', function (done) {
@@ -52,7 +52,7 @@ describe('Cloudify Widget System Tests', function () {
         });
 
         afterEach(function (done) {
-            utils.closeBrowser(poolHealthDriver, done);
+            common.driverCleanup(poolHealthDriver, done);
         });
 
         it('Should verify that there are bootstrapped nodes', function (done) {
@@ -73,7 +73,7 @@ describe('Cloudify Widget System Tests', function () {
         });
 
         afterEach(function (done) {
-            utils.closeBrowser(xapDemoDriver, done);
+            common.driverCleanup(xapDemoDriver, done);
         });
 
         it('Should be a successful execution', function (done) {
