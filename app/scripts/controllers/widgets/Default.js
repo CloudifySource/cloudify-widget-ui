@@ -22,6 +22,7 @@ angular.module('cloudifyWidgetUiApp')
         $scope.currentTime = new Date().getTime();
         $scope.widgetState = STATE_STOPPED;
         $scope.output = '';
+        $scope.isSoloMode = false;
 
         // this controller will handle post/receive messages !
         // it will also hold the state for the view (which is now coupled inside Widget.js controller, and should be extracted from there)
