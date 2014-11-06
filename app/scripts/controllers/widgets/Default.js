@@ -84,8 +84,8 @@ angular.module('cloudifyWidgetUiApp')
             $scope.widgetStatus.nodeModel = status.nodeModel;
 
             if (status.nodeModel && status.nodeModel.publicIp) {
-                $scope.widgetStatus.consoleLink = status.widget.consoleLink;
-                $scope.widgetStatus.consoleLink.link = status.widget.consoleLink.link.replace('$HOST', status.nodeModel.publicIp);
+                $scope.widgetStatus.consoleLink = $scope.widget.consoleLink;
+                $scope.widgetStatus.consoleLink.link = $scope.widget.consoleLink.link.replace('$HOST', status.nodeModel.publicIp);
             }
 
             $scope.widgetStatus.instanceIsAvailable = (status.exitStatus && status.exitStatus.code === 0);
