@@ -22,16 +22,18 @@
     </ul>
 
     <ul id="links">
-        <li ng-show="!!widgetStatus.instanceIsAvailable">
-            <a href="{{widgetStatus.consoleLink.url}}"
+        <li>
+            <span ng-show="!widgetStatus.instanceIsAvailable">{{widgetStatus.consoleLink.title}}</span>
+            <a ng-show="!!widgetStatus.instanceIsAvailable"
+               href="{{widgetStatus.consoleLink.link}}"
                class="track"
                target="_blank">{{widgetStatus.consoleLink.title}}</a>
         </li>
         <li>
-            <span ng-show="!widgetStatus.cloudifyUiIsAvailable">{{ 'global.cloudify' | i18n }}</span>
-            <a href="http://{{widgetStatus.publicIp}}:8099"
+            <span ng-show="!widgetStatus.instanceIsAvailable">{{ 'global.cloudify' | i18n }}</span>
+            <a href="http://{{widgetStatus.nodeModel.publicIp}}:8099"
                 target="_blank"
-                ng-show="!!widgetStatus.cloudifyUiIsAvailable"
+                ng-show="!!widgetStatus.instanceIsAvailable"
                 class="track">{{ 'global.cloudify' | i18n }}
             </a>
         </li>
