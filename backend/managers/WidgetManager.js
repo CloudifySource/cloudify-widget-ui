@@ -495,7 +495,8 @@ function _playFinally(err, curryParams) {
                 { _id: curryParams.executionObjectId },
                 {
                     $set: {
-                        state: 'STOPPED'
+                        state: 'STOPPED',
+                        error: err.message
                     }
                 },
                 function (err, nUpdated) {
@@ -670,6 +671,9 @@ function getPublicExecutionDetails(execution) {
                              {'expires': execution.nodeModel.expires}) : undefined;
     retVal.exitStatus = execution.exitStatus;
     retVal.output = execution.output;
+    if (execution.error) {
+        retVal.error = execution.error;
+    }
 
     return retVal;
 }
