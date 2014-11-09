@@ -11,10 +11,7 @@ var http = require('http');
 exports.waitForElementEnabledById = function (driver, elementId, callback, delay) {
     logger.debug('Waiting for element [', elementId, '] to be enabled');
 
-    if (!delay) {
-        delay = 15000;
-    }
-
+    delay = delay || 15000;
     var element = driver.findElement(webDriver.By.id(elementId));
 
     driver.wait(function () {
@@ -30,10 +27,7 @@ exports.waitForElementEnabledById = function (driver, elementId, callback, delay
 exports.waitForElementDisplayedById = function (driver, elementId, callback, delay) {
     logger.debug('Waiting for element [', elementId, '] to be displayed.');
 
-    if (!delay) {
-        delay = 10000;
-    }
-
+    delay = delay || 10000;
     var element = driver.findElement(webDriver.By.id(elementId));
 
     driver.wait(function () {

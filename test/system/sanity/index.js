@@ -8,33 +8,31 @@
 var log4js = require('log4js');
 var logger = log4js.getLogger('index');
 var assert = require('assert');
-var async = require('async');
-var http = require('http');
-var Client = require('node-rest-client').Client;
 var common = require('../common.js');
-var utils = require('../utils.js');
-var path = require('path');
+var waitUtils = require('../waitUtils.js');
 var webDriver = require('selenium-webdriver');
-var meJson = process.env.ME_JSON && path.resolve(process.env.ME_JSON) || path.resolve(__dirname, '../conf.json');
-var conf = require(meJson);
+var conf = require('../conf').conf;
 
+var GsDriver = require('../GsDriver');
+var gsDriver;
 
 describe('Cloudify Widget System Tests', function () {
 
+    // that's just to verify that the tests are working. Should be run usually.
     xdescribe('Sanity tests', function () {
-        var sanityDriver;
 
         beforeEach(function (done) {
-            sanityDriver = common.getChromeDriver();
-            sanityDriver.get('http://www.google.com').then(done);
+            gsDriver = new GsDriver();
+            gsDriver.chrome();
+            gsDriver.driver().get('http://www.google.com').then(done);
         });
 
         afterEach(function (done) {
-            common.driverCleanup(sanityDriver, done);
+            gsDriver.cleanup(done);
         });
 
         it('should verify sanity against google', function (done) {
-            var searchBox = sanityDriver.findElement(webDriver.By.name('q'));
+            var searchBox = gsDriver.driver().findElement(webDriver.By.name('q'));
             searchBox.sendKeys('webDriver');
             searchBox.getAttribute('value').then(function (value) {
                 assert.equal(value, 'webDriver');
@@ -44,20 +42,20 @@ describe('Cloudify Widget System Tests', function () {
     });
 
     describe('Pool Health', function () {
-        var poolHealthDriver;
 
         beforeEach(function (done) {
-            poolHealthDriver = common.getChromeDriver();
-            common.performLogin(poolHealthDriver, done, []);
+            gsDriver = new GsDriver();
+            gsDriver.chrome();
+            common.performLogin(gsDriver.driver(), done, []);
         });
 
         afterEach(function (done) {
-            common.driverCleanup(poolHealthDriver, done);
+            gsDriver.cleanup(done);
         });
 
         it('Should verify that there are bootstrapped nodes', function (done) {
             var url = 'http://thewidget.staging.gsdev.info/backend/admin/pools/'+conf.widget.poolId+'/status';
-            common.performSyncRESTGet(poolHealthDriver, url, function (status) {
+            common.performSyncRESTGet(gsDriver.driver(), url, function (err, status) {
                 assert.notEqual(0, status[conf.widget.poolId].countPerNodeStatus.BOOTSTRAPPED);
                 done();
             });
@@ -65,23 +63,23 @@ describe('Cloudify Widget System Tests', function () {
     });
 
     describe('XAP Demo', function () {
-        var xapDemoDriver;
 
         beforeEach(function (done) {
-            xapDemoDriver = common.getChromeDriver();
-            xapDemoDriver.get('http://docs.gigaspaces.com/tutorials/xap_cloud_management.html').then(done);
+            gsDriver = new GsDriver();
+            gsDriver.chrome();
+            gsDriver.driver().get('http://docs.gigaspaces.com/tutorials/xap_cloud_management.html').then(done);
         });
 
         afterEach(function (done) {
-            common.driverCleanup(xapDemoDriver, done);
+            gsDriver.cleanup(done);
         });
 
         it('Should be a successful execution', function (done) {
-            utils.waitForElementEnabledById(xapDemoDriver, 'launch', function (launchBtn) {
+            waitUtils.waitForElementEnabledById(gsDriver.driver(), 'launch', function (launchBtn) {
                 logger.debug('Clicking on launch btn');
                 launchBtn.click();
 
-                utils.waitForElementEnabledById(xapDemoDriver, 'use', function (useLink) {
+                waitUtils.waitForElementEnabledById(gsDriver.driver(), 'use', function (useLink) {
                     useLink.getAttribute('href').then(function (href) {
                         logger.debug('href = ', href);
                         assert(href.indexOf('#') === -1);

@@ -7,43 +7,9 @@
 
 var log4js = require('log4js');
 var logger = log4js.getLogger('index');
-var lodash = require('lodash');
 var webDriver = require('selenium-webdriver');
 var async = require('async');
-var path = require('path');
-var meJson = process.env.ME_JSON && path.resolve(process.env.ME_JSON) || path.resolve(__dirname, 'conf.json');
-var conf = require(meJson);
-
-try {
-    var overrideJSON = path.resolve(__dirname, 'conf/dev/conf-override.json');
-    var overrideConf = require(overrideJSON);
-    lodash.merge(conf, overrideConf);
-} catch (e) {
-    logger.debug('There is no conf-override.json file', e);
-}
-
-exports.getChromeDriver = function () {
-    var driver = new webDriver.Builder()
-        .usingServer(conf.seleniumServerLocation)
-        .withCapabilities(webDriver.Capabilities.chrome())
-        .build();
-
-    return driver;
-};
-
-exports.driverCleanup = function(driver, done, delay) {
-    if (!delay) {
-        delay = 2000;
-    }
-
-    webDriver.promise.delayed(delay).then(function () {
-        driver.close().then(function () {
-            logger.info('Closing web browser');
-            driver.quit();
-            done();
-        });
-    });
-};
+var conf = require('./conf').conf;
 
 exports.getLoginCredentials = function () {
     var args = {
@@ -61,7 +27,7 @@ exports.performLogin = function (driver, done, validationFunctions) {
     var steps = [
         function getLoginPage(callback) {
             logger.debug('Getting login page');
-            driver.get('http://thewidget.staging.gsdev.info/#/login').then(function () {
+            driver.get(conf.widget.login.url).then(function () {
                 callback();
             });
         },
@@ -143,6 +109,6 @@ exports.performSyncRESTGet = function (driver, url, callback) {
         callback(xhr.responseText);
     }, url).then(function (str) {
         var status = JSON.parse(str);
-        callback(status);
+        callback(null, status);
     });
 };

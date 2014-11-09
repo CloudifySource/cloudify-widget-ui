@@ -1,11 +1,12 @@
 {
-    "seleniumServerLocation": "__http://host:port/wd/hub__",
+    "seleniumServerLocation": "http://localhost:4444/wd/hub",
     "widget": {
         "login": {
             "admin": {
                 "email": "__email__",
                 "password": "__password__"
-            }
+            },
+            "url": "__loginUrl__"
         },
         "poolId": -1
     }
