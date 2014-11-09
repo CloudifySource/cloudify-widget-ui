@@ -564,10 +564,13 @@ function _expireNode(curryParams, curryCallback) {
             return;
         }
 
+        updateExecution(managers.db.toObjectId(curryParams.executionId), {
+            state: 'STOPPED'
+        });
+
         curryCallback(null, curryParams);
     });
 }
-
 
 function _stopFinally(err, curryParams) {
     logger.trace('-stop- finished !');
@@ -646,7 +649,7 @@ exports.stop = function (widgetId, executionId, remote, stopCallback) {
             var initialCurryParams = {
                 widgetId: widgetId,
                 executionId: executionId,
-
+                executionObjectId: managers.db.toObjectId(executionId),
                 stopCallback: stopCallback
             };
             callback(null, initialCurryParams);
@@ -670,7 +673,8 @@ function getPublicExecutionDetails(execution) {
     retVal.widget =  _.omit(execution.widget, ['userId']);
     retVal.nodeModel =  execution.nodeModel ? _.merge(_.pick(execution.nodeModel, ['id']),
                              {'publicIp': execution.nodeModel.machineSshDetails.publicIp },
-                             {'expires': execution.nodeModel.expires}) : undefined;
+                             {'expires': execution.nodeModel.expires},
+                             {'state': execution.state}) : undefined;
     retVal.exitStatus = execution.exitStatus;
     retVal.output = execution.output;
     if (execution.error) {
@@ -699,10 +703,10 @@ exports.getStatus = function (executionId, callback) {
             // if this exists on the execution status, we know execution ended.
             //
 
-            // if expires < now, call stop()
+            // if expires < now, update state.
             if (execution.nodeModel && execution.nodeModel.expires < new Date().getTime()) {
                 updateExecution(managers.db.toObjectId(executionId), {
-                    state: 'EXPIRED'
+                    state: 'STOPPED'
                 });
             }
 

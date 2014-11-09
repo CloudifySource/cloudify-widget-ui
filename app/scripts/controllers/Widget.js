@@ -136,14 +136,18 @@ angular.module('cloudifyWidgetUiApp')
             }
             $scope.widgetStatus = status;
             _postStatus(status);
-            $timeout(function () {
-                _pollStatus(false, widget, executionId);
-            }, myTimeout || 3000);
+            if (!status.error && (!status.nodeModel || status.nodeModel.state === STATE_RUNNING)) {
+                $timeout(function () {
+                    _pollStatus(false, widget, executionId);
+                }, myTimeout || 3000);
+            } else {
+                _postStopped(executionId);
+            }
         }
 
         function _pollStatus(myTimeout, widget, executionId) {
             $log.debug('polling status');
-            if ($scope.widgetStatus.state !== STATE_STOPPED) { // keep polling until widget stops ==> mainly for timeleft..
+            if (!$scope.widgetStatus.nodeModel || $scope.widgetStatus.nodeModel.state !== STATE_STOPPED) { // keep polling until widget stops ==> mainly for timeleft..
                 WidgetsService.getStatus(widget._id, executionId).then(function (result) {
                     if (!result) {
                         return;
