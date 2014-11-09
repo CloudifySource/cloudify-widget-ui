@@ -190,6 +190,7 @@ function _createExecutionModel(curryParams, curryCallback) {
         var executionModel = {};
         executionModel.widget = curryParams.widget;
         executionModel.loginDetailsId = curryParams.loginDetailsId;
+        executionModel.state = 'RUNNING';
 
         collection.insert(executionModel, function (err, docsInserted) {
             if (!!err) {
@@ -489,6 +490,29 @@ function _playFinally(err, curryParams) {
 
     if (!!err) {
 //        logger.error('failed to play widget with id [%s]', curryParams.widgetId);
+        managers.db.connect('widgetExecutions', function (db, collection, done) {
+            collection.update(
+                { _id: curryParams.executionObjectId },
+                {
+                    $set: {
+                        state: 'STOPPED'
+                    }
+                },
+                function (err, nUpdated) {
+                    if (!!err) {
+                        logger.error('failed updating widget execution model', err);
+                        done();
+                        return;
+                    }
+                    if (!nUpdated) {
+                        logger.error('no widget execution docs updated in the database');
+                        done();
+                        return;
+                    }
+                    done();
+                });
+        });
+
         curryParams.playCallback(err, curryParams.executionId);
         return;
     }
