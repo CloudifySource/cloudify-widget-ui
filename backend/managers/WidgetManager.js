@@ -484,36 +484,38 @@ function _runBootstrapAndInstallCommands(curryParams, curryCallback) {
     curryCallback(null, curryParams);
 }
 
+function updateExecution(executionObjectId, data) {
+    managers.db.connect('widgetExecutions', function (db, collection, done) {
+        collection.update(
+            { _id: executionObjectId },
+            {
+                $set: data
+            },
+            function (err, nUpdated) {
+                if (!!err) {
+                    logger.error('failed updating widget execution model', err);
+                    done();
+                    return;
+                }
+                if (!nUpdated) {
+                    logger.error('no widget execution docs updated in the database');
+                    done();
+                    return;
+                }
+                done();
+            });
+    });
+}
 
 function _playFinally(err, curryParams) {
 
 
     if (!!err) {
 //        logger.error('failed to play widget with id [%s]', curryParams.widgetId);
-        managers.db.connect('widgetExecutions', function (db, collection, done) {
-            collection.update(
-                { _id: curryParams.executionObjectId },
-                {
-                    $set: {
-                        state: 'STOPPED',
-                        error: err.message
-                    }
-                },
-                function (err, nUpdated) {
-                    if (!!err) {
-                        logger.error('failed updating widget execution model', err);
-                        done();
-                        return;
-                    }
-                    if (!nUpdated) {
-                        logger.error('no widget execution docs updated in the database');
-                        done();
-                        return;
-                    }
-                    done();
-                });
+        updateExecution(curryParams.executionObjectId, {
+            state: 'STOPPED',
+            error: err.message
         });
-
         curryParams.playCallback(err, curryParams.executionId);
         return;
     }
@@ -696,6 +698,14 @@ exports.getStatus = function (executionId, callback) {
             // add the status from cli execution (0 or 1)..
             // if this exists on the execution status, we know execution ended.
             //
+
+            // if expires < now, call stop()
+            if (execution.nodeModel && execution.nodeModel.expires < new Date().getTime()) {
+                updateExecution(managers.db.toObjectId(executionId), {
+                    state: 'EXPIRED'
+                });
+            }
+
             logger.debug('reading status');
             services.logs.readStatus(executionId, function (err, exitStatus) {
                 logger.debug('read status');
