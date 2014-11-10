@@ -24,7 +24,7 @@ exports.list = function (req, res) {
 };
 
 function getWidgetPublicParams(widget) {
-    var result = _.pick(widget, 'showAdvanced', 'embedVideoSnippet', 'productName', 'productVersion', 'title', 'providerUrl', '_id', 'login', 'showAdvanced', 'socialLogin','theme', 'consoleLink', 'showCloudifyLink');
+    var result = _.pick(widget, 'showAdvanced', 'embedVideoSnippet', 'productName', 'productVersion', 'title', 'providerUrl', '_id', 'login', 'showAdvanced', 'socialLogin', 'theme', 'consoleLink', 'showCloudifyLink', 'soloMode');
     if (result.hasOwnProperty('socialLogin')) {
         result.socialLogin = _.pick(result.socialLogin, 'data');
     }
@@ -110,12 +110,12 @@ exports.play = function (req, res) {
         return;
     }
 
-    var playCallback = function playCallback (err, result) {
+    var playCallback = function playCallback(err, result) {
         if (!!err) {
             var errorStr = err.message;
             logger.error(errorStr);
             services.logs.appendOutput(errorStr, result);
-            res.send(200, { 'executionId' : result });
+            res.send(200, { 'executionId': result });
             return;
         }
 
@@ -126,7 +126,7 @@ exports.play = function (req, res) {
         }
 
         logger.info('widget play initiated successfully, execution id is [%s]', result);
-        res.send(200, { 'executionId' : result } );
+        res.send(200, { 'executionId': result });
     };
 
     if (req.body.remote) {
@@ -286,7 +286,7 @@ exports.getWidgetForPlayer = function (req, res) {
 };
 
 exports.getStatus = function (req, res) {
-    logger.debug('calling widget get status. user id [%s], widget id [%s], execution id [%s]',  req.params.widgetId, req.params.executionId);
+    logger.debug('calling widget get status. user id [%s], widget id [%s], execution id [%s]', req.params.widgetId, req.params.executionId);
 
     if (!req.params.widgetId) {
         logger.error('unable to get output, no widget id found on request');
