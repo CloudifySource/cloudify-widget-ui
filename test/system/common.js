@@ -69,7 +69,8 @@ exports.performLogin = function (driver, done, validationFunctions) {
                 callback();
             });
 
-        }]
+        }
+    ]
         .concat(validationFunctions)
         .concat([
             function finishLogin(callback) {
