@@ -3,7 +3,6 @@
     <!-- TODO FIXME figure out how to put inner frame without it being empty -->
 
 
-    <img src="/images/beta.png" class="beta-ribbon"/>
     <span id="title">{{widget.title}}</span>
 
     <a herf="javascript:void(0)" id="start_btn" class="button" ng-show="showPlay()" ng-click="play()"></a>
@@ -23,16 +22,18 @@
     </ul>
 
     <ul id="links">
-        <li ng-show="!!widgetStatus.instanceIsAvailable">
-            <a href="{{widgetStatus.consoleLink.url}}"
+        <li>
+            <span ng-show="!widgetStatus.instanceIsAvailable">{{widgetStatus.consoleLink.title}}</span>
+            <a ng-show="!!widgetStatus.instanceIsAvailable"
+               href="{{widgetStatus.consoleLink.link}}"
                class="track"
                target="_blank">{{widgetStatus.consoleLink.title}}</a>
         </li>
-        <li>
-            <span ng-show="!widgetStatus.cloudifyUiIsAvailable">{{ 'global.cloudify' | i18n }}</span>
-            <a href="http://{{widgetStatus.publicIp}}:8099"
+        <li ng-show="widget.showCloudifyLink">
+            <span ng-show="!widgetStatus.instanceIsAvailable">{{ 'global.cloudify' | i18n }}</span>
+            <a href="http://{{widgetStatus.nodeModel.publicIp}}:8099"
                 target="_blank"
-                ng-show="!!widgetStatus.cloudifyUiIsAvailable"
+                ng-show="!!widgetStatus.instanceIsAvailable"
                 class="track">{{ 'global.cloudify' | i18n }}
             </a>
         </li>

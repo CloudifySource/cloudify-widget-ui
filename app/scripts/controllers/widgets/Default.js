@@ -49,6 +49,7 @@ angular.module('cloudifyWidgetUiApp')
 
         function _resetWidgetStatus() {
             $scope.widgetState = STATE_STOPPED;
+            $scope.widgetStatus = {};
         }
 
         _resetWidgetStatus();
@@ -69,10 +70,27 @@ angular.module('cloudifyWidgetUiApp')
 
         function _handleStatus(status) {
             $log.debug(['got status', status]);
+            updateWidgetStatus(status);
 
             ellipsisIndex = ellipsisIndex + 1;
-            $scope.output = status.output ? status.output : '';
+            $scope.output = status.output || '';
             _scrollLog();
+        }
+
+        function updateWidgetStatus(status) {
+            if (!$scope.widgetStatus) {
+                $scope.widgetStatus = {};
+            }
+
+            $scope.widgetStatus.nodeModel = status.nodeModel;
+
+            if (status.nodeModel && status.nodeModel.publicIp) {
+                $scope.widgetStatus.consoleLink = $scope.widget.consoleLink;
+                $scope.widgetStatus.consoleLink.link = $scope.widget.consoleLink.link.replace('$HOST', status.nodeModel.publicIp);
+            }
+
+            $scope.widgetStatus.instanceIsAvailable = (status.exitStatus && status.exitStatus.code === 0);
+
         }
 
         /****************** Login Feature , todo: move to blank ***********************/

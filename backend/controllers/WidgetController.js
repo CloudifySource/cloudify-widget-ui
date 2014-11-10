@@ -24,7 +24,7 @@ exports.list = function (req, res) {
 };
 
 function getWidgetPublicParams(widget) {
-    var result = _.pick(widget, 'showAdvanced', 'embedVideoSnippet', 'productName', 'productVersion', 'title', 'providerUrl', '_id', 'login', 'showAdvanced', 'socialLogin','theme');
+    var result = _.pick(widget, 'showAdvanced', 'embedVideoSnippet', 'productName', 'productVersion', 'title', 'providerUrl', '_id', 'login', 'showAdvanced', 'socialLogin','theme', 'consoleLink', 'showCloudifyLink');
     if (result.hasOwnProperty('socialLogin')) {
         result.socialLogin = _.pick(result.socialLogin, 'data');
     }
@@ -151,13 +151,13 @@ exports.stop = function (req, res) {
         return;
     }
 
-
     managers.widget.stop(req.params.widgetId, req.params.executionId, req.body.remote, function (err, result) {
         if (!!err) {
             logger.error('stop widget failed', err);
             res.send(500, {message: 'stop widget failed', error: err});
             return;
         }
+
         res.send(200, result);
     });
 
