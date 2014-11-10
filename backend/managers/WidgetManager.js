@@ -190,6 +190,7 @@ function _createExecutionModel(curryParams, curryCallback) {
         var executionModel = {};
         executionModel.widget = curryParams.widget;
         executionModel.loginDetailsId = curryParams.loginDetailsId;
+        executionModel.state = 'RUNNING';
 
         collection.insert(executionModel, function (err, docsInserted) {
             if (!!err) {
@@ -483,12 +484,38 @@ function _runBootstrapAndInstallCommands(curryParams, curryCallback) {
     curryCallback(null, curryParams);
 }
 
+function updateExecution(executionObjectId, data) {
+    managers.db.connect('widgetExecutions', function (db, collection, done) {
+        collection.update(
+            { _id: executionObjectId },
+            {
+                $set: data
+            },
+            function (err, nUpdated) {
+                if (!!err) {
+                    logger.error('failed updating widget execution model', err);
+                    done();
+                    return;
+                }
+                if (!nUpdated) {
+                    logger.error('no widget execution docs updated in the database');
+                    done();
+                    return;
+                }
+                done();
+            });
+    });
+}
 
 function _playFinally(err, curryParams) {
 
 
     if (!!err) {
 //        logger.error('failed to play widget with id [%s]', curryParams.widgetId);
+        updateExecution(curryParams.executionObjectId, {
+            state: 'STOPPED',
+            error: err.message
+        });
         curryParams.playCallback(err, curryParams.executionId);
         return;
     }
@@ -537,10 +564,13 @@ function _expireNode(curryParams, curryCallback) {
             return;
         }
 
+        updateExecution(managers.db.toObjectId(curryParams.executionId), {
+            state: 'STOPPED'
+        });
+
         curryCallback(null, curryParams);
     });
 }
-
 
 function _stopFinally(err, curryParams) {
     logger.trace('-stop- finished !');
@@ -619,7 +649,7 @@ exports.stop = function (widgetId, executionId, remote, stopCallback) {
             var initialCurryParams = {
                 widgetId: widgetId,
                 executionId: executionId,
-
+                executionObjectId: managers.db.toObjectId(executionId),
                 stopCallback: stopCallback
             };
             callback(null, initialCurryParams);
@@ -643,9 +673,13 @@ function getPublicExecutionDetails(execution) {
     retVal.widget =  _.omit(execution.widget, ['userId']);
     retVal.nodeModel =  execution.nodeModel ? _.merge(_.pick(execution.nodeModel, ['id']),
                              {'publicIp': execution.nodeModel.machineSshDetails.publicIp },
-                             {'expires': execution.nodeModel.expires}) : undefined;
+                             {'expires': execution.nodeModel.expires},
+                             {'state': execution.state}) : undefined;
     retVal.exitStatus = execution.exitStatus;
     retVal.output = execution.output;
+    if (execution.error) {
+        retVal.error = execution.error;
+    }
 
     return retVal;
 }
@@ -668,6 +702,14 @@ exports.getStatus = function (executionId, callback) {
             // add the status from cli execution (0 or 1)..
             // if this exists on the execution status, we know execution ended.
             //
+
+            // if expires < now, update state.
+            if (execution.nodeModel && execution.nodeModel.expires < new Date().getTime()) {
+                updateExecution(managers.db.toObjectId(executionId), {
+                    state: 'STOPPED'
+                });
+            }
+
             logger.debug('reading status');
             services.logs.readStatus(executionId, function (err, exitStatus) {
                 logger.debug('read status');
