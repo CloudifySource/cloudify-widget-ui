@@ -102,7 +102,7 @@ exports.delete = function (req, res) {
 };
 
 exports.play = function (req, res) {
-    logger.info('calling widget play for user id [%s], widget id [%s], remote [%s]', req.params.widgetId, req.body.remote);
+    logger.info('calling widget play for user id [%s], widget id [%s], remote [%s], solo mode [%s]', req.params.widgetId, req.body.remote, req.body.soloMode);
 
     if (!req.params.widgetId) {
         logger.error('unable to play, no widget id found on request');
@@ -131,6 +131,8 @@ exports.play = function (req, res) {
 
     if (req.body.remote) {
         managers.widget.playRemote(req.params.widgetId, req.body.advancedParams, playCallback);
+    } else if (req.body.soloMode) {
+        // todo: implement play flow for solo.
     } else {
         managers.widget.play(req.params.widgetId, req.body.loginDetailsId, playCallback);
     }

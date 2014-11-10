@@ -34,15 +34,8 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         this.playWidget = function( widget, advancedParams, remote, loginDetailsId){
-            if (widget.soloMode) {
-                $log.info('playing widget solo mode');
-                return $http.post('/backend/widgets/' + widget._id + '/playSolo', {advancedParams: advancedParams, remote: remote, loginDetailsId: loginDetailsId});
-
-            } else {
-                $log.info('playing widget free mode');
-                return $http.post('/backend/widgets/' + widget._id + '/play', {advancedParams: advancedParams, remote: remote, loginDetailsId: loginDetailsId});
-
-            }
+            $log.info('playing widget');
+            return $http.post('/backend/widgets/' + widget._id + '/play', {advancedParams: advancedParams, remote: remote, loginDetailsId: loginDetailsId, soloMode: widget.soloMode});
         };
 
         this.stopWidget = function( widget, executionId ){
