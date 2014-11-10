@@ -29,7 +29,7 @@
                class="track"
                target="_blank">{{widgetStatus.consoleLink.title}}</a>
         </li>
-        <li>
+        <li ng-show="widget.showCloudifyLink">
             <span ng-show="!widgetStatus.instanceIsAvailable">{{ 'global.cloudify' | i18n }}</span>
             <a href="http://{{widgetStatus.nodeModel.publicIp}}:8099"
                 target="_blank"
