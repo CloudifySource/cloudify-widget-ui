@@ -89,6 +89,7 @@ angular.module('cloudifyWidgetUiApp')
             _resetWidgetStatus();
             $scope.widgetStatus.state = STATE_RUNNING;
 
+            //todo: check if solo or free, execute play login accordingly.
             WidgetsService.playWidget($scope.widget, $scope.advancedParams, $scope.isRemoteBootstrap, $scope.loginDetailsId)
                 .then(function (result) {
                     $log.info(['play result', result]);
