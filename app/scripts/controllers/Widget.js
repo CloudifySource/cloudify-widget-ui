@@ -41,6 +41,12 @@ angular.module('cloudifyWidgetUiApp')
             localStorage.removeItem( $scope.widget._id );
         }
 
+        function cleanUp(executionId) {
+            deleteState();
+            _postStopped(executionId);
+            $scope.executionId = null;
+        }
+
         function loadState(){
             var executionId = JSON.parse(localStorage.getItem( $scope.widget._id ));
             if ( !!executionId ){
@@ -113,9 +119,7 @@ angular.module('cloudifyWidgetUiApp')
 
             // now stop widget
             WidgetsService.stopWidget($scope.widget, $scope.executionId.executionId).then(function () {
-                deleteState();
-                _postStopped(executionId);
-                $scope.executionId = null;
+                cleanUp(executionId);
             });
         }
 
@@ -141,7 +145,7 @@ angular.module('cloudifyWidgetUiApp')
                     _pollStatus(false, widget, executionId);
                 }, myTimeout || 3000);
             } else {
-                _postStopped(executionId);
+                cleanUp(executionId);
             }
         }
 
