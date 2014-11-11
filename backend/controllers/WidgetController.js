@@ -24,7 +24,7 @@ exports.list = function (req, res) {
 };
 
 function getWidgetPublicParams(widget) {
-    var result = _.pick(widget, 'showAdvanced', 'embedVideoSnippet', 'productName', 'productVersion', 'title', 'providerUrl', '_id', 'login', 'showAdvanced', 'socialLogin', 'theme', 'consoleLink', 'showCloudifyLink', 'soloMode');
+    var result = _.pick(widget, 'showAdvanced', 'embedVideoSnippet', 'productName', 'productVersion', 'title', 'providerUrl', '_id', 'login', 'showAdvanced', 'socialLogin', 'theme', 'consoleLink', 'showCloudifyLink', 'executionDetails');
     if (result.hasOwnProperty('socialLogin')) {
         result.socialLogin = _.pick(result.socialLogin, 'data');
     }
@@ -102,7 +102,7 @@ exports.delete = function (req, res) {
 };
 
 exports.play = function (req, res) {
-    logger.info('calling widget play for user id [%s], widget id [%s], remote [%s], solo mode [%s]', req.params.widgetId, req.body.remote, req.body.soloMode);
+    logger.info('calling widget play for user id [%s], widget id [%s], solo mode [%s]', req.params.widgetId, req.body.executionDetails.isSoloMode);
 
     if (!req.params.widgetId) {
         logger.error('unable to play, no widget id found on request');
@@ -129,10 +129,8 @@ exports.play = function (req, res) {
         res.send(200, { 'executionId': result });
     };
 
-    if (req.body.remote) {
-        managers.widget.playRemote(req.params.widgetId, req.body.advancedParams, playCallback);
-    } else if (req.body.soloMode) {
-        // todo: implement play flow for solo.
+    if (req.body.executionDetails.isSoloMode) {
+        managers.widget.playSolo(req.params.widgetId, req.body.executionDetails, playCallback);
     } else {
         managers.widget.play(req.params.widgetId, req.body.loginDetailsId, playCallback);
     }

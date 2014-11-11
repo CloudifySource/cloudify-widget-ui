@@ -138,7 +138,7 @@ function getTempSuffix() {
 function _getWidget(curryParams, curryCallback) {
     logger.trace('-play- getWidget');
     managers.db.connect('widgets', function (db, collection, done) {
-        collection.findOne({ _id: managers.db.toObjectId(curryParams.widgetId) }, function (err, result) {
+        collection.findOne({ _id: curryParams.widgetObjectId }, function (err, result) {
             if (!!err) {
                 logger.error('unable to find widget', err);
                 curryCallback(err, curryParams);
@@ -592,6 +592,7 @@ exports.play = function (widgetId, loginDetailsId, playCallback) {
             function initCurryParams(callback) {
                 var initialCurryParams = {
                     widgetId: widgetId,
+                    widgetObjectId: managers.db.toObjectId(widgetId),
                     loginDetailsId: loginDetailsId,
                     playCallback: playCallback
                 };
@@ -612,7 +613,7 @@ exports.play = function (widgetId, loginDetailsId, playCallback) {
 };
 
 
-exports.playRemote = function (widgetId, poolKey, advancedParams, playCallback) {
+exports.playSolo = function (widgetId, executionDetails, playCallback) {
 
     logger.trace('-playRemote !!!!!!');
 
@@ -621,8 +622,9 @@ exports.playRemote = function (widgetId, poolKey, advancedParams, playCallback) 
             function initCurryParams(callback) {
                 var initialCurryParams = {
                     widgetId: widgetId,
-                    poolKey: poolKey,
-                    advancedParams: advancedParams,
+                    widgetObjectId: managers.db.toObjectId(widgetId),
+//                    poolKey: poolKey,
+                    executionDetails: executionDetails,
                     playCallback: playCallback
                 };
                 callback(null, initialCurryParams);
