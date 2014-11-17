@@ -134,12 +134,14 @@ angular.module('cloudifyWidgetUiApp')
             _postStop($scope.widget, $scope.executionId);
         };
 
-//        $scope.getFormPath = function (widget) {
-//            if (widget.remoteBootstrap && widget.remoteBootstrap.cloudifyForm) {
+        $scope.getFormPath = function (/*widget*/) {
+            // todo: remove from comment when we want to support more cloud types. For now, just return the EC2 form.
+//            if (widget.executionDetails && widget.executionDetails.isSoloMode && widget.executionDetails.cloudifyForm) {
 //                return '/views/widget/forms/' + widget.remoteBootstrap.cloudifyForm + '.html';
 //            }
 //            return '';
-//        };
+            return '/views/widget/forms/ec2.html';
+        };
 
 
         WidgetsService.getPublicWidget($routeParams.widgetId).then(function (result) {

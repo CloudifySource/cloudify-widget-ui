@@ -6,3 +6,5 @@ exports.files = require('./FilesService');
 exports.logs = require('./LogsService');
 exports.widgetLoginsTypes = require('./WidgetLoginTypes');
 exports.mandrill = require('./MandrillService');
+exports.crypto = require('./CryptoService');
+exports.ec2Api = require('./clouds/ec2');

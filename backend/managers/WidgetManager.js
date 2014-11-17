@@ -213,28 +213,38 @@ function _createExecutionModel(curryParams, curryCallback) {
 }
 
 function _updateExecutionModel(data, curryParams, curryCallback) {
-
     managers.db.connect('widgetExecutions', function (db, collection, done) {
-        collection.update(
+        collection.findOne(
             { _id: curryParams.executionObjectId },
-            {
-                $set: data
-            },
-            function (err, nUpdated) {
-                if (!!err) {
-                    logger.error('failed updating widget execution model', err);
+            function(err, result) {
+                if (err) {
+                    logger.error('failed to retrieve execution model before update', err);
                     curryCallback(err, curryParams);
                     done();
                     return;
                 }
-                if (!nUpdated) {
-                    logger.error('no widget execution docs updated in the database');
-                    curryCallback(new Error('no widget execution docs updated in the database'), curryParams);
-                    done();
-                    return;
-                }
-                curryCallback(null, curryParams);
-                done();
+
+                result = _.merge(result, data);
+
+                collection.update(
+                    { _id: curryParams.executionObjectId },
+                    result,
+                    function (err, nUpdated) {
+                        if (err) {
+                            logger.error('failed updating widget execution model', err);
+                            curryCallback(err, curryParams);
+                            done();
+                            return;
+                        }
+                        if (!nUpdated) {
+                            logger.error('no widget execution docs updated in the database');
+                            curryCallback(new Error('no widget execution docs updated in the database'), curryParams);
+                            done();
+                            return;
+                        }
+                        curryCallback(null, curryParams);
+                        done();
+                    });
             });
     });
 }
@@ -250,6 +260,28 @@ function _updateExecutionModelAddPaths(curryParams, curryCallback) {
         downloadsPath: curryParams.executionDownloadsPath,
         logsPath: curryParams.executionLogsPath
     }, curryParams, curryCallback);
+}
+
+function _updateExecutionModelAddExecutionDetails(curryParams, curryCallback) {
+    logger.trace('-play- updateExecutionModelAddExecutionDetails');
+
+    var encryptionKey = curryParams.executionId;
+    var details = curryParams.executionDetails;
+
+    if (!details.EC2 || !details.EC2.params || !details.EC2.params.apiKey || !details.EC2.params.secretKey) {
+        curryCallback(new Error('Cloud provider apiKey and secretKey are mandatory fields!'), curryParams);
+
+    }
+
+    _updateExecutionModel({
+        cloudProvider: {
+            EC2: {
+                apiKey: services.crypto.encrypt(encryptionKey, details.EC2.params.apiKey),
+                secretKey: services.crypto.encrypt(encryptionKey, details.EC2.params.secretKey)
+            }
+        }
+    }, curryParams, curryCallback);
+
 }
 
 function _updateExecutionModelAddNodeModel(curryParams, curryCallback) {
@@ -269,20 +301,39 @@ function _downloadRecipe(curryParams, curryCallback) {
     // download recipe zip
     var options = {
         destDir: curryParams.executionDownloadsPath,
-        recipeUrl: curryParams.widget.recipeUrl
+        url: curryParams.widget.recipeUrl,
+        extract: true
     };
 
-    if (!options.recipeUrl) {
+    if (!options.url) {
         curryParams.shouldInstall = false;
         curryCallback(null, curryParams);
 
     } else {
         curryParams.shouldInstall = true;
-        services.dl.downloadRecipe(options, function (e) {
+        services.dl.downloadZipfile(options, function (e) {
             curryCallback(e, curryParams);
         });
 
     }
+}
+
+function _downloadCloudProvider(curryParams, curryCallback) {
+    logger.trace('-play- downloadCloudProvider');
+
+    // TODO : add validation if destination download not already exists otherwise simply call callback.
+    logger.info('downloading Cloud Provider from ', curryParams.executionDetails.providerUrl);
+
+    var options = {
+        destDir: curryParams.executionDownloadsPath,
+        url: curryParams.executionDetails.providerUrl,
+        extract: true
+    };
+
+    services.dl.downloadZipfile(options, function (e) {
+        curryCallback(e, curryParams);
+    });
+
 }
 
 function _occupyMachine(curryParams, curryCallback) {
@@ -374,58 +425,58 @@ function _runInstallCommand(curryParams, curryCallback) {
     curryCallback(null, curryParams);
 }
 
-function _copyCloudFolder(curryParams, curryCallback) {
-    logger.trace('-play- copyCloudFolder');
+function _generateKeyPair(curryParams, curryCallback) {
+    var executionDetails = curryParams.executionDetails;
+    var encryptionKey = curryParams.executionId;
 
-    logger.debug('copyCloudFolder, widget:', curryParams.widget);
-    var cloudifyCloudsDir = conf.cloudifyCloudsDir;
-    logger.debug('cloudifyCloudsDir:', cloudifyCloudsDir);
-    var cloudName = curryParams.widget.remoteBootstrap.cloudifyCloud;
-    logger.debug('cloudName:', cloudName);
-    var cloudSourceFolder = cloudifyCloudsDir + path.sep + cloudName;
-    var suffix = getTempSuffix();
-    logger.debug('suffix:', suffix);
-    curryParams.cloudDistFolderName = curryParams.widget.remoteBootstrap.cloudifyCloud + suffix;
-    var cloudDistFolder = cloudifyCloudsDir + path.sep + curryParams.cloudDistFolderName;
-    curryParams.cloudDistFolder = cloudDistFolder;
-    logger.debug('cloudSourceFolder:', cloudSourceFolder, ', cloudDistFolder', cloudDistFolder, 'cloudDistFolderName', curryParams.cloudDistFolderName);
-
-    var ncp = require('ncp').ncp;
-    ncp.limit = 16;
-
-    ncp(cloudSourceFolder, cloudDistFolder, function (err) {
-        if (!!err) {
-            logger.info(err);
-            return;
-        }
-        logger.info('Folder [%s] was successfully copied into [%s]', cloudSourceFolder, cloudDistFolder);
+    if (!executionDetails.EC2) {
         curryCallback(null, curryParams);
+    }
+
+    services.ec2Api.createKeyPair(executionDetails.EC2.params.apiKey, executionDetails.EC2.params.secretKey, 'us-east-1', 'Cloudify-Widget-' + curryParams.executionId, function(err, data) {
+        if (err) {
+            curryCallback(err, curryParams);
+        }
+
+        //create pem file
+        var keyPairPemFile = curryParams.executionDownloadsPath + path.sep + curryParams.widget.executionDetails.providerRootPath + path.sep + 'upload/keyFile.pem';
+        fs.appendFile(keyPairPemFile, data.KeyMaterial, function(err) {
+            if (err) {
+                curryCallback(err, curryParams);
+            }
+
+            fs.chmodSync(keyPairPemFile, '600');
+
+            curryParams.executionDetails.EC2.params.keyPair = data;
+
+            _updateExecutionModel({
+                cloudProvider: {
+                    EC2: {
+                        keyPairName: services.crypto.encrypt(encryptionKey, data.KeyName),
+                        keyPairSecret: services.crypto.encrypt(encryptionKey, data.KeyMaterial),
+                        keyPairFile: keyPairPemFile
+                    }
+                }
+            }, curryParams, curryCallback);
+        });
+
     });
 }
 
-function _overrideCloudPropertiesFile(curryParams, curryCallback) {
-    logger.trace('-play- overrideCloudPropertiesFile');
-
-    var cloudName = curryParams.widget.remoteBootstrap.cloudifyCloud;
-    var cloudPropertiesFile = curryParams.cloudDistFolder + path.sep + cloudName + '-cloud.properties';
-    var advancedParams = curryParams.advancedParams;
-    logger.info('Cloud Properties File is ', cloudPropertiesFile, 'advancedParams=', curryParams.advancedParams);
-
-    //overrideParams( curryParams.cloudDistFolderName, cloudPropertiesFile, curryParams.advancedParams, curryCallback );
-    logger.info('---overrideParams---, -advancedParams:', advancedParams);
-
+function _getPropertiesUpdateLine(executionDetails) {
     var updateLine = '';
-    if (advancedParams.SOFTLAYER) {
-        var username = advancedParams.SOFTLAYER.params.username;
-        var apiKey = advancedParams.SOFTLAYER.params.apiKey;
+
+    if (executionDetails.SOFTLAYER) {
+        var username = executionDetails.SOFTLAYER.params.username;
+        var apiKey = executionDetails.SOFTLAYER.params.apiKey;
         updateLine =
             'user=' + username + '\n' +
             'apiKey="' + apiKey + '"';
     }
-    else if (advancedParams.HP) {
-        var key = advancedParams.HP.params.key;
-        var secretKey = advancedParams.HP.params.secretKey;
-        var project = advancedParams.HP.params.project;
+    else if (executionDetails.HP) {
+        var key = executionDetails.HP.params.key;
+        var secretKey = executionDetails.HP.params.secretKey;
+        var project = executionDetails.HP.params.project;
         updateLine =
             'tenant="' + project + '"\n' +
             'user="' + key + '"\n' +
@@ -435,7 +486,31 @@ function _overrideCloudPropertiesFile(curryParams, curryCallback) {
          'keyPair="' + newPemFile.getName() + '"';
          'securityGroup="' + cloudConf.securityGroup + '"';
          */
+    } else if (executionDetails.EC2) {
+        var ec2user = executionDetails.EC2.params.apiKey;
+        var ec2apiKey = executionDetails.EC2.params.secretKey;
+        var ec2keyPair = executionDetails.EC2.params.keyPair.KeyName;
+
+        updateLine =
+            '\n\nuser="' + ec2user + '"\n' +
+            'apiKey="' + ec2apiKey + '"\n' +
+            'keyPair="' + ec2keyPair + '"\n' +
+            'keyFile="keyFile.pem"\n';
     }
+
+    return updateLine;
+}
+
+function _overrideCloudPropertiesFile(curryParams, curryCallback) {
+    logger.trace('-play- overrideCloudPropertiesFile');
+
+    var cloudName = curryParams.widget.executionDetails.providerName;
+    var cloudPropertiesFile = curryParams.executionDownloadsPath + path.sep + curryParams.widget.executionDetails.providerRootPath + path.sep + cloudName + '-cloud.properties';
+    var executionDetails = curryParams.executionDetails;
+
+    logger.info('---overrideParams---, -advancedParams:', executionDetails);
+
+    var updateLine = _getPropertiesUpdateLine(executionDetails);
 
     logger.info('---updateLine', updateLine);
 
@@ -623,7 +698,6 @@ exports.playSolo = function (widgetId, executionDetails, playCallback) {
                 var initialCurryParams = {
                     widgetId: widgetId,
                     widgetObjectId: managers.db.toObjectId(widgetId),
-//                    poolKey: poolKey,
                     executionDetails: executionDetails,
                     playCallback: playCallback
                 };
@@ -632,8 +706,10 @@ exports.playSolo = function (widgetId, executionDetails, playCallback) {
             _getWidget,
             _createExecutionModel,
             _updateExecutionModelAddPaths,
+            _updateExecutionModelAddExecutionDetails,
             _downloadRecipe,
-            _copyCloudFolder,
+            _downloadCloudProvider,
+            _generateKeyPair,
             _overrideCloudPropertiesFile,
             _runBootstrapAndInstallCommands
         ],
