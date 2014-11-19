@@ -270,7 +270,6 @@ function _updateExecutionModelAddExecutionDetails(curryParams, curryCallback) {
 
     if (!details.EC2 || !details.EC2.params || !details.EC2.params.apiKey || !details.EC2.params.secretKey) {
         curryCallback(new Error('Cloud provider apiKey and secretKey are mandatory fields!'), curryParams);
-
     }
 
     _updateExecutionModel({
@@ -504,8 +503,9 @@ function _getPropertiesUpdateLine(executionDetails) {
 function _overrideCloudPropertiesFile(curryParams, curryCallback) {
     logger.trace('-play- overrideCloudPropertiesFile');
 
+    curryParams.cloudDistFolderName = curryParams.executionDownloadsPath + path.sep + curryParams.widget.executionDetails.providerRootPath;
     var cloudName = curryParams.widget.executionDetails.providerName;
-    var cloudPropertiesFile = curryParams.executionDownloadsPath + path.sep + curryParams.widget.executionDetails.providerRootPath + path.sep + cloudName + '-cloud.properties';
+    var cloudPropertiesFile = curryParams.cloudDistFolderName + path.sep + cloudName + '-cloud.properties';
     var executionDetails = curryParams.executionDetails;
 
     logger.info('---overrideParams---, -advancedParams:', executionDetails);
@@ -538,13 +538,13 @@ function _runBootstrapAndInstallCommands(curryParams, curryCallback) {
 
     logger.info('-playRemote waterfall- runCliBootstrapCommand, JOIN:', installPath);
     logger.info('-installPath after handlingseparators:', installPath);
+
     var command = {
         arguments: [
             'bootstrap-cloud',
             curryParams.cloudDistFolderName,
             ';',
-            curryParams.widget.recipeType.installCommand,
-            '-timeout',
+            'install-service -disableSelfHealing -timeout',
             installTimeout,
             installPath
         ],
@@ -583,7 +583,6 @@ function updateExecution(executionObjectId, data) {
 }
 
 function _playFinally(err, curryParams) {
-
 
     if (!!err) {
 //        logger.error('failed to play widget with id [%s]', curryParams.widgetId);
