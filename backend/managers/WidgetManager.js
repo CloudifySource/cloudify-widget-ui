@@ -462,7 +462,7 @@ function _generateKeyPair(curryParams, curryCallback) {
     });
 }
 
-function _getPropertiesUpdateLine(executionDetails) {
+function _getPropertiesUpdateLine(executionDetails, executionId) {
     var updateLine = '';
 
     if (executionDetails.SOFTLAYER) {
@@ -494,7 +494,9 @@ function _getPropertiesUpdateLine(executionDetails) {
             '\n\nuser="' + ec2user + '"\n' +
             'apiKey="' + ec2apiKey + '"\n' +
             'keyPair="' + ec2keyPair + '"\n' +
-            'keyFile="keyFile.pem"\n';
+            'keyFile="keyFile.pem"\n' +
+            'machineNamePrefix="cloudify-agent-widget-' + executionId + '"\n' +
+            'managementGroup="cloudify-manager-widget-' + executionId + '"\n';
     }
 
     return updateLine;
@@ -510,7 +512,7 @@ function _overrideCloudPropertiesFile(curryParams, curryCallback) {
 
     logger.info('---overrideParams---, -advancedParams:', executionDetails);
 
-    var updateLine = _getPropertiesUpdateLine(executionDetails);
+    var updateLine = _getPropertiesUpdateLine(executionDetails, curryParams.executionId);
 
     logger.info('---updateLine', updateLine);
 
@@ -525,6 +527,26 @@ function _overrideCloudPropertiesFile(curryParams, curryCallback) {
         curryCallback(null, curryParams);
     });
 
+}
+
+function _runTeardownCommand(curryParams, curryCallback) {
+    logger.info('-stopRemote- runClieTeardown');
+
+    var teardownPath = path.resolve(path.join(curryParams.executionModel.downloadsPath, curryParams.widget.executionDetails.providerRootPath));
+    var command = {
+        arguments: [
+            'teardown-cloud',
+            teardownPath
+        ],
+        logsDir: curryParams.executionModel.logsPath,
+        executionId: curryParams.executionObjectId.toHexString()
+    };
+
+    logger.info('-command ', command);
+
+    services.cloudifyCli.executeCommand(command);
+
+    curryCallback(null, curryParams);
 }
 
 function _runBootstrapAndInstallCommands(curryParams, curryCallback) {
@@ -638,12 +660,14 @@ function _expireNode(curryParams, curryCallback) {
             return;
         }
 
-        updateExecution(managers.db.toObjectId(curryParams.executionId), {
-            state: 'STOPPED'
-        });
-
         curryCallback(null, curryParams);
     });
+}
+
+function _updateExecutionModelStopped(curryParams, curryCallback) {
+    _updateExecutionModel({
+        state: 'STOPPED'
+    }, curryParams, curryCallback);
 }
 
 function _stopFinally(err, curryParams) {
@@ -719,12 +743,12 @@ exports.playSolo = function (widgetId, executionDetails, playCallback) {
 
 exports.stop = function (widgetId, executionId, remote, stopCallback) {
 
-
     var tasks = [
 
         function initCurryParams(callback) {
             var initialCurryParams = {
                 widgetId: widgetId,
+                widgetObjectId: managers.db.toObjectId(widgetId),
                 executionId: executionId,
                 executionObjectId: managers.db.toObjectId(executionId),
                 stopCallback: stopCallback
@@ -737,7 +761,10 @@ exports.stop = function (widgetId, executionId, remote, stopCallback) {
     ];
 
     // if execution is not on a remote machine, the node is in the pool - add a task to expire it
-    !remote && tasks.push(_expireNode);
+//    remote ? tasks.push(_runTeardownCommand) : tasks.push(_expireNode);
+    !remote  && tasks.push(_expireNode);
+
+    tasks.push(_updateExecutionModelStopped);
 
     async.waterfall(
         tasks,
@@ -748,10 +775,16 @@ exports.stop = function (widgetId, executionId, remote, stopCallback) {
 function getPublicExecutionDetails(execution) {
     var retVal = {};
     retVal.widget =  _.omit(execution.widget, ['userId']);
-    retVal.nodeModel =  execution.nodeModel ? _.merge(_.pick(execution.nodeModel, ['id']),
-                             {'publicIp': execution.nodeModel.machineSshDetails.publicIp },
-                             {'expires': execution.nodeModel.expires},
-                             {'state': execution.state}) : undefined;
+
+    if (execution.nodeModel) {
+        retVal.nodeModel =  _.merge(_.pick(execution.nodeModel, ['id']),
+            {'publicIp': execution.nodeModel.machineSshDetails.publicIp },
+            {'expires': execution.nodeModel.expires},
+            {'state': execution.state});
+    } else {
+        retVal.nodeModel = {'state': execution.state};
+    }
+
     retVal.exitStatus = execution.exitStatus;
     retVal.output = execution.output;
     if (execution.error) {

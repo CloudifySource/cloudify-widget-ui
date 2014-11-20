@@ -106,14 +106,16 @@ angular.module('cloudifyWidgetUiApp')
             _postMessage({'name' : 'widget_loaded'});
         }
 
-        function stop (widget, executionId) {
+        function stop () {
             //first, stop polling for status (resolves race condition - getStatus before stop finished).
             _resetWidgetStatus();
 
+            var isSoloMode = $scope.widget.executionDetails.isSoloMode;
+
             // now stop widget
-            WidgetsService.stopWidget($scope.widget, $scope.executionId.executionId).then(function () {
+            WidgetsService.stopWidget($scope.widget, $scope.executionId.executionId, isSoloMode).then(function () {
                 deleteState();
-                _postStopped(executionId);
+                _postStopped($scope.executionId.executionId);
                 $scope.executionId = null;
             });
         }

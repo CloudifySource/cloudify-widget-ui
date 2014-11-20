@@ -38,8 +38,8 @@ angular.module('cloudifyWidgetUiApp')
             return $http.post('/backend/widgets/' + widget._id + '/play', {executionDetails: executionDetails, loginDetailsId: loginDetailsId});
         };
 
-        this.stopWidget = function( widget, executionId ){
-            return $http.post('/backend/widgets/' + widget._id + '/executions/' + executionId + '/stop');
+        this.stopWidget = function( widget, executionId, isSoloMode ){
+            return $http.post('/backend/widgets/' + widget._id + '/executions/' + executionId + '/stop', { isSoloMode: isSoloMode });
         };
 
         this.getStatus = function( widgetId, executionId ){
