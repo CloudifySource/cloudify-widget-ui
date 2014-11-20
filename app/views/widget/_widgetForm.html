@@ -56,23 +56,6 @@
                     <span class="col-md-4">Show Cloudify link: </span>
                     <input class="col-md-1" type="checkbox" ng-model="widget.showCloudifyLink"/>
                 </div>
-
-                <!--<div class="row">-->
-                    <!--<strong>Bootstrap</strong>-->
-                <!--</div>-->
-                <!--<div class="row">-->
-                    <!--<span class="col-md-4">Active : </span>-->
-                    <!--<input class="col-md-1" type="checkbox" ng-model="widget.remoteBootstrap.active"/>-->
-                <!--</div>-->
-                <!--<div class="row">-->
-                    <!--<span class="col-md-4">Form : </span>-->
-                    <!--<select class="col-md-8" ng-model="widget.remoteBootstrap.cloudifyForm"-->
-                            <!--ng-options="c.id as c.label for c in remoteBootstrapForms"></select>-->
-                <!--</div>-->
-                <!--<div class="row">-->
-                    <!--<span class="col-md-4">Cloudify Cloud : </span>-->
-                    <!--<input class="col-md-8" ng-model="widget.remoteBootstrap.cloudifyCloud" type="text"/>-->
-                <!--</div>-->
             </tab>
             <tab heading="Execution Details" select="navigateTo('executionDetails')">
                 <div class="row">
@@ -91,14 +74,6 @@
                     <span class="col-md-4">Cloud Provider root path: </span>
                     <input class="col-md-8" type="text" ng-model="widget.executionDetails.providerRootPath" ng-disabled="!widget.executionDetails.isSoloMode"/>
                 </div>
-                <!--<div class="row">-->
-                    <!--<span class="col-md-4">Application name: </span>-->
-                    <!--<input class="col-md-8" type="text" ng-model="widget.executionDetails.appName" ng-disabled="!widget.executionDetails.isSoloMode"/>-->
-                <!--</div>-->
-                <!--<div class="row">-->
-                    <!--<span class="col-md-4">Service name: </span>-->
-                    <!--<input class="col-md-8" type="text" ng-model="widget.executionDetails.serviceName" ng-disabled="!widget.executionDetails.isSoloMode"/>-->
-                <!--</div>-->
             </tab>
             <tab heading="Theme" select="navigateTo('theme')">
                 <div class="row">
