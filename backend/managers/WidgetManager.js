@@ -130,11 +130,6 @@ function sendEmailAfterInstall(curryParams){
 
 }
 
-function getTempSuffix() {
-    var currTime = '' + new Date().getTime();
-    return currTime.substring(currTime.length - 4);
-}
-
 function _getWidget(curryParams, curryCallback) {
     logger.trace('-play- getWidget');
     managers.db.connect('widgets', function (db, collection, done) {
@@ -529,6 +524,7 @@ function _overrideCloudPropertiesFile(curryParams, curryCallback) {
 
 }
 
+/*
 function _runTeardownCommand(curryParams, curryCallback) {
     logger.info('-stopRemote- runClieTeardown');
 
@@ -548,6 +544,7 @@ function _runTeardownCommand(curryParams, curryCallback) {
 
     curryCallback(null, curryParams);
 }
+*/
 
 function _runBootstrapAndInstallCommands(curryParams, curryCallback) {
     logger.info('-playRemote- runCliBootstrapCommand, executionLogsPath:', curryParams.executionLogsPath, 'installCommand:', curryParams.widget.recipeType.installCommand);

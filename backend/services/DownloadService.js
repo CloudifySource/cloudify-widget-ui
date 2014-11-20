@@ -28,7 +28,7 @@ exports.downloadZipfile = function (options, callback) {
             .get(zipFileUrl)
             .dest(destDir);
 
-        download.run(function (err, files, stream) {
+        download.run(function (err/*, files, stream*/) {
             if (err) {
                 logger.info('got error from download',err);
                 callback(err);
