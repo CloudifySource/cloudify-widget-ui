@@ -30,6 +30,9 @@
     "aws-sdk": "~2.0.8",
     "mandrill-api": "~1.0.40"
   },
+  "scripts": {
+      "test": "grunt"
+  },
   "devDependencies": {
     "connect-livereload": "~0.2.0",
     "grunt": "~0.4.1",
