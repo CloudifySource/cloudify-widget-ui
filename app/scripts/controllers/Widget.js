@@ -70,7 +70,7 @@ angular.module('cloudifyWidgetUiApp')
             playInternal();
         };
 
-        function play (widget, advancedParams, isRemoteBootstrap) {
+        function play (widget) {
             //check if social login is required
             var socialLoginRequired = false;
             if (widget.socialLogin && widget.socialLogin.data && widget.socialLogin.data.length !== 0) {
@@ -78,8 +78,6 @@ angular.module('cloudifyWidgetUiApp')
             }
 
             $scope.widget = widget;
-            $scope.advancedParams = advancedParams;
-            $scope.isRemoteBootstrap = isRemoteBootstrap;
 
             if (socialLoginRequired) {
                 // show the social login popup
@@ -95,7 +93,8 @@ angular.module('cloudifyWidgetUiApp')
             _resetWidgetStatus();
             $scope.widgetStatus.state = STATE_RUNNING;
 
-            WidgetsService.playWidget($scope.widget, $scope.advancedParams, $scope.isRemoteBootstrap, $scope.loginDetailsId)
+            var executionDetails = $scope.widget.executionDetails;
+            WidgetsService.playWidget($scope.widget, $scope.loginDetailsId, executionDetails)
                 .then(function (result) {
                     $log.info(['play result', result]);
 
@@ -113,13 +112,15 @@ angular.module('cloudifyWidgetUiApp')
             _postMessage({'name' : 'widget_loaded'});
         }
 
-        function stop (widget, executionId) {
+        function stop () {
             //first, stop polling for status (resolves race condition - getStatus before stop finished).
             _resetWidgetStatus();
 
+            var isSoloMode = $scope.widget.executionDetails.isSoloMode;
+
             // now stop widget
-            WidgetsService.stopWidget($scope.widget, $scope.executionId.executionId).then(function () {
-                cleanUp(executionId);
+            WidgetsService.stopWidget($scope.widget, $scope.executionId.executionId, isSoloMode).then(function () {
+                cleanUp($scope.executionId.executionId);
             });
         }
 
@@ -202,7 +203,7 @@ angular.module('cloudifyWidgetUiApp')
             }
 
             if (data.name === WidgetConstants.PLAY) {
-                play($scope.widget/*, data.advancedParams, data.isRemoteBootstrap*/); // currently support only non remote execution
+                play(data.widget); // currently support only non remote execution
             }
 
             if (data.name === WidgetConstants.STOP) {

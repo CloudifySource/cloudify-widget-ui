@@ -17,7 +17,7 @@
     "widget": {
         "default": {
             "trialLeft": "Trial time left:",
-            "advanced": "Advanced",
+            "advanced": "Solo Mode",
             "pem": "PEM",
             "hpConsole": "HP Console",
             "embedCode": "Embed Code",

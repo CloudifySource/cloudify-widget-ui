@@ -127,19 +127,21 @@ angular.module('cloudifyWidgetUiApp')
 //            var advancedParams = _hasAdvanced() ? _getAdvanced() : null;
 //            console.log('advanced params: ', advancedParams, '_hasAdvanced()=', _hasAdvanced());
 
-            _postPlay($scope.widget, /*advancedParams*/null, /*_isRemoteBootstrap()*/false);
+            _postPlay($scope.widget);
         };
 
         $scope.stop = function () {
-            _postStop($scope.widget, $scope.executionId, false /*_isRemoteBootstrap()*/);
+            _postStop($scope.widget, $scope.executionId);
         };
 
-//        $scope.getFormPath = function (widget) {
-//            if (widget.remoteBootstrap && widget.remoteBootstrap.cloudifyForm) {
+        $scope.getFormPath = function (/*widget*/) {
+            // todo: remove from comment when we want to support more cloud types. For now, just return the EC2 form.
+//            if (widget.executionDetails && widget.executionDetails.isSoloMode && widget.executionDetails.cloudifyForm) {
 //                return '/views/widget/forms/' + widget.remoteBootstrap.cloudifyForm + '.html';
 //            }
 //            return '';
-//        };
+            return '/views/widget/forms/ec2.html';
+        };
 
 
         WidgetsService.getPublicWidget($routeParams.widgetId).then(function (result) {
@@ -150,18 +152,13 @@ angular.module('cloudifyWidgetUiApp')
 
 //        var emptyList = [];
 
-//        function _isRemoteBootstrap() {
-//            return $scope.widget.remoteBootstrap && $scope.widget.remoteBootstrap.active;
-//        }
-
-
         // post outgoing messages
-        function _postPlay(widget, advancedParams, isRemoteBootstrap) {
-            _postMessage({name: 'widget_play', widget: widget, advancedParams: advancedParams, isRemoteBootstrap: isRemoteBootstrap});
+        function _postPlay(widget) {
+            _postMessage({name: 'widget_play', widget: widget});
         }
 
-        function _postStop(widget, executionId, isRemoteBootstrap) {
-            _postMessage({name: 'widget_stop', widget: widget, executionId: executionId, isRemoteBootstrap: isRemoteBootstrap});
+        function _postStop(widget, executionId) {
+            _postMessage({name: 'widget_stop', widget: widget, executionId: executionId});
         }
 
         function _postMessage(data) {

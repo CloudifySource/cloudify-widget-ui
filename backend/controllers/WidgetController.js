@@ -24,7 +24,7 @@ exports.list = function (req, res) {
 };
 
 function getWidgetPublicParams(widget) {
-    var result = _.pick(widget, 'showAdvanced', 'embedVideoSnippet', 'productName', 'productVersion', 'title', 'providerUrl', '_id', 'login', 'showAdvanced', 'socialLogin','theme', 'consoleLink', 'showCloudifyLink');
+    var result = _.pick(widget, 'showAdvanced', 'embedVideoSnippet', 'productName', 'productVersion', 'title', 'providerUrl', '_id', 'login', 'showAdvanced', 'socialLogin', 'theme', 'consoleLink', 'showCloudifyLink', 'executionDetails');
     if (result.hasOwnProperty('socialLogin')) {
         result.socialLogin = _.pick(result.socialLogin, 'data');
     }
@@ -102,7 +102,7 @@ exports.delete = function (req, res) {
 };
 
 exports.play = function (req, res) {
-    logger.info('calling widget play for user id [%s], widget id [%s], remote [%s]', req.params.widgetId, req.body.remote);
+    logger.info('calling widget play for user id [%s], widget id [%s], solo mode [%s]', req.params.widgetId, req.body.executionDetails.isSoloMode);
 
     if (!req.params.widgetId) {
         logger.error('unable to play, no widget id found on request');
@@ -110,12 +110,12 @@ exports.play = function (req, res) {
         return;
     }
 
-    var playCallback = function playCallback (err, result) {
+    var playCallback = function playCallback(err, result) {
         if (!!err) {
             var errorStr = err.message;
             logger.error(errorStr);
             services.logs.appendOutput(errorStr, result);
-            res.send(200, { 'executionId' : result });
+            res.send(200, { 'executionId': result });
             return;
         }
 
@@ -126,18 +126,18 @@ exports.play = function (req, res) {
         }
 
         logger.info('widget play initiated successfully, execution id is [%s]', result);
-        res.send(200, { 'executionId' : result } );
+        res.send(200, { 'executionId': result });
     };
 
-    if (req.body.remote) {
-        managers.widget.playRemote(req.params.widgetId, req.body.advancedParams, playCallback);
+    if (req.body.executionDetails.isSoloMode) {
+        managers.widget.playSolo(req.params.widgetId, req.body.executionDetails, playCallback);
     } else {
         managers.widget.play(req.params.widgetId, req.body.loginDetailsId, playCallback);
     }
 };
 
 exports.stop = function (req, res) {
-    logger.info('calling widget stop. user id [%s], widget id [%s], execution id [%s]', req.params.widgetId, req.params.executionId);
+    logger.info('calling widget stop. widget id [%s], execution id [%s], soloMode [%s]', req.params.widgetId, req.params.executionId, req.body.isSoloMode);
 
     if (!req.params.widgetId) {
         logger.error('unable to stop widget, no widget id found on request');
@@ -151,7 +151,7 @@ exports.stop = function (req, res) {
         return;
     }
 
-    managers.widget.stop(req.params.widgetId, req.params.executionId, req.body.remote, function (err, result) {
+    managers.widget.stop(req.params.widgetId, req.params.executionId, req.body.isSoloMode, function (err, result) {
         if (!!err) {
             logger.error('stop widget failed', err);
             res.send(500, {message: 'stop widget failed', error: err});
@@ -284,7 +284,7 @@ exports.getWidgetForPlayer = function (req, res) {
 };
 
 exports.getStatus = function (req, res) {
-    logger.debug('calling widget get status. user id [%s], widget id [%s], execution id [%s]',  req.params.widgetId, req.params.executionId);
+    logger.debug('calling widget get status. user id [%s], widget id [%s], execution id [%s]', req.params.widgetId, req.params.executionId);
 
     if (!req.params.widgetId) {
         logger.error('unable to get output, no widget id found on request');
