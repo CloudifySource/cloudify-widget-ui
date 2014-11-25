@@ -11,34 +11,34 @@ angular.module('cloudifyWidgetUiApp')
         var popupWindow = null;
 
         // when there's an executionId, lets start polling...
-        $scope.$watch('executionId', function( newValue, oldValue ){
+        $scope.$watch('executionId', function (newValue, oldValue) {
             $log.info('executionId changed', newValue, oldValue);
-            if ( !!newValue && !oldValue ){
+            if (!!newValue && !oldValue) {
                 $log.info('detected executionId exists, starting poll');
                 $scope.widgetStatus.state = STATE_RUNNING;
-                _pollStatus(1, { '_id' : $scope.widget._id }, newValue.executionId);
+                _pollStatus(1, { '_id': $scope.widget._id }, newValue.executionId);
             }
 
-            if ( !newValue ){
+            if (!newValue) {
                 _resetWidgetStatus();
             }
         });
 
         // this is to first init the widget on the scope with the bare minimum - the id.
         // then, async, go fetch the entire thing and override.
-        $scope.widget =  {  '_id' : $routeParams.widgetId };
+        $scope.widget = {  '_id': $routeParams.widgetId };
         WidgetsService.getPublicWidget($routeParams.widgetId).then(function (result) {
             $scope.widget = result.data;
         });
 
         $scope.executionId = null;
 
-        function saveState(){
-            localStorage.setItem( $scope.widget._id, JSON.stringify($scope.executionId) );
+        function saveState() {
+            localStorage.setItem($scope.widget._id, JSON.stringify($scope.executionId));
         }
 
-        function deleteState(){
-            localStorage.removeItem( $scope.widget._id );
+        function deleteState() {
+            localStorage.removeItem($scope.widget._id);
         }
 
         function cleanUp(executionId) {
@@ -47,9 +47,9 @@ angular.module('cloudifyWidgetUiApp')
             $scope.executionId = null;
         }
 
-        function loadState(){
-            var executionId = JSON.parse(localStorage.getItem( $scope.widget._id ));
-            if ( !!executionId ){
+        function loadState() {
+            var executionId = JSON.parse(localStorage.getItem($scope.widget._id));
+            if (!!executionId) {
                 $log.info('resuming execution.. found execution in local storage');
                 $scope.executionId = executionId;
             }
@@ -70,11 +70,11 @@ angular.module('cloudifyWidgetUiApp')
             playInternal();
         };
 
-        function play (widget) {
+        function play(widget) {
             //check if social login is required
             var socialLoginRequired = false;
             if (widget.socialLogin && widget.socialLogin.data && widget.socialLogin.data.length !== 0) {
-                socialLoginRequired = $scope.find( widget.socialLogin.data, { 'enabled' : true} ) !== undefined;
+                socialLoginRequired = $scope.find(widget.socialLogin.data, { 'enabled': true}) !== undefined;
             }
 
             $scope.widget = widget;
@@ -88,13 +88,12 @@ angular.module('cloudifyWidgetUiApp')
             }
         }
 
-        function playInternal () {
+        function playInternal() {
             $log.info('playing widget');
             _resetWidgetStatus();
             $scope.widgetStatus.state = STATE_RUNNING;
 
-            var executionDetails = $scope.widget.executionDetails;
-            WidgetsService.playWidget($scope.widget, $scope.loginDetailsId, executionDetails)
+            WidgetsService.playWidget($scope.widget, $scope.loginDetailsId, $scope.widget.executionDetails)
                 .then(function (result) {
                     $log.info(['play result', result]);
 
@@ -107,19 +106,18 @@ angular.module('cloudifyWidgetUiApp')
                 });
         }
 
-        function parentLoaded(){
+        function parentLoaded() {
             $log.info('posting widget_loaded message');
-            _postMessage({'name' : 'widget_loaded'});
+            _postMessage({'name': 'widget_loaded'});
         }
 
-        function stop () {
+        function stop() {
             //first, stop polling for status (resolves race condition - getStatus before stop finished).
             _resetWidgetStatus();
 
-            var isSoloMode = $scope.widget.executionDetails.isSoloMode;
-
             // now stop widget
-            WidgetsService.stopWidget($scope.widget, $scope.executionId.executionId, isSoloMode).then(function () {
+            WidgetsService.stopWidget($scope.widget, $scope.executionId.executionId).then(function () {
+                //todo: need to refactor this redundant executionId.executionId.
                 cleanUp($scope.executionId.executionId);
             });
         }
@@ -136,7 +134,7 @@ angular.module('cloudifyWidgetUiApp')
 
         function _handleStatus(status, myTimeout, widget, executionId) {
 
-            if ( !!status && !!status.output ) {
+            if (!!status && !!status.output) {
                 status.output = status.output.split('\n');
             }
             $scope.widgetStatus = status;
@@ -166,25 +164,24 @@ angular.module('cloudifyWidgetUiApp')
 
         // post outgoing messages
 
-        function _postStatus (status) {
+        function _postStatus(status) {
             _postMessage({name: 'widget_status', data: status});
         }
 
 
-        function _postPlayed () {
+        function _postPlayed() {
             _postMessage({name: 'widget_played', executionId: $scope.executionId});
         }
 
-        function _postStopped (executionId) {
+        function _postStopped(executionId) {
             _postMessage({name: 'widget_stopped', executionId: executionId});
         }
 
         function _postMessage(data) {
-            if ( $window.parent !== $window ) {
+            if ($window.parent !== $window) {
                 $window.parent.postMessage(data, /*$window.location.origin*/ '*');
             }
         }
-
 
 
 //        $log.debug('listening to messages on ', $window);
@@ -203,7 +200,7 @@ angular.module('cloudifyWidgetUiApp')
             }
 
             if (data.name === WidgetConstants.PLAY) {
-                play(data.widget); // currently support only non remote execution
+                play(data.widget);
             }
 
             if (data.name === WidgetConstants.STOP) {
@@ -217,5 +214,5 @@ angular.module('cloudifyWidgetUiApp')
         });
 
         parentLoaded();
-        $timeout(loadState,1);
+        $timeout(loadState, 1);
     });
