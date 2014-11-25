@@ -620,27 +620,21 @@ function _playFinally(err, curryParams) {
 
 function _getExecutionModel(curryParams, curryCallback) {
 
+    exports.getExecutionModelById(curryParams.executionId, function(err, result) {
+        if (!!err) {
+            curryCallback(err, curryParams);
+            return;
+        }
 
-    managers.db.connect('widgetExecutions', function (db, collection, done) {
-        collection.findOne({_id: managers.db.toObjectId(curryParams.executionId)}, function (err, result) {
+        if (!result) {
+            curryCallback(new Error('could not find execution model'), curryParams);
+            return;
+        }
 
-            if (!!err) {
-                curryCallback(err, curryParams);
-                done();
-                return;
-            }
-
-            if (!result) {
-                curryCallback(new Error('could not find execution model'), curryParams);
-                done();
-                return;
-            }
-
-            curryParams.executionModel = result;
-            curryCallback(null, curryParams);
-            done();
-        });
+        curryParams.executionModel = result;
+        curryCallback(null, curryParams);
     });
+
 }
 
 function _expireNode(curryParams, curryCallback) {
@@ -679,6 +673,25 @@ function _stopFinally(err, curryParams) {
 
     curryParams.stopCallback(null, {});
 }
+
+exports.getExecutionModelById = function(executionId, callback) {
+    managers.db.connect('widgetExecutions', function (db, collection) {
+        collection.findOne({_id: managers.db.toObjectId(executionId)}, function (err, result) {
+
+            if (err) {
+                callback(err, {});
+                return;
+            }
+
+            if (!result) {
+                callback(new Error('could not find execution model'), {});
+                return;
+            }
+
+            callback(null, result);
+        });
+    });
+};
 
 exports.play = function (widgetId, loginDetailsId, playCallback) {
 
@@ -738,7 +751,7 @@ exports.playSolo = function (widgetId, executionDetails, playCallback) {
     );
 };
 
-exports.stop = function (widgetId, executionId, remote, stopCallback) {
+exports.stop = function (widgetId, executionId, isSoloMode, stopCallback) {
 
     var tasks = [
 
@@ -759,7 +772,7 @@ exports.stop = function (widgetId, executionId, remote, stopCallback) {
 
     // if execution is not on a remote machine, the node is in the pool - add a task to expire it
 //    remote ? tasks.push(_runTeardownCommand) : tasks.push(_expireNode);
-    !remote  && tasks.push(_expireNode);
+    !isSoloMode  && tasks.push(_expireNode);
 
     tasks.push(_updateExecutionModelStopped);
 

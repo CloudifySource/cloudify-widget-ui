@@ -137,7 +137,7 @@ exports.play = function (req, res) {
 };
 
 exports.stop = function (req, res) {
-    logger.info('calling widget stop. widget id [%s], execution id [%s], soloMode [%s]', req.params.widgetId, req.params.executionId, req.body.isSoloMode);
+    logger.info('calling widget stop. widget id [%s], execution id [%s]', req.params.widgetId, req.params.executionId);
 
     if (!req.params.widgetId) {
         logger.error('unable to stop widget, no widget id found on request');
@@ -151,14 +151,25 @@ exports.stop = function (req, res) {
         return;
     }
 
-    managers.widget.stop(req.params.widgetId, req.params.executionId, req.body.isSoloMode, function (err, result) {
+    managers.widget.getExecutionModelById(req.params.executionId, function (err, executionModel) {
         if (!!err) {
             logger.error('stop widget failed', err);
             res.send(500, {message: 'stop widget failed', error: err});
             return;
         }
 
-        res.send(200, result);
+        var isSoloMode = executionModel.widget.executionDetails.isSoloMode;
+
+        managers.widget.stop(req.params.widgetId, req.params.executionId, isSoloMode, function (err, result) {
+            if (!!err) {
+                logger.error('stop widget failed', err);
+                res.send(500, {message: 'stop widget failed', error: err});
+                return;
+            }
+
+            res.send(200, result);
+        });
+
     });
 
 };

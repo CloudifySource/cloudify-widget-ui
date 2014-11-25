@@ -167,6 +167,13 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.create = function () {
 
+            if (!$scope.widget.executionDetails) {
+                // if there are no executionDetails defined, default to non-solo mode.
+                $scope.widget.executionDetails = {
+                    isSoloMode: false
+                };
+            }
+
             $log.info('creating new widget', $scope.widget);
 
             WidgetsService.createWidget($scope.widget).then(
@@ -190,7 +197,7 @@ angular.module('cloudifyWidgetUiApp')
             }
         );
 
-        $scope.navigateTo = function(section) {
+        $scope.navigateTo = function (section) {
             $location.search('section', section);
         };
     });
