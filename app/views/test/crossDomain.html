@@ -1,0 +1,49 @@
+<html>
+
+<head>
+    <script src="../../bower_components/jquery/jquery.js"></script>
+</head>
+<body>
+<div>
+    <!--<iframe width="100" height="100" scrolling="no" src="http://thewidget.staging.gsdev.info/#/widgets/53b525a32e427e332e32a3d9/view?timestamp=14044647516289" class="ng-scope"></iframe>-->
+    <iframe width="500" height="500" scrolling="no" src="http://biginsights.localhost.com:9000/#/widgets/53b2d8738efa1c8745959966/view?timestamp=1404635187186" class="ng-scope"></iframe>
+
+    <button id="play">Play</button>
+    <button id="stop">Stop</button>
+</div>
+
+
+
+<script>
+//    alert($);
+
+    $(function(){
+        var targetOrigin = 'http://' + $('iframe').attr('src').replace('http://','').split('/')[0];
+        console.log('targetOrigin is',targetOrigin);
+
+
+        function _postMessage( message ){
+            $('iframe')[0].contentWindow.postMessage(message,targetOrigin);
+        }
+
+
+        window.addEventListener('message',function(){
+            console.log('crossDomain got message', arguments);
+        },false);
+
+        $('#play').click(function(){
+           console.log('playing');
+            _postMessage( { 'name' : 'widget_play' } );
+        });
+
+        $('#stop').click(function(){
+            console.log('stopping');
+            _postMessage( { 'name' : 'widget_stop' } );
+        });
+    })
+</script>
+
+</body>
+
+
+</html>

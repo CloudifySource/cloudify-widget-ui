@@ -1,0 +1,28 @@
+{
+    "global": {
+        "help": "Help",
+        "poweredBy": "Powered by:",
+        "cloudify": "Cloudify",
+        "patent": "&nbsp;&nbsp;(Patent Pending)",
+        "buttons": {
+            "submit": "Submit"
+        }
+    },
+    "login" : {
+        "username": "Username:",
+        "password": "Password:",
+        "noAccount": "Don't have an account?",
+        "signup": "Signup"
+    },
+    "widget": {
+        "default": {
+            "trialLeft": "Trial time left:",
+            "advanced": "Solo Mode",
+            "pem": "PEM",
+            "hpConsole": "HP Console",
+            "embedCode": "Embed Code",
+            "copyToEmbed": "Copy the code below to embed the widget on your website."
+        }
+    }
+
+}

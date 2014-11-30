@@ -11,6 +11,8 @@
     <meta name="viewport" content="width=device-width">
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
+      <link href="bower_components/toastr/toastr.css" rel="stylesheet"/>
+      <link href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet"/>
         <!-- build:css({.tmp,app}) styles/main.css -->
         <link rel="stylesheet" href="styles/main.css">
         <!-- endbuild -->
@@ -36,7 +38,9 @@
       s.parentNode.insertBefore(g,s)}(document,'script'));
     </script>
 
+    <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/angular/angular.js"></script>
+    <!--<script src="scripts/templates.js"></script>-->
 
     <!-- build:js({.tmp,app}) scripts/scripts.js -->
     <script src="scripts/app.js"></script>
@@ -44,21 +48,10 @@
     <!-- endbuild -->
 
         <!-- build:js scripts/plugins.js -->
-        <script src="bower_components/jquery/jquery.js"></script>
-        <script src="bower_components/bootstrap-sass/js/bootstrap-affix.js"></script>
-        <script src="bower_components/bootstrap-sass/js/bootstrap-alert.js"></script>
-        <script src="bower_components/bootstrap-sass/js/bootstrap-dropdown.js"></script>
-        <script src="bower_components/bootstrap-sass/js/bootstrap-tooltip.js"></script>
-        <script src="bower_components/bootstrap-sass/js/bootstrap-modal.js"></script>
-        <script src="bower_components/bootstrap-sass/js/bootstrap-transition.js"></script>
-        <script src="bower_components/bootstrap-sass/js/bootstrap-button.js"></script>
-        <script src="bower_components/bootstrap-sass/js/bootstrap-popover.js"></script>
-        <script src="bower_components/bootstrap-sass/js/bootstrap-typeahead.js"></script>
-        <script src="bower_components/bootstrap-sass/js/bootstrap-carousel.js"></script>
-        <script src="bower_components/bootstrap-sass/js/bootstrap-scrollspy.js"></script>
-        <script src="bower_components/bootstrap-sass/js/bootstrap-collapse.js"></script>
-        <script src="bower_components/bootstrap-sass/js/bootstrap-tab.js"></script>
-        <!-- endbuild -->
+        <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="bower_components/toastr/toastr.js"></script>
+
+    <!-- endbuild -->
 
         <!-- build:js scripts/modules.js -->
         <script src="bower_components/angular-resource/angular-resource.js"></script>
@@ -66,9 +59,18 @@
         <script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
         <script src="bower_components/angular-route/angular-route.js"></script>
         <script src="bower_components/ngstorage/ngStorage.js"></script>
+        <script src="bower_components/i18next/release/i18next-1.7.1.min.js"></script>
+        <script src="bower_components/gs-ui-infra/app/scripts/app.js"></script>
+        <script src="bower_components/gs-ui-infra/app/scripts/filters/i18n.js"></script>
+        <script src="bower_components/gs-ui-infra/app/scripts/services/i18next.js"></script>
+        <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+        <script src="bower_components/underscore/underscore.js"></script>
+        <script src="bower_components/angular-underscore/angular-underscore.js"></script>
+        <script src="scripts/constants/WidgetConstants.js"></script>
         <script src="scripts/controllers/Login.js"></script>
         <script src="scripts/controllers/Demo.js"></script>
         <script src="scripts/services/AdminPoolCrudService.js"></script>
+        <script src="scripts/services/AccountPoolCrudService.js"></script>
         <script src="scripts/services/LoginService.js"></script>
         <script src="scripts/controllers/Signup.js"></script>
         <script src="scripts/controllers/Dashboard.js"></script>
@@ -79,18 +81,41 @@
         <script src="scripts/directives/poolManager.js"></script>
         <script src="scripts/services/WidgetsService.js"></script>
         <script src="scripts/controllers/WidgetView.js"></script>
+        <script src="scripts/controllers/WidgetEmbed.js"></script>
         <script src="scripts/directives/widgetEmbed.js"></script>
-        <script src="scripts/controllers/Widget.js"></script>
+
         <script src="scripts/services/WidgetThemesService.js"></script>
         <script src="scripts/services/PostParentService.js"></script>
         <script src="scripts/controllers/AdminPoolCrud.js"></script>
         <script src="scripts/directives/jsonBinder.js"></script>
         <script src="scripts/directives/poolsTable.js"></script>
+        <script src="scripts/directives/poolForm.js"></script>
       <script src="scripts/controllers/WidgetLogin.js"></script>
       <script src="scripts/services/LoginTypesService.js"></script>
       <script src="scripts/controllers/CustomLogin.js"></script>
       <script src="scripts/services/CustomLogin.js"></script>
+      <script src="scripts/controllers/AdminUsersIndex.js"></script>
+      <script src="scripts/controllers/AdminUsersEdit.js"></script>
+      <script src="scripts/services/WidgetClient.js"></script>
+      <script src="scripts/services/AdminUsersService.js"></script>
+      <script src="scripts/controllers/admin/MyUser.js"></script>
+      <script src="scripts/controllers/admin/System.js"></script>
       <script src="scripts/services/TextContentCompiler.js"></script>
+      <script src="scripts/controllers/widgets/Default.js"></script>
+      <script src="scripts/controllers/admin/UserPools.js"></script>
+      <script src="scripts/services/admin/Client.js"></script>
+      <script src="scripts/services/user/Client.js"></script>
+      <script src="scripts/services/Client.js"></script>
+      <script src="scripts/controllers/pools/accountPools.js"></script>
+      <script src="scripts/controllers/pools/accountPoolCrud.js"></script>
+      <script src="scripts/controllers/admin/PoolsCreate.js"></script>
+      <script src="scripts/controllers/admin/PoolView.js"></script>
+      <script src="scripts/controllers/admin/PoolUpdate.js"></script>
+      <script src="scripts/controllers/admin/WidgetRead.js"></script>
+      <script src="scripts/directives/blankFrame.js"></script>
       <!-- endbuild -->
+
+    <!-- on purpose, taking this file out, making it debuggable on environments -->
+      <script src="scripts/controllers/Widget.js"></script>
 </body>
 </html>

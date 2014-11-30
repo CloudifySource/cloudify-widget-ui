@@ -17,7 +17,8 @@
         <tbody>
             <tr ng-repeat="error in model.poolErrors">
                 <td>{{ error.id }}</td>
-                <td>{{ error.timestamp | date:'medium' }}</td>
+                <!--<td>{{ error.timestamp | date:'medium' }}</td>--> <!-- this causes problems for some reason -->
+                <td>{{ error.timestamp }}</td>
                 <td>{{ error.source }}</td>
                 <td>{{ error.poolId }}</td>
                 <td><pre>{{ error.message }}</pre></td>

@@ -1,20 +1,53 @@
 <div layout>
-    <h3>Users</h3>
-    <button ng-click="addUser()">Create New User</button>
-    <table ng-init="getUsers()">
-        <thead>
+    <div class="row" style="margin-bottom: 10px">
+        <h3>Users</h3>
+        <button ng-click="addUser()">Create New User</button>
+    </div>
+    <div class="col-md-6">
+        <table class="table table-bordered table-striped" ng-init="getUsers()">
+            <thead>
             <tr>
                 <th>ID</th>
-                <th>UUID</th>
+                <th>Pool Key</th>
+                <th>Description</th>
                 <th colspan="1">Actions</th>
             </tr>
-        </thead>
-        <tbody>
-            <tr ng-repeat="user in model.users">
-                <td>{{ user.id }}</td>
-                <td>{{ user.uuid }}</td>
-                <td><a ng-href="#/admin/accounts/{{ user.id }}/pools">see pools</a></td>
+            </thead>
+            <tbody>
+            <tr ng-repeat="user in users">
+                <td style="vertical-align: middle;">{{ user.email }}</td>
+                <td style="vertical-align: middle;">
+                    <div class="row">{{ user.poolKey }}</div>
+                    <div class="row">
+                        <input ng-model="manualPoolKey" type="text" placeholder="Assign New Pool Key"/>
+                        <button ng-click="assignNewPoolKey(user)">Set</button>
+                    </div>
+                    <div class="row">
+                        <button ng-click="setPoolKey(user,manualPoolKey)">Set From Input</button>
+                        <button ng-click="removePoolKey(user)">Remove</button>
+                    </div>
+                </td>
+                <td style="vertical-align: middle;">
+                    <div ng-show="!!user.poolKey">
+                        <div class="row" ng-show="!getAccount(user)">**This user is from another manager.<br/> It has a pool key but
+                            it does not match any uuid from the manager
+                        </div>
+                        <div class="row" style="max-width:200px;">{{ getAccount(user).description }}</div>
+                        <div class="row" >
+                            <input type="text" ng-model="newDescription" placeholder="Enter custom description here"/>
+                            <button ng-click="setDescription( user , newDescription )">Set</button>
+                        </div>
+                    </div>
+                </td>
+                <td style="vertical-align: middle;">
+
+                    <a ng-show="!!getAccount(user)" ng-href="#/admin/accounts/{{ getAccount(user).id }}/pools">see
+                        pools</a>
+
+
+                </td>
             </tr>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 </div>

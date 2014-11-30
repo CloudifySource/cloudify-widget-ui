@@ -2,11 +2,11 @@
 
 describe('Service: WidgetThemesService', function () {
 
-  // load the service's module
-  beforeEach(module('cloudifyWidgetUiApp'));
+    // load the service's module
+    beforeEach(module('cloudifyWidgetUiApp'));
 
-  // instantiate service
-  var WidgetThemesService;
+    // instantiate service
+//    var WidgetThemesService;
 //  beforeEach(inject(function (_WidgetThemesService_) {
 //    WidgetThemesService = _WidgetThemesService_;
 //  }));

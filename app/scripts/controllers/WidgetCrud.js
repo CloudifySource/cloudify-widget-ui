@@ -1,13 +1,11 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetCrudCtrl', function ($scope, $routeParams, $log, LoginTypesService, WidgetsService, $location, WidgetThemesService, $window) {
-
+    .controller('WidgetCrudCtrl', function ($scope, $routeParams, $log, LoginTypesService, WidgetsService, $location, WidgetThemesService, LoginService/*,$timeout*/) {
 
         $scope.availableLoginTypes = function () {
             return LoginTypesService.getAll();
         };
-
 
         function _getSocialLoginById(id) {
             if (!!$scope.widget && !!$scope.widget.socialLogin && !!$scope.widget.socialLogin.data) {
@@ -23,11 +21,12 @@ angular.module('cloudifyWidgetUiApp')
 
         }
 
-
         // use this with the following from the popup window:
         //
-        $scope.loginDone = function () {
+        $scope.loginDone = function (loginDetailsId) {
             $log.info('login is done');
+            $scope.loginDetailsId = loginDetailsId;
+
             if (popupWindow !== null) {
                 popupWindow.close();
                 popupWindow = null;
@@ -37,21 +36,7 @@ angular.module('cloudifyWidgetUiApp')
         var popupWindow = null;
 
         $scope.tryItNow = function (socialLogin, widget) {
-            $window.$windowScope = $scope;
-
-            var size = LoginTypesService.getIndexSize();
-
-            var left = (screen.width / 2) - (size.width / 2);
-            var top = (screen.height / 2) - (size.height / 2);
-
-            var url = null;
-            if (socialLogin === null) {
-                url = '/#/widgets/' + $scope.widget._id + '/login/index';
-            } else {
-                url = '/backend/widgets/' + widget._id + '/login/' + socialLogin.id;
-            }
-
-            popupWindow = window.open(url, 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + size.width + ', height=' + size.height + ', top=' + top + ', left=' + left);
+            popupWindow = LoginService.performSocialLogin(socialLogin, widget, $scope);
         };
 
         $scope.isTypeSupportsMailchimp = function (socialLogin) {
@@ -156,25 +141,21 @@ angular.module('cloudifyWidgetUiApp')
             redirectToWidgets();
         };
 
-
-        $scope.widgetAsJson = function () {
-            return JSON.stringify($scope.widget, {}, 4);
-        };
-
         $scope.view = function () {
             $scope.update().then(function () {
                 $location.path('/widgets/' + $scope.widget._id + '/read');
             });
         };
 
-
         $scope.update = function () {
             return WidgetsService.updateWidget($scope.widget).then(
                 function success() {
                     $log.info('successfully updated the widget');
+                    toastr.info('successfully updated the widget');
 
                 },
                 function error() {
+                    toastr.error('unknown error');
                     $log.error('unable to update the widget');
                 }
             );
@@ -185,6 +166,13 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         $scope.create = function () {
+
+            if (!$scope.widget.executionDetails) {
+                // if there are no executionDetails defined, default to non-solo mode.
+                $scope.widget.executionDetails = {
+                    isSoloMode: false
+                };
+            }
 
             $log.info('creating new widget', $scope.widget);
 
@@ -197,5 +185,19 @@ angular.module('cloudifyWidgetUiApp')
                     $log.info('error creating widget');
                 }
             );
+        };
+
+        WidgetsService.listPools().then(
+            function success(result) {
+                $scope.userPools = result.data;
+            },
+            function error(cause) {
+                $scope.userPools = undefined;
+                $log.error('error getting pools list - ' + cause.data);
+            }
+        );
+
+        $scope.navigateTo = function (section) {
+            $location.search('section', section);
         };
     });

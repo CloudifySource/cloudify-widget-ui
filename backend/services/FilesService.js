@@ -1,3 +1,4 @@
+'use strict';
 var logger = require('log4js').getLogger('FilesService');
 var fs = require('fs');
 var path = require('path');
@@ -17,25 +18,7 @@ exports.mkdirp = function (directory) {
     }
 };
 
-/**
- * walks a directory tree and returns file paths as a list.
- * when order of results is important, pass {@code true} to serial,
- * but note that this is much slower than parallel walk.
- *
- * @param dir the directory path
- * @param done a callback with err and result as parameters
- * @param serial (Boolean) a serial walk means ordered results, but it's much slower. default is parallel.
- *
- * @see walkSerial
- * @see walkParallel
- */
-exports.walk = function (dir, done, serial) {
-    if (serial) {
-        return walkSerial(dir, done)
-    } else {
-        return walkParallel(dir, done);
-    }
-};
+
 
 /**
  * walks a directory tree and returns file paths as an unordered list.
@@ -46,25 +29,33 @@ exports.walk = function (dir, done, serial) {
 function walkParallel (dir, done) {
     var results = [];
     fs.readdir(dir, function (err, list) {
-        if (err) return done(err);
+        if (err) {
+            return done(err);
+        }
         var pending = list.length;
-        if (!pending) return done(null, results);
+        if (!pending) {
+            return done(null, results);
+        }
         list.forEach(function (file) {
             file = path.resolve(dir, file);
             fs.stat(file, function (err, stat) {
                 if (stat && stat.isDirectory()) {
                     walkParallel(file, function (err, res) {
                         results = results.concat(res);
-                        if (!--pending) done(null, results);
+                        if (!--pending) {
+                            done(null, results);
+                        }
                     });
                 } else {
                     results.push(file);
-                    if (!--pending) done(null, results);
+                    if (!--pending) {
+                        done(null, results);
+                    }
                 }
             });
         });
     });
-};
+}
 
 /**
  * walks a directory tree and returns file paths as an ordered list. slower than parallel walk.
@@ -73,11 +64,15 @@ function walkParallel (dir, done) {
 function walkSerial (dir, done) {
     var results = [];
     fs.readdir(dir, function (err, list) {
-        if (err) return done(err);
+        if (err) {
+            return done(err);
+        }
         var i = 0;
         (function next() {
             var file = list[i++];
-            if (!file) return done(null, results);
+            if (!file){
+                return done(null, results);
+            }
             file = path.resolve(dir, file);
             fs.stat(file, function (err, stat) {
                 if (stat && stat.isDirectory()) {
@@ -92,4 +87,24 @@ function walkSerial (dir, done) {
             });
         })();
     });
+}
+
+/**
+ * walks a directory tree and returns file paths as a list.
+ * when order of results is important, pass {@code true} to serial,
+ * but note that this is much slower than parallel walk.
+ *
+ * @param dir the directory path
+ * @param done a callback with err and result as parameters
+ * @param serial (Boolean) a serial walk means ordered results, but it's much slower. default is parallel.
+ *
+ * @see walkSerial
+ * @see walkParallel
+ */
+exports.walk = function (dir, done, serial) {
+    if (serial) {
+        return walkSerial(dir, done);
+    } else {
+        return walkParallel(dir, done);
+    }
 };

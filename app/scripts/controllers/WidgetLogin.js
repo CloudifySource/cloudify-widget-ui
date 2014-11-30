@@ -16,6 +16,7 @@ angular.module('cloudifyWidgetUiApp')
             for (var i = 0; i < ids.length; i++) {
                 result.push(LoginTypesService.getById(ids[i].id));
             }
+            console.log(result);
             return result;
         };
     });

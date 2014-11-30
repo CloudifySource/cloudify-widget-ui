@@ -1,7 +1,9 @@
-<h4>Widget Requires User Details</h4>
+<h4>Please select authentication service</h4>
 
 <div>
-    <div ng-repeat="login in loginTypes(widget.socialLogin.data)">
-        <a ng-href="/backend/widgets/{{widget._id}}/login/{{login.id}}">{{login.label}}</a>
+    <div ng-repeat="login in loginTypes(widget.socialLogin.data)" class="thumb">
+        <a ng-href="/backend/widgets/{{widget._id}}/login/{{login.id}}">
+            <div class="social-login-icon login-{{login.id}}"></div>
+        </a>
     </div>
 </div>

@@ -8,15 +8,13 @@ var mountFolder = function (connect, dir) {
     return connect.static(require('path').resolve(dir));
 };
 
-// # Globbing
-// for performance reasons we're only matching one level down:
-// 'test/spec/{,*/}*.js'
-// use this if you want to recursively match all subfolders:
-// 'test/spec/**/*.js'
 
 module.exports = function (grunt) {
+
+    require('time-grunt')(grunt);
     // load all grunt tasks
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+
 
     // configurable paths
     var yeomanConfig = {
@@ -29,19 +27,44 @@ module.exports = function (grunt) {
     } catch (e) {
     }
 
+    var deployOpts;
+    try { // optional file
+        deployOpts = grunt.file.readJSON('dev/deploy.json');
+    } catch (e) {
+        deployOpts = { 'privateKey': 'Gruntfile.js'};
+    }
+
     grunt.initConfig({
         yeoman: yeomanConfig,
+        deployOpts: deployOpts,
+        pkg: grunt.file.readJSON('package.json'),
+        sftp: {
+            upload: {
+                files: {
+                    'artifacts': 'artifacts/**'
+                },
+                options: {
+                    'username': '<%=deployOpts.username%>',
+                    'privateKey': grunt.file.read(deployOpts.privateKey),
+                    'host': '<%=deployOpts.host%>',
+                    'path': '<%=deployOpts.path%>/<%=pkg.name%>/<%=pkg.version%>',
+                    'createDirectories': true,
+                    'showProgress': true,
+                    'srcBasePath': 'artifacts'
+                }
+            }
+        },
         watch: {
             coffee: {
-                files: ['<%= yeoman.app %>/scripts/{,*/}*.coffee'],
+                files: ['<%= yeoman.app %>/scripts/**/*.coffee'],
                 tasks: ['coffee:dist']
             },
             coffeeTest: {
-                files: ['test/spec/{,*/}*.coffee'],
+                files: ['test/spec/**/*.coffee'],
                 tasks: ['coffee:test']
             },
             compass: {
-                files: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
+                files: ['<%= yeoman.app %>/styles/**/*.{scss,sass}'],
                 tasks: ['compass:server']
             },
             livereload: {
@@ -49,10 +72,10 @@ module.exports = function (grunt) {
                     livereload: LIVERELOAD_PORT
                 },
                 files: [
-                    '<%= yeoman.app %>/{,*/}*.html',
-                    '{.tmp,<%= yeoman.app %>}/styles/{,*/}*.css',
-                    '{.tmp,<%= yeoman.app %>}/scripts/{,*/}*.js',
-                    '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
+                    '<%= yeoman.app %>/**/*.html',
+                    '{.tmp,<%= yeoman.app %>}/styles/**/*.css',
+                    '{.tmp,<%= yeoman.app %>}/scripts/**/*.js',
+                    '<%= yeoman.app %>/images/**/*.{png,jpg,jpeg,gif,webp,svg}'
                 ]
             }
         },
@@ -60,30 +83,30 @@ module.exports = function (grunt) {
             options: {
                 port: 9000,
                 // Change this to '0.0.0.0' to access the server from outside.
-                hostname: 'localhost'
+                hostname: '127.0.0.1'
             },
             proxies: [
                 {
                     context: '/backend',
-                    host: 'localhost',
+                    host: '127.0.0.1',
                     port: 9001,
                     https: false,
-                    changeOrigin: true,
+                    changeOrigin: false,
                     xforward: false
                 }
             ],
-/*
-            proxiesProd: [
-                {
-                    context: '/backend',
-                    host: 'widgetui.gsdev.info',
-                    port: 80,
-                    https: false,
-                    changeOrigin: true,
-                    xforward: false
-                }
-            ],
-*/
+            /*
+             proxiesProd: [
+             {
+             context: '/backend',
+             host: 'widgetui.gsdev.info',
+             port: 80,
+             https: false,
+             changeOrigin: true,
+             xforward: false
+             }
+             ],
+             */
             livereload: {
                 options: {
                     middleware: function (connect) {
@@ -118,10 +141,20 @@ module.exports = function (grunt) {
         },
         open: {
             server: {
-                url: 'http://localhost:<%= connect.options.port %>'
+                url: 'http://127.0.0.1:<%= connect.options.port %>'
             }
         },
         clean: {
+            artifacts: {
+                files: [
+                    {
+                        dot: true,
+                        src: [
+                            'artifacts'
+                        ]
+                    }
+                ]
+            },
             dist: {
                 files: [
                     {
@@ -134,37 +167,66 @@ module.exports = function (grunt) {
                     }
                 ]
             },
-            server: '.tmp'
+            server: '.tmp',
+            coverageBackend: ['backend-coverage'],
+            coverageFrontend: ['coverage'],
+            instrumentBackend: ['backend-instrument']
         },
         jshint: {
-            options: {
-                jshintrc: '.jshintrc'
+
+            frontend: {
+                options: {
+                    jshintrc: '.jshintrc'
+                },
+                files: {
+                    'src': [
+                        'Gruntfile.js',
+                        '<%= yeoman.app %>/scripts/**/*.js'
+                    ]
+                }
             },
-            all: [
-                'Gruntfile.js',
-                '<%= yeoman.app %>/scripts/{,*/}*.js'
-            ]
-        },
-        coffee: {
-            dist: {
-                files: [
-                    {
-                        expand: true,
-                        cwd: '<%= yeoman.app %>/scripts',
-                        src: '{,*/}*.coffee',
-                        dest: '.tmp/scripts',
-                        ext: '.js'
-                    }
-                ]
+            backend: {
+                options: {
+                    jshintrc: 'backend.jshintrc'
+                },
+                files: {
+                    'src': [
+                        'server.js',
+                        'backend/**/*.js'
+                    ]
+                }
             },
             test: {
+                options: {
+                    jshintrc: 'test.jshintrc'
+                },
+                files: {
+                    'src': [
+                        'test/**/*.js'
+                    ]
+                }
+            },
+            testBackend: {
+                options: {
+                    jshintrc: 'testBackend.jshintrc'
+                },
+                files: {
+                    'src': [
+                        'test-backend/**/*.js'
+                    ]
+                }
+            }
+        },
+        fixmyjs: {
+            options: {
+                jshintrc: 'testBackend.jshintrc',
+                indentpref: 'spaces'
+            },
+            testBackend: {
                 files: [
                     {
-                        expand: true,
-                        cwd: 'test/spec',
-                        src: '{,*/}*.coffee',
-                        dest: '.tmp/spec',
-                        ext: '.js'
+                        src: ['test-backend/**/*.js'],
+                        expand:true
                     }
                 ]
             }
@@ -199,9 +261,9 @@ module.exports = function (grunt) {
             dist: {
                 files: {
                     src: [
-                        '<%= yeoman.dist %>/scripts/{,*/}*.js',
-                        '<%= yeoman.dist %>/styles/{,*/}*.css',
-                        '<%= yeoman.dist %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}',
+                        '<%= yeoman.dist %>/scripts/**/*.js',
+                        '<%= yeoman.dist %>/styles/**/*.css',
+                        '<%= yeoman.dist %>/images/**/*.{png,jpg,jpeg,gif,webp,svg}',
                         '<%= yeoman.dist %>/styles/fonts/*'
                     ]
                 }
@@ -214,8 +276,8 @@ module.exports = function (grunt) {
             }
         },
         usemin: {
-            html: ['<%= yeoman.dist %>/{,*/}*.html'],
-            css: ['<%= yeoman.dist %>/styles/{,*/}*.css'],
+            html: ['<%= yeoman.dist %>/*.html', '<%= yeoman.dist %>/views/**/*.html'],
+            css: ['<%= yeoman.dist %>/styles/**/*.css'],
             options: {
                 dirs: ['<%= yeoman.dist %>']
             }
@@ -226,7 +288,7 @@ module.exports = function (grunt) {
                     {
                         expand: true,
                         cwd: '<%= yeoman.app %>/images',
-                        src: '{,*/}*.{png,jpg,jpeg}',
+                        src: '**/*.{png,jpg,jpeg}',
                         dest: '<%= yeoman.dist %>/images'
                     }
                 ]
@@ -239,8 +301,8 @@ module.exports = function (grunt) {
             // dist: {
             //   files: {
             //     '<%= yeoman.dist %>/styles/main.css': [
-            //       '.tmp/styles/{,*/}*.css',
-            //       '<%= yeoman.app %>/styles/{,*/}*.css'
+            //       '.tmp/styles/**/*.css',
+            //       '<%= yeoman.app %>/styles/**/*.css'
             //     ]
             //   }
             // }
@@ -268,6 +330,21 @@ module.exports = function (grunt) {
                 ]
             }
         },
+        html2js: {
+            options: {
+                htmlmin: {
+                    collapseWhitespace: true,
+                    collapseBooleanAttributes: true,
+                    removeComments: true
+                },
+                module: 'widget-ui-tpls',
+                base: 'app'
+            },
+            main: {
+                src: ['<%= yeoman.app %>/views/**/*.html'],
+                dest: '<%= yeoman.dist %>/scripts/templates.js'
+            }
+        },
         // Put files not handled in other tasks here
         copy: {
             dist: {
@@ -281,8 +358,12 @@ module.exports = function (grunt) {
                             '*.{ico,png,txt}',
                             '.htaccess',
                             'bower_components/**/*',
-                            'images/{,*/}*.{gif,webp,svg}',
-                            'styles/fonts/*'
+                            'images/**/*.{gif,webp,svg}',
+                            'styles/fonts/*',
+                            'i18n/*',
+                            'scripts/controllers/Widget.js',
+                            '.tmp/concat/scripts/templates.js',
+                            '*.html'
                         ]
                     },
                     {
@@ -296,24 +377,68 @@ module.exports = function (grunt) {
                     {
                         expand: true,
                         dest: '<%= yeoman.dist %>',
-                        src: [ '*.js', '*.sh','package.json', 'build/**/*', 'backend/**/*', 'conf/**/*' ]
+                        src: [ '*.js', '*.sh', 'package.json', 'build/**/*', 'backend/**/*', 'conf/**/*', 'build.id' ]
+                    },
+                    {
+                        //liron
+                        expand: true,
+                        dot: true,
+                        cwd: '.',
+                        dest: '<%= yeoman.dist %>',
+                        src: [
+                            '.npmignore',
+                            'package.json',
+                            'server.js',
+                            'test-backend/**/*',
+                            'logs/gsui.log'
+
+                        ]
                     }
                 ]
+            },
+            artifacts: {
+                files: [
+                    {
+                        dest: 'artifacts/',
+                        src: [
+                            'build.id'
+                        ]
+                    },
+                    {
+                        'expand': true,
+                        'dest': 'artifacts/',
+                        'cwd': '<%= yeoman.dist %>',
+                        'src': '*.tgz'
+
+                    },
+                    {
+                        'expand': true,
+                        'dest': 'artifacts/',
+                        'cwd': 'build',
+                        'src': ['install.sh']
+                    }
+                ]
+            },
+
+            backendCoverageTests: {
+
+                expand: true,
+                dest: 'backend-instrument',
+                src: ['test-backend/**/*','conf/**/*']
             }
+
         },
         concurrent: {
             server: [
-                'coffee:dist',
                 'compass:server'
             ],
             test: [
-                'coffee',
                 'compass'
             ],
             dist: [
-                'coffee',
                 'compass:dist',
                 'imagemin',
+//                'html2js'
                 'htmlmin'
             ]
         },
@@ -321,7 +446,32 @@ module.exports = function (grunt) {
             unit: {
                 configFile: 'karma.conf.js',
                 singleRun: true
+            },
+            single: {
+                configFile: 'karma.conf.js',
+//                singleRun: true
+                options: {
+                    files: [
+                        'node_modules/karma-jasmine/lib/jasmine.js',
+                        'node_modules/grunt-karma/node_modules/karma/adapter/jasmine.js',
+                        'app/bower_components/jquery/jquery.js',
+                        'app/bower_components/angular/angular.js',
+                        'app/bower_components/angular-cookies/angular-cookies.js',
+                        'app/bower_components/angular-route/angular-route.js',
+                        'app/bower_components/ngstorage/ngStorage.js',
+                        'app/bower_components/angular-resource/angular-resource.js',
+                        'app/bower_components/angular-mocks/angular-mocks.js',
+//                        'app/scripts/*.js',
+                        'app/scripts/**/*.js',
+                        'test/mock/**/*.js',
+//                        'test/spec/**/*.js',
+                        'test/**/blankFrame.js'
+                    ]
+                },
+                singleRun: false,
+                autoWatch: true
             }
+
         },
         cdnify: {
             dist: {
@@ -348,6 +498,55 @@ module.exports = function (grunt) {
                     ]
                 }
             }
+        },
+
+        'run': {
+            'installProduction': {
+                options: {
+                    'cwd': 'dist'
+                },
+                cmd: 'npm',
+                args: [
+                    'install',
+                    '--production'
+                ]
+
+            },
+            'packDist': {
+                'options': {
+                    'cwd': 'dist'
+                },
+                'cmd': 'npm',
+                'args': [
+                    'pack'
+                ]
+            }
+        },
+        instrument: {
+            files: 'backend/**/*.js',
+            options: {
+                lazy: true,
+                basePath: 'backend-instrument/'
+            }
+        },
+        storeCoverage: {
+            options: {
+                dir: 'backend-coverage/reports'
+            }
+        },
+        makeReport: {
+            src: 'backend-coverage/reports/**/*.json',
+            options: {
+                type: 'html',
+                dir: 'backend-coverage/html/reports',
+                print: 'detail'
+            }
+        },
+        /*jshint camelcase: false */
+        jasmine_node: {
+            unit: ['test-backend/unit'],
+            unitInstrument: ['backend-instrument/test-backend/unit']
+            // integration: ['test-backend/integration/jasmine/']
         }
     });
 
@@ -370,7 +569,34 @@ module.exports = function (grunt) {
         'clean:server',
         'concurrent:test',
         'connect:test',
-        'karma'
+        'karma:unit'
+    ]);
+
+    grunt.registerTask('test', function (testBackend) {
+        var tasks = [];
+        if (testBackend === undefined || testBackend === '' || testBackend === 'all' || testBackend === 'frontend') { // default
+            tasks = [
+                'jshint',
+                'clean:server',
+                'concurrent:test',
+                'connect:test',
+                'html2js',
+                'karma:unit'
+            ];
+        }
+
+        if (testBackend === undefined || testBackend === '' || testBackend === 'all' || testBackend === 'backend') {
+            // guy - we always use code coverage in grunt.. when debug from the IDE so no need for no instrumented mode in grunt.
+            tasks = tasks.concat(['clean:instrumentBackend','clean:coverageBackend', 'instrument', 'copy:backendCoverageTests', 'jasmine_node:unitInstrument', 'storeCoverage', 'makeReport', 'clean:instrumentBackend']);
+        }
+        grunt.task.run(tasks);
+    });
+
+    grunt.registerTask('testSingle', [
+        'clean:server',
+        'concurrent:test',
+        'connect:test',
+        'karma:single'
     ]);
 
     grunt.registerTask('build', [
@@ -378,7 +604,8 @@ module.exports = function (grunt) {
         'useminPrepare',
         'concurrent:dist',
         'concat',
-        'copy',
+        'writeBuildId',
+        'copy:dist',
         'cdnify',
         'ngmin',
         'cssmin',
@@ -387,9 +614,38 @@ module.exports = function (grunt) {
         'usemin'
     ]);
 
+    //liron
+    grunt.registerTask('backend', function () {
+        grunt.config.set('jshint.options.jshintrc', '.backendhintrc');
+        grunt.task.run('jshint:backend');
+    });
+
+    //liron
     grunt.registerTask('default', [
         'jshint',
-        'test',
-        'build'
+        'test:all',
+        'build',
+        'backend'
+    ]);
+
+    grunt.loadNpmTasks('grunt-fixmyjs');
+
+    grunt.registerTask('pack', [
+        'run:installProduction',
+        'run:packDist'
+    ]);
+
+    grunt.registerTask('writeBuildId',
+        function () {
+            grunt.file.write('build.id', require('os').hostname() + '-' + new Date().getTime());
+        }
+    );
+
+    grunt.registerTask('deploy', [
+        'clean:artifacts',
+        'default',
+        'pack',
+        'copy:artifacts',
+        'sftp'
     ]);
 };
