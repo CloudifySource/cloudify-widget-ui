@@ -2,6 +2,7 @@
  * Created by liron on 11/26/14.
  */
 'use strict';
+process.env.WIDGET_UI_ME_CONF_JSON = require('path').resolve(__dirname, '../conf/test-conf.json');
 // example with spies
 var Person = function () {
 };

@@ -1,4 +1,5 @@
 'use strict';
+process.env.WIDGET_UI_ME_CONF_JSON = require('path').resolve(__dirname, '../conf/test-conf.json');
 /**
  * Created by liron on 11/30/14.
  */
