@@ -23,6 +23,7 @@
         "expect":false,
         "it":false,
         "beforeEach":false,
-        "describe":false
+        "describe":false,
+        "spyOn": false
     }
 }
