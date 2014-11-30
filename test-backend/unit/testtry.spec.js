@@ -5,6 +5,7 @@
 'use strict';
 
 process.env.ME_CONF = require('path').resolve(__dirname, '../conf/test-conf.json');
+process.env.WIDGET_UI_ME_CONF_JSON = require('path').resolve(__dirname, '../conf/test-conf.json');
 
 describe('Backend: walkFolder', function () {
 
