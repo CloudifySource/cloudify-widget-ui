@@ -75,6 +75,7 @@
     "mocha": "^2.0.1",
     "mocha-selenium": "^0.1.1",
     "ng-html2js": "~1.1.0",
+    "q": "^1.1.2",
     "reporter-file": "0.0.1",
     "requirejs": "~2.1.10",
     "selenium-webdriver": "^2.44.0",
