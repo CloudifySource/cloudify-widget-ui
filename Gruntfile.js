@@ -205,9 +205,33 @@ module.exports = function (grunt) {
                         'test/**/*.js'
                     ]
                 }
+            },
+            testBackend: {
+                options: {
+                    jshintrc: 'testBackend.jshintrc'
+                },
+                files: {
+                    'src': [
+                        'test-backend/**/*.js'
+                    ]
+                }
             }
         },
-
+        fixmyjs: {
+            options: {
+                jshintrc: 'testBackend.jshintrc',
+                indentpref: 'spaces'
+            },
+            testBackend: {
+                files: [
+                    {
+                        src: ['test-backend/**/*.js'],
+                        expand:true,
+                        dest : 'guy'
+                    }
+                ]
+            }
+        },
         compass: {
             options: {
                 sassDir: '<%= yeoman.app %>/styles',
@@ -605,6 +629,7 @@ module.exports = function (grunt) {
         'backend'
     ]);
 
+    grunt.loadNpmTasks('grunt-fixmyjs');
 
     grunt.registerTask('pack', [
         'run:installProduction',
