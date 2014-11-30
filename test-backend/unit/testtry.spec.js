@@ -4,6 +4,8 @@
 
 'use strict';
 
+process.env.ME_CONF = require('path').resolve(__dirname, '../conf/test-conf.json');
+
 describe('Backend: walkFolder', function () {
 
     it('has a browseBlueprint', function () {
