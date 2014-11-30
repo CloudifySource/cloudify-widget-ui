@@ -226,8 +226,7 @@ module.exports = function (grunt) {
                 files: [
                     {
                         src: ['test-backend/**/*.js'],
-                        expand:true,
-                        dest : 'guy'
+                        expand:true
                     }
                 ]
             }
