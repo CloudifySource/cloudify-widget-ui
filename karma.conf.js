@@ -40,7 +40,7 @@ module.exports = function (config) {
 
 // test results reporter to use
 // possible values: dots || progress || growl
-        reporters: ['story','coverage','junit','failed'],
+        reporters: ['story', 'coverage', 'junit', 'failed'],
 
 // web server port
         port: 8080,
@@ -85,6 +85,13 @@ module.exports = function (config) {
             }
         },
 
+        customLaunchers: {
+            Chrome_travis_ci: {
+                base: 'Chrome',
+                flags: ['--no-sandbox']
+            }
+        },
+
         plugins: [
             'karma-jasmine',
             'karma-coverage',
@@ -99,6 +106,10 @@ module.exports = function (config) {
         ]
 
     };
+
+    if (process.env.TRAVIS) {
+        configuration.browsers = ['Chrome_travis_ci'];
+    }
 
     config.set(configuration);
 
