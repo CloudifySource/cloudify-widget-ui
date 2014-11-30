@@ -25,6 +25,42 @@ exports.deleteKeyPair = function deleteKeyPair(apiKey, secretKey, region, keyNam
     ec2.deleteKeyPair({ 'KeyName': keyName }, callback);
 };
 
+exports.modifyImageAttribute = function modifyImageAttribute(apiKey, secretKey, region, imageId, callback) {
+    //todo: add support for all regions (if region is undefined) - try each one until one succeeds or all failed.
+
+    var creds ={
+        'accessKeyId': apiKey,
+        'secretAccessKey': secretKey,
+        'region': region
+    };
+
+    var ec2 = new aws.EC2(creds);
+    var iam = new aws.IAM(creds);
+
+    logger.debug('modifying image launch permissions for ', imageId);
+
+    iam.getUser({}, function (err, data) {
+        if (err) {
+            logger.error('Could not locate user ', apiKey);
+            callback(err, null);
+        }
+
+        var params = {
+            ImageId: imageId,
+            LaunchPermission: {
+                Add: [
+                    {
+                        Group: 'all',
+                        UserId: data.User.UserId
+                    }
+                ]
+            }
+        };
+
+        ec2.modifyImageAttribute(params, callback);
+    });
+
+};
 
 /**
  *
