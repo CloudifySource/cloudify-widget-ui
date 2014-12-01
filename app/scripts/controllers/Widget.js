@@ -103,6 +103,11 @@ angular.module('cloudifyWidgetUiApp')
                     _postPlayed($scope.executionId);
                 }, function (err) {
                     $log.info(['play error', err]);
+
+                    var status = {
+                        error: err
+                    };
+                    _postStatus(status);
                 });
         }
 
