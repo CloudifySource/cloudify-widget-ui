@@ -1,6 +1,17 @@
 <div layout>
     <a href="#/widgets/{{widget._id}}/update">Edit</a>
-    <a href="#/dashboard">Dashboard</a>
-<pre>{{widgetAsJson()}}</pre>
-<div widget-embed widget="widget"></div>
+    <!--<a href="#/dashboard">Dashboard</a>-->
+    <pre>{{ widget | json }}</pre>
+
+    <!--<div widget-embed widget="widget"></div>-->
+
+    <!--post message inner frame test-->
+    <!-- TODO FIXME figure out how to put inner frame without it being empty -->
+    <div ng-controller="WidgetsDefaultCtrl">
+        <hr />
+        <button ng-click="play()">post play</button>
+        <button ng-click="stop()">post stop</button>
+        <br />
+        <div widget-embed widget="widget" theme="theme"></div>
+    </div>
 </div>

@@ -1,15 +1,24 @@
-
 <div ng-show="needsLogin" id="login">
     <div class="error">
         {{pageError}}
     </div>
-
-    <form ng-submit="login()">
-        Username : <input ng-model="page.email"/><br/>
-        Password: <input ng-model="page.password" type="password"/><br/>
-        <input type="submit" value="Submit"/>
-        <br/>
-        Don't have an account? <br/>
-        <a ng-href="#/signup">Signup</a>
-    </form>
+    <div class="center-block container col-md-12">
+        <form ng-submit="login()" class=" col-md-12">
+            <div class="row">
+                <span class="col-md-5">{{ 'login.username' | i18n }}</span>
+                <input class="col-md-7" ng-model="page.email"/>
+            </div>
+            <div class="row">
+                <span class="col-md-5">{{ 'login.password' | i18n }}</span>
+                <input class="col-md-7" ng-model="page.password" type="password"/>
+            </div>
+            <div class="row pull-right">
+                <input type="submit" value="{{ 'global.buttons.submit' | i18n }}"/>
+            </div>
+            <div class="row pull-left" style="margin-left: 30px">
+                <span>{{ 'login.noAccount' | i18n}}</span>
+                <a ng-href="#/signup">{{ 'login.signup' | i18n }}</a>
+            </div>
+        </form>
+    </div>
 </div>

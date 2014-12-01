@@ -1,17 +1,33 @@
 <div class="container" id="logged-in-layout" ng-class="{'logged-in' : !!$root.user}">
-<div class="require-login">
-<div class="logged-in-layout nested-hidden">
-    hello {{user.email}},
-    <button ng-click="logout()">logout</button>
-    <a admin ng-href="#/admin/users">manage users</a>
-    <a admin ng-href="#/admin/pools">manage pools</a>
-    <a admin ng-href="#/admin/pools/status">pools status</a>
-    <label class="auto-refresh">
-        <input type="checkbox" ng-model="$root.autoRefresh" >
-        auto refresh
-    </label>
-</div>
-<hr class="logged-in-layout nested-hidden"/>
-</div>
-<div ng-transclude class="logged-in-layout"></div>
+    <div class="require-login header navbar">
+        <div class="logged-in-layout">
+            <div class="pull-left logotype" style="margin:5px;">
+                <img ng-src="/images/gigaspaces_logo.png"/>
+            </div>
+
+            <div class="hello">
+                <span >hello {{user.email}}</span>
+            </div>
+            <ul class="nav pull-right">
+                <li><a admin ng-href="#/admin/users">manage users</a></li>
+                <li><a admin ng-href="#/admin/myUser">my user</a></li>
+                <li><a admin ng-href="#/admin/system">system</a></li>
+                <li><a admin ng-href="#/admin/pools">manage pools</a></li>
+                <li><a admin ng-href="#/admin/pools/status">pools status</a></li>
+                <li><a ng-href="#/widgets">My widgets</a></li>
+                <li><a ng-href="#/pools">My pools</a></li>
+                <li>
+                    <button ng-click="logout()">logout</button>
+                </li>
+            </ul>
+
+
+            <!--<label class="auto-refresh">-->
+            <!--<input type="checkbox" ng-model="$root.autoRefresh" >-->
+            <!--auto refresh-->
+            <!--</label>-->
+        </div>
+        <!--<hr class="logged-in-layout nested-hidden"/>-->
+    </div>
+    <div ng-transclude class="logged-in-layout"></div>
 </div>

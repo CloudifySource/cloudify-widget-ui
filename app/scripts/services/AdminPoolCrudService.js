@@ -9,6 +9,10 @@ angular.module('cloudifyWidgetUiApp')
                 return $http.get('/backend/admin/pools');
             };
 
+            this.getBootstrapScript = function () {
+                return $http.get('/backend/admin/pools/script');
+            };
+
             this.getUsers = function () {
                 return $http.get('/backend/admin/users');
             };
@@ -61,8 +65,16 @@ angular.module('cloudifyWidgetUiApp')
                 return $http.post('/backend/admin/pools/' + poolId + '/nodes/' + nodeId + '/delete');
             };
 
+            this.deleteCloudNode = function (poolId, machineId) {
+                return $http.post('/backend/admin/pools/' + poolId + '/cloud/nodes/' + machineId + '/delete');
+            };
+
             this.bootstrapPoolNode = function (poolId, nodeId) {
                 return $http.post('/backend/admin/pools/' + poolId + '/nodes/' + nodeId + '/bootstrap');
+            };
+
+            this.pingNode = function (poolId, nodeId) {
+                return $http.post('/backend/admin/pools/' + poolId + '/nodes/' + nodeId + '/ping');
             };
 
             this.deletePoolErrors = function (poolId) {
@@ -83,6 +95,14 @@ angular.module('cloudifyWidgetUiApp')
 
             this.getPoolDecisions = function (poolId) {
                 return $http.get('/backend/admin/pools/' + poolId + '/decisions');
+            };
+
+            this.getThreadPoolStatus = function () {
+                return $http.get('/backend/admin/threadpools');
+            };
+
+            this.getDataSourcesStatus = function () {
+                return $http.get('/backend/admin/datasources');
             };
 
             this.abortPoolDecision = function (poolId, decisionId) {

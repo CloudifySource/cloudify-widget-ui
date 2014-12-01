@@ -1,0 +1,17 @@
+<div layout id="accountPoolDetails">
+
+    <div class="actions">
+        <a href="#/pools/{{poolId}}/edit">Edit pool</a>
+    </div>
+
+    <div class="jumbotron col-md-4" >
+        Pool id : <span>{{ poolId }}</span><br/>
+        Current size : <span>{{ poolStatus.currentSize || 0 }}</span><br/><br/>
+
+        Created : <span>{{ poolStatus.countPerNodeStatus.CREATED || 0 }}</span><br/>
+        Bootstrapping : <span>{{ poolStatus.countPerNodeStatus.BOOTSTRAPPING || 0 }}</span><br/>
+        Bootstrapped : <span>{{ poolStatus.countPerNodeStatus.BOOTSTRAPPED || 0 }}</span><br/>
+        Occupied : <span>{{ poolStatus.countPerNodeStatus.OCCUPIED || 0 }}</span><br/>
+        Expired : <span>{{ poolStatus.countPerNodeStatus.EXPIRED || 0 }}</span><br/>
+    </div>
+</div>

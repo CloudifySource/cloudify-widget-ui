@@ -5,27 +5,38 @@
     <button ng-click="addPoolNode(model.poolId)">create node</button>
     <table ng-init="getPoolNodes(model.poolId)">
         <thead>
-            <tr>
-                <th>Node ID</th>
+            <tr class="pool-nodes">
+                <th class="sortable" ng-click="predicate = 'id'; reverse=!reverse"><a href="">Node ID</a></th>
                 <th>Machine ID</th>
                 <th>Pool Settings ID</th>
-                <th>Machine Status</th>
+                <th class="sortable" ng-click="predicate = 'nodeStatus'; reverse=!reverse"><a href="">Machine Status</a></th>
                 <th>Machine SSH Details</th>
-                <th colspan="2">Actions</th>
+                <th class="sortable" ng-click="predicate = 'expires'; reverse=!reverse"><a href="">Expires in</a></th>
+                <th colspan="3">Actions</th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="node in model.nodes">
+            <tr ng-repeat="node in model.nodes track by node.id | orderBy:predicate:reverse">
                 <td>{{ node.id }}</td>
                 <td>{{ node.machineId }}</td>
                 <td>{{ node.poolId }}</td>
                 <td>{{ node.nodeStatus }}</td>
                 <td><pre>{{ asJson(node.machineSshDetails) | json }}</pre></td>
+                <td>{{ node.expires | date:"medium" }} </td>
                 <td>
-                    <button ng-if="node.id" ng-click="bootstrapPoolNode(model.poolId, node.id)">bootstrap node</button>
+                    <button ng-if="node.id" ng-click="pingNode(model.poolId, node.id)">ping</button><br>
+                    <div ng-if="node.pingStatus">
+                        <span>{{ node.pingStatus.pingStatus }} at {{ node.pingStatus.timestamp | date:"medium" }}</span>
+                        <pre ng-if="node.pingStatus.pingResponses.length > 0 && node.pingStatus.pingStatus != 'PING_SUCCESS'">
+                            {{ asJson(node.pingStatus.pingResponses) | json }}
+                        </pre>
+                    </div>
                 </td>
                 <td>
-                    <button ng-if="node.id" ng-click="deletePoolNode(model.poolId, node.id)">delete node</button>
+                    <button ng-if="node.id" ng-click="bootstrapPoolNode(model.poolId, node.id)">bootstrap</button>
+                </td>
+                <td>
+                    <button ng-if="node.id" ng-click="deletePoolNode(model.poolId, node.id)">delete</button>
                 </td>
             </tr>
         </tbody>

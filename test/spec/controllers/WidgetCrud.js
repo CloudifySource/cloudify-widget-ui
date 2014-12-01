@@ -2,11 +2,11 @@
 
 describe('Controller: WidgetCrudCtrl', function () {
 
-  // load the controller's module
-  beforeEach(module('cloudifyWidgetUiApp'));
+    // load the controller's module
+    beforeEach(module('cloudifyWidgetUiApp'));
 
-  var WidgetCrudCtrl,
-    scope;
+//    var WidgetCrudCtrl,
+//        scope;
 
 //  // Initialize the controller and a mock scope
 //  beforeEach(inject(function ($controller, $rootScope) {

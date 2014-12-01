@@ -1,15 +1,43 @@
 <div layout>
     <a href="#/admin/users">back to all users</a>
-    <a href="#/admin/accounts/{{ model.accountId }}/pools/create">create new pool</a>
+    <a href="#/admin/accounts/{{ accountId }}/pools/create">create new pool</a>
 
-    <h3>Pools for user {{ model.accountId }}</h3>
+    <h3>Pools for user {{ accountId }}</h3>
 
-    <div pools-table
-         ng-init="getAccountPools(model.accountId)"
-         ng-model="model.accountPools"
-         update-fn="updateAccountPool"
-         delete-fn="deleteAccountPool"
-         clean-fn="cleanAccountPool"
-            ></div>
+
+    <table>
+        <thead>
+        <tr>
+            <!--<th>{{ model }}</th>-->
+            <th>Pool ID</th>
+            <th>Account ID</th>
+            <th>Pool Settings</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="pool in pools track by $index">
+            <td>{{ pool.id }}</td>
+            <td>{{ pool.accountId }}</td>
+            <td>
+                <a href="#/admin/accounts/{{accountId}}/pools/{{pool.id}}/combinedView">
+                    <span ng-show="!!pool.poolSettings.name && pool.poolSettings.name.trim().length > 0">{{pool.poolSettings.name}}</span>
+                    <span ng-show="!pool.poolSettings.name || pool.poolSettings.name.trim().length <= 0">[[No Name]]</span>
+                </a>
+                <!--<textarea json-binder ng-readonly="!editModeStatusArray[$index]" ng-model="pool.poolSettings"></textarea>-->
+            </td>
+            <!--<td>-->
+
+            <!--<label>-->
+            <!--<input type="checkbox"-->
+            <!--ng-model="editModeStatusArray[$index]"-->
+            <!--ng-change="callUpdateAccountPool(editModeStatusArray[$index], pool)">-->
+            <!--edit pool-->
+            <!--</label>-->
+            <!--</td>-->
+
+        </tr>
+        </tbody>
+    </table>
+
 
 </div>

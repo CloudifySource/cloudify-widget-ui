@@ -7,3 +7,7 @@ app/bower_components
 *.iml
 dev
 downloaded
+build.id
+artifacts
+cloudify-folder
+coverage

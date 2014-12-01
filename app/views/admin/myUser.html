@@ -1,0 +1,13 @@
+<div layout class="admin-my-user">
+
+
+    <div>
+        {{page.message}}
+    </div>
+
+<input ng-model="myUser.poolKey"/>
+    <button ng-click="setPoolKey(myUser.poolKey)">Update Pool Key</button><br/>
+    <button ng-click="testPoolKey()">Test Pool Key</button><br/>
+    <button ng-click="resetChanges()">Reset Changes</button>
+
+</div>

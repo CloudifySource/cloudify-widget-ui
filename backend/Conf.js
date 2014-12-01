@@ -1,10 +1,8 @@
 var fs = require('fs');
-var async = require('async');
+var path = require('path');
 var _  = require('lodash');
-var meConf = 'conf/dev/me.json';
-var prodConf = 'conf/prod.json';
-
-var conf;
+var meConf = process.env.WIDGET_UI_ME_CONF_JSON || path.resolve('conf/dev/me.json') ;
+var prodConf = path.resolve(path.join(__dirname,'..','conf/prod.json') );
 
 var data = fs.readFileSync(prodConf, 'utf8');
 if (!!data) {
