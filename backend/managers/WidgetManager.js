@@ -509,7 +509,9 @@ function _getPropertiesUpdateLine(executionDetails, executionId) {
             'keyPair="' + ec2keyPair + '"\n' +
             'keyFile="keyFile.pem"\n' +
             'machineNamePrefix="cloudify-agent-widget-' + executionId + '"\n' +
-            'managementGroup="cloudify-manager-widget-' + executionId + '"\n';
+            'managementGroup="cloudify-manager-widget-' + executionId + '"\n' +
+            'privateImageId="'+ executionDetails.privateImageId + '"\n' +
+            'privateImageRegion="' + executionDetails.privateImageRegion + '"\n';
     }
 
     return updateLine;
