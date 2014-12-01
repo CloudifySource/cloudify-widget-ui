@@ -457,6 +457,24 @@ function _generateKeyPair(curryParams, curryCallback) {
     });
 }
 
+function _modifyImageAttributes(curryParams, curryCallback) {
+    var executionDetails = curryParams.executionDetails;
+
+    if (!executionDetails.EC2) {
+        curryCallback(null, curryParams);
+    }
+
+    services.ec2Api.modifyImageAttribute(executionDetails.EC2.params.apiKey, executionDetails.EC2.params.secretKey,
+                                         executionDetails.privateImageRegion, executionDetails.privateImageId, function (err) {
+
+        if (err) {
+            curryCallback(err, curryParams);
+        } else {
+            curryCallback(null, curryParams);
+        }
+    });
+}
+
 function _getPropertiesUpdateLine(executionDetails, executionId) {
     var updateLine = '';
 
@@ -743,6 +761,7 @@ exports.playSolo = function (widgetId, executionDetails, playCallback) {
             _downloadRecipe,
             _downloadCloudProvider,
             _generateKeyPair,
+            _modifyImageAttributes,
             _overrideCloudPropertiesFile,
             _runBootstrapAndInstallCommands
         ],

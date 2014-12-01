@@ -28,7 +28,7 @@ exports.deleteKeyPair = function deleteKeyPair(apiKey, secretKey, region, keyNam
 exports.modifyImageAttribute = function modifyImageAttribute(apiKey, secretKey, region, imageId, callback) {
     //todo: add support for all regions (if region is undefined) - try each one until one succeeds or all failed.
 
-    var creds ={
+    var creds = {
         'accessKeyId': apiKey,
         'secretAccessKey': secretKey,
         'region': region
@@ -60,6 +60,17 @@ exports.modifyImageAttribute = function modifyImageAttribute(apiKey, secretKey, 
         ec2.modifyImageAttribute(params, callback);
     });
 
+};
+
+exports.describeRegions = function(apiKey, secretKey, callback) {
+    var creds = {
+        'accessKeyId': apiKey,
+        'secretAccessKey': secretKey,
+        'region': 'us-east-1'
+    };
+
+    var ec2 = new aws.EC2(creds);
+    ec2.describeRegions({}, callback);
 };
 
 /**
