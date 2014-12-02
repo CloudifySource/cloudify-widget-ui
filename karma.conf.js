@@ -20,7 +20,6 @@ module.exports = function (config) {
             'app/bower_components/ngstorage/ngStorage.js',
             'app/bower_components/angular-resource/angular-resource.js',
             'app/bower_components/angular-mocks/angular-mocks.js',
-            'app/bower_components/angular-mocks/angular-mocks.js',
             'app/bower_components/gs-ui-infra/app/scripts/app.js',
             'app/bower_components/gs-ui-infra/app/scripts/filters/i18n.js',
             'app/bower_components/gs-ui-infra/app/scripts/services/i18next.js',
