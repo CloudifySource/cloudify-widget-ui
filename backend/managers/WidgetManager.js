@@ -464,7 +464,7 @@ function _getRecipePropertiesUpdateLine(executionDetails) {
         for (var i = 0; i < executionDetails.recipeProperties.length; i++) {
             var prop = executionDetails.recipeProperties[i];
 
-            if (isNaN(parseInt(prop.value))) {
+            if (!_.isNumber(prop.value)) {
                 updateLine += prop.key + '="' + prop.value + '"\n';
             } else {
                 updateLine += prop.key + '=' + prop.value + '\n';

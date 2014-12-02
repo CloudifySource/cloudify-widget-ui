@@ -177,7 +177,7 @@ angular.module('cloudifyWidgetUiApp')
 //                ]
 //            });
 //        }
-//
+
         function _postMessage(data) {
             $log.info('posting message to widget api frame, message data: ', data);
             // TODO frame ref should not be hard-coded
@@ -200,7 +200,7 @@ angular.module('cloudifyWidgetUiApp')
 //                if (data.name === 'widget_loaded') {
 //                    _postProperties();
 //                }
-//
+
                 if (data.name === WidgetConstants.STATUS) {
                     _handleStatus(data.data);
                 }
