@@ -161,6 +161,23 @@ angular.module('cloudifyWidgetUiApp')
             _postMessage({name: 'widget_stop', widget: widget, executionId: executionId});
         }
 
+        // code for testing recipe properties message.
+//        function _postProperties() {
+//            _postMessage({
+//                name: 'widget_recipe_properties',
+//                data: [
+//                    {
+//                        key: 'key1',
+//                        value: 'value1'
+//                    },
+//                    {
+//                        key: 'key2',
+//                        value: 1234
+//                    }
+//                ]
+//            });
+//        }
+//
         function _postMessage(data) {
             $log.info('posting message to widget api frame, message data: ', data);
             // TODO frame ref should not be hard-coded
@@ -179,6 +196,11 @@ angular.module('cloudifyWidgetUiApp')
                 }
                 var data = e.data;
 
+                // code for testing recipe properties message.
+//                if (data.name === 'widget_loaded') {
+//                    _postProperties();
+//                }
+//
                 if (data.name === WidgetConstants.STATUS) {
                     _handleStatus(data.data);
                 }

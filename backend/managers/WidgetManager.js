@@ -457,7 +457,25 @@ function _generateKeyPair(curryParams, curryCallback) {
     });
 }
 
-function _getPropertiesUpdateLine(executionDetails, executionId) {
+function _getRecipePropertiesUpdateLine(executionDetails) {
+    var updateLine = '';
+
+    if (executionDetails.recipeProperties) {
+        for (var i = 0; i < executionDetails.recipeProperties.length; i++) {
+            var prop = executionDetails.recipeProperties[i];
+
+            if (isNaN(parseInt(prop.value))) {
+                updateLine += prop.key + '="' + prop.value + '"\n';
+            } else {
+                updateLine += prop.key + '=' + prop.value + '\n';
+            }
+        }
+    }
+
+    return updateLine;
+}
+
+function _getCloudPropertiesUpdateLine(executionDetails, executionId) {
     var updateLine = '';
 
     if (executionDetails.SOFTLAYER) {
@@ -494,7 +512,14 @@ function _getPropertiesUpdateLine(executionDetails, executionId) {
             'managementGroup="cloudify-manager-widget-' + executionId + '"\n';
     }
 
+    updateLine += _getRecipePropertiesUpdateLine(executionDetails);
+
     return updateLine;
+}
+
+function _updatePropertiesFile(fileName, updateLine, callback) {
+    logger.info('---updateLine', updateLine);
+    fs.appendFile(fileName, updateLine, callback);
 }
 
 function _overrideCloudPropertiesFile(curryParams, curryCallback) {
@@ -504,21 +529,36 @@ function _overrideCloudPropertiesFile(curryParams, curryCallback) {
     var cloudName = curryParams.widget.executionDetails.providerName;
     var cloudPropertiesFile = curryParams.cloudDistFolderName + path.sep + cloudName + '-cloud.properties';
     var executionDetails = curryParams.executionDetails;
+    var updateLine = _getCloudPropertiesUpdateLine(executionDetails, curryParams.executionId);
 
-    logger.info('---overrideParams---, -advancedParams:', executionDetails);
-
-    var updateLine = _getPropertiesUpdateLine(executionDetails, curryParams.executionId);
-
-    logger.info('---updateLine', updateLine);
-
-    fs.appendFile(cloudPropertiesFile, updateLine, function (err) {
-
-        if (!!err) {
+    _updatePropertiesFile(cloudPropertiesFile, updateLine, function(err) {
+        if (err) {
             logger.info(err);
             curryCallback(err, curryParams);
         }
-        logger.info('Cloud Properties File was updated:', cloudPropertiesFile);
 
+        logger.info('Cloud Properties File was updated:', cloudPropertiesFile);
+        curryCallback(null, curryParams);
+    });
+
+}
+
+function _overrideRecipePropertiesFile(curryParams, curryCallback) {
+    logger.trace('-play- overrideRecipePropertiesFile');
+
+    curryParams.recipeDistFolderName = curryParams.executionDownloadsPath + path.sep + curryParams.widget.recipeRootPath;
+    // filename - assuming that the file format is 'recipeName'-'recipeType'.properties i.e. mongod-service.properties
+    var recipePropertiesFile = curryParams.recipeDistFolderName + path.sep + curryParams.widget.recipeName + '-' + curryParams.widget.recipeType + '.properties';
+    var executionDetails = curryParams.executionDetails;
+    var updateLine = _getRecipePropertiesUpdateLine(executionDetails);
+
+    _updatePropertiesFile(recipePropertiesFile, updateLine, function(err) {
+        if (err) {
+            logger.info(err);
+            curryCallback(err, curryParams);
+        }
+
+        logger.info('Recipe Properties File was updated:', recipePropertiesFile);
         curryCallback(null, curryParams);
     });
 
@@ -744,6 +784,7 @@ exports.playSolo = function (widgetId, executionDetails, playCallback) {
             _downloadCloudProvider,
             _generateKeyPair,
             _overrideCloudPropertiesFile,
+            _overrideRecipePropertiesFile,
             _runBootstrapAndInstallCommands
         ],
 
