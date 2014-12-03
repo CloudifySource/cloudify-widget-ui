@@ -217,6 +217,7 @@ angular.module('cloudifyWidgetUiApp')
             }
 
             if (data.name === WidgetConstants.RECIPE_PROPERTIES) {
+                $log.info('widget got new properties info: ', data.data);
                 $scope.recipeProperties = data.data;
             }
 
