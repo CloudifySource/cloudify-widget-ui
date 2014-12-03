@@ -93,6 +93,10 @@ angular.module('cloudifyWidgetUiApp')
             _resetWidgetStatus();
             $scope.widgetStatus.state = STATE_RUNNING;
 
+            if ($scope.recipeProperties) {
+                $scope.widget.executionDetails.recipeProperties = $scope.recipeProperties;
+            }
+
             WidgetsService.playWidget($scope.widget, $scope.loginDetailsId, $scope.widget.executionDetails)
                 .then(function (result) {
                     $log.info(['play result', result]);
@@ -103,6 +107,11 @@ angular.module('cloudifyWidgetUiApp')
                     _postPlayed($scope.executionId);
                 }, function (err) {
                     $log.info(['play error', err]);
+
+                    var status = {
+                        error: err
+                    };
+                    _postStatus(status);
                 });
         }
 
@@ -205,6 +214,11 @@ angular.module('cloudifyWidgetUiApp')
 
             if (data.name === WidgetConstants.STOP) {
                 stop();
+            }
+
+            if (data.name === WidgetConstants.RECIPE_PROPERTIES) {
+                $log.info('widget got new properties info: ', data.data);
+                $scope.recipeProperties = data.data;
             }
 
             // this is here because JSHint fails at switch case indentation so it was converted to if statements.

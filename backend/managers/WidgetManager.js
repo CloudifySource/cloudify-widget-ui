@@ -475,7 +475,25 @@ function _modifyImages(curryParams, curryCallback) {
 
 }
 
-function _getPropertiesUpdateLine(executionDetails, executionId) {
+function _getRecipePropertiesUpdateLine(executionDetails) {
+    var updateLine = '';
+
+    if (executionDetails.recipeProperties) {
+        for (var i = 0; i < executionDetails.recipeProperties.length; i++) {
+            var prop = executionDetails.recipeProperties[i];
+
+            if (_.isNumber(prop.value)) {
+                updateLine += prop.key + '=' + prop.value + '\n';
+            } else {
+                updateLine += prop.key + '="' + prop.value + '"\n';
+            }
+        }
+    }
+
+    return updateLine;
+}
+
+function _getCloudPropertiesUpdateLine(executionDetails, executionId) {
     var updateLine = '';
 
     if (executionDetails.SOFTLAYER) {
@@ -509,12 +527,17 @@ function _getPropertiesUpdateLine(executionDetails, executionId) {
             'keyPair="' + ec2keyPair + '"\n' +
             'keyFile="keyFile.pem"\n' +
             'machineNamePrefix="cloudify-agent-widget-' + executionId + '"\n' +
-            'managementGroup="cloudify-manager-widget-' + executionId + '"\n' +
-            'privateImageId="' + executionDetails.privateImageId + '"\n' +
-            'privateImageRegion="' + executionDetails.privateImageRegion + '"\n';
+            'managementGroup="cloudify-manager-widget-' + executionId + '"\n';
     }
 
+    updateLine += _getRecipePropertiesUpdateLine(executionDetails);
+
     return updateLine;
+}
+
+function _updatePropertiesFile(fileName, updateLine, callback) {
+    logger.info('---updateLine', updateLine);
+    fs.appendFile(fileName, updateLine, callback);
 }
 
 function _overrideCloudPropertiesFile(curryParams, curryCallback) {
@@ -524,47 +547,62 @@ function _overrideCloudPropertiesFile(curryParams, curryCallback) {
     var cloudName = curryParams.widget.executionDetails.providerName;
     var cloudPropertiesFile = curryParams.cloudDistFolderName + path.sep + cloudName + '-cloud.properties';
     var executionDetails = curryParams.executionDetails;
+    var updateLine = _getCloudPropertiesUpdateLine(executionDetails, curryParams.executionId);
 
-    logger.info('---overrideParams---, -advancedParams:', executionDetails);
-
-    var updateLine = _getPropertiesUpdateLine(executionDetails, curryParams.executionId);
-
-    logger.info('---updateLine', updateLine);
-
-    fs.appendFile(cloudPropertiesFile, updateLine, function (err) {
-
-        if (!!err) {
+    _updatePropertiesFile(cloudPropertiesFile, updateLine, function(err) {
+        if (err) {
             logger.info(err);
             curryCallback(err, curryParams);
         }
-        logger.info('Cloud Properties File was updated:', cloudPropertiesFile);
 
+        logger.info('Cloud Properties File was updated:', cloudPropertiesFile);
+        curryCallback(null, curryParams);
+    });
+
+}
+
+function _overrideRecipePropertiesFile(curryParams, curryCallback) {
+    logger.trace('-play- overrideRecipePropertiesFile');
+
+    curryParams.recipeDistFolderName = curryParams.executionDownloadsPath + path.sep + curryParams.widget.recipeRootPath;
+    // filename - assuming that the file format is 'recipeName'-'recipeType'.properties i.e. mongod-service.properties
+    var recipePropertiesFile = curryParams.recipeDistFolderName + path.sep + curryParams.widget.recipeName + '-' + curryParams.widget.recipeType + '.properties';
+    var executionDetails = curryParams.executionDetails;
+    var updateLine = _getRecipePropertiesUpdateLine(executionDetails);
+
+    _updatePropertiesFile(recipePropertiesFile, updateLine, function(err) {
+        if (err) {
+            logger.info(err);
+            curryCallback(err, curryParams);
+        }
+
+        logger.info('Recipe Properties File was updated:', recipePropertiesFile);
         curryCallback(null, curryParams);
     });
 
 }
 
 /*
- function _runTeardownCommand(curryParams, curryCallback) {
- logger.info('-stopRemote- runClieTeardown');
+function _runTeardownCommand(curryParams, curryCallback) {
+    logger.info('-stopRemote- runClieTeardown');
 
- var teardownPath = path.resolve(path.join(curryParams.executionModel.downloadsPath, curryParams.widget.executionDetails.providerRootPath));
- var command = {
- arguments: [
- 'teardown-cloud',
- teardownPath
- ],
- logsDir: curryParams.executionModel.logsPath,
- executionId: curryParams.executionObjectId.toHexString()
- };
+    var teardownPath = path.resolve(path.join(curryParams.executionModel.downloadsPath, curryParams.widget.executionDetails.providerRootPath));
+    var command = {
+        arguments: [
+            'teardown-cloud',
+            teardownPath
+        ],
+        logsDir: curryParams.executionModel.logsPath,
+        executionId: curryParams.executionObjectId.toHexString()
+    };
 
- logger.info('-command ', command);
+    logger.info('-command ', command);
 
- services.cloudifyCli.executeCommand(command);
+    services.cloudifyCli.executeCommand(command);
 
- curryCallback(null, curryParams);
- }
- */
+    curryCallback(null, curryParams);
+}
+*/
 
 function _runBootstrapAndInstallCommands(curryParams, curryCallback) {
     logger.info('-playRemote- runCliBootstrapCommand, executionLogsPath:', curryParams.executionLogsPath, 'installCommand:', curryParams.widget.recipeType.installCommand);
@@ -640,7 +678,7 @@ function _playFinally(err, curryParams) {
 
 function _getExecutionModel(curryParams, curryCallback) {
 
-    exports.getExecutionModelById(curryParams.executionId, function (err, result) {
+    exports.getExecutionModelById(curryParams.executionId, function(err, result) {
         if (!!err) {
             curryCallback(err, curryParams);
             return;
@@ -694,7 +732,7 @@ function _stopFinally(err, curryParams) {
     curryParams.stopCallback(null, {});
 }
 
-exports.getExecutionModelById = function (executionId, callback) {
+exports.getExecutionModelById = function(executionId, callback) {
     managers.db.connect('widgetExecutions', function (db, collection) {
         collection.findOne({_id: managers.db.toObjectId(executionId)}, function (err, result) {
 
@@ -765,6 +803,7 @@ exports.playSolo = function (widgetId, executionDetails, playCallback) {
             _generateKeyPair,
             _modifyImages,
             _overrideCloudPropertiesFile,
+            _overrideRecipePropertiesFile,
             _runBootstrapAndInstallCommands
         ],
 
