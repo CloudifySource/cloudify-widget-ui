@@ -136,6 +136,18 @@ angular.module('cloudifyWidgetUiApp')
             $location.path('/widgets');
         }
 
+        $scope.addPrivateImageItem = function() {
+            if (!$scope.widget.executionDetails.privateImages) {
+                $scope.widget.executionDetails.privateImages = [];
+            }
+
+            $scope.widget.executionDetails.privateImages.push({});
+        };
+
+        $scope.removePrivateImageItem = function(index) {
+            $scope.widget.executionDetails.privateImages.splice(index, 1);
+        };
+
         $scope.delete = function () {
             WidgetsService.deleteWidget($scope.widget);
             redirectToWidgets();

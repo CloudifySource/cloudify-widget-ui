@@ -3,6 +3,7 @@
 
 var aws = require('aws-sdk');
 var logger = require('log4js').getLogger('index');
+var async = require('async');
 
 
 exports.createKeyPair = function createKeyPair(apiKey, secretKey, region, keyName, callback) {
@@ -25,7 +26,25 @@ exports.deleteKeyPair = function deleteKeyPair(apiKey, secretKey, region, keyNam
     ec2.deleteKeyPair({ 'KeyName': keyName }, callback);
 };
 
-exports.modifyImageAttribute = function modifyImageAttribute(apiKey, secretKey, region, imageId, callback) {
+exports.getUser = function getUser(apiKey, secretKey, callback) {
+    var creds = {
+        'accessKeyId': apiKey,
+        'secretAccessKey': secretKey,
+        'region': 'us-east-1'
+    };
+
+    var iam = new aws.IAM(creds);
+    iam.getUser({}, function (err, data) {
+        if (err) {
+            logger.error('Could not locate user ', apiKey);
+            callback(err, null);
+        }
+
+        callback(null, data);
+    });
+};
+
+exports.modifyImage = function modifyImage(apiKey, secretKey, region, imageId, callback) {
     //todo: add support for all regions (if region is undefined) - try each one until one succeeds or all failed.
 
     var creds = {
@@ -35,13 +54,11 @@ exports.modifyImageAttribute = function modifyImageAttribute(apiKey, secretKey, 
     };
 
     var ec2 = new aws.EC2(creds);
-    var iam = new aws.IAM(creds);
 
     logger.debug('modifying image launch permissions for ', imageId);
 
-    iam.getUser({}, function (err, data) {
+    exports.getUser(apiKey, secretKey, function (err, data) {
         if (err) {
-            logger.error('Could not locate user ', apiKey);
             callback(err, null);
         }
 
@@ -58,6 +75,43 @@ exports.modifyImageAttribute = function modifyImageAttribute(apiKey, secretKey, 
         };
 
         ec2.modifyImageAttribute(params, callback);
+    });
+
+};
+
+exports.modifyImages = function modifyImages(apiKey, secretKey, images, callback) {
+    var tasks = [];
+
+    function createTask(image) {
+        return function (callback) {
+            exports.modifyImage(apiKey, secretKey, image.imageRegion, image.imageId, callback);
+        };
+    }
+
+    for (var i = 0; i < images; i++) {
+        var image = images[i];
+        tasks.push(createTask(image));
+    }
+
+    async.parallel(tasks, function (err, results) {
+        if (err) {
+            callback(err, {});
+        }
+
+        var failed = '';
+        for (var i = 0; i < results.length; i++) {
+            var image = results[i];
+            if (image.fail) {
+                failed += 'Private image ' + image.imageId + ' region ' + image.imageRegion + ' launch modification failed. Error: ' + image.err.message + '\n';
+            }
+        }
+
+        if (failed !== '') {
+            callback(new Error(failed), {});
+        } else {
+            callback(null, results);
+        }
+
     });
 
 };

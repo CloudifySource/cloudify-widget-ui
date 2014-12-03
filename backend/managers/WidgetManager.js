@@ -60,7 +60,7 @@ var models = require('../models');
  *      - update execution model whether email sent successfully or not.
  *
  */
-function sendEmailAfterInstall(curryParams){
+function sendEmailAfterInstall(curryParams) {
     if (!curryParams.widget.socialLogin || !curryParams.widget.socialLogin.handlers || !curryParams.widget.socialLogin.handlers.mandrill || !curryParams.widget.socialLogin.handlers.mandrill.enabled) {
         // noop
         return;
@@ -70,7 +70,7 @@ function sendEmailAfterInstall(curryParams){
     var publicIp = curryParams.nodeModel.machineSshDetails.publicIp;
     var link = '<a href="http://"' + publicIp + '> http://' + publicIp + '</a>';
 
-    managers.widgetLogins.getWidgetLoginById(curryParams.loginDetailsId, function(err, result) {
+    managers.widgetLogins.getWidgetLoginById(curryParams.loginDetailsId, function (err, result) {
         if (!!err) {
             logger.error('unable to find login details, email send failed', err);
             return;
@@ -100,24 +100,24 @@ function sendEmailAfterInstall(curryParams){
                     'content': curryParams.nodeModel.randomValue
                 },
                 {
-                    'name' : 'publicIp',
-                    'content' : publicIp
+                    'name': 'publicIp',
+                    'content': publicIp
                 }
             ],
             'message': {
-                'to':[
+                'to': [
                     {
-                        'email':result.loginDetails.email,
+                        'email': result.loginDetails.email,
                         'name': fullname,
                         'type': 'to'
                     }
                 ]
             },
-            'async':true
+            'async': true
         };
 
-        services.mandrill.sendMandrillTemplate( data,
-            function(err, result){
+        services.mandrill.sendMandrillTemplate(data,
+            function (err, result) {
                 if (!!err) {
                     curryParams.widget.socialLogin.handlers.mandrill.status = err;
                 } else {
@@ -211,7 +211,7 @@ function _updateExecutionModel(data, curryParams, curryCallback) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.findOne(
             { _id: curryParams.executionObjectId },
-            function(err, result) {
+            function (err, result) {
                 if (err) {
                     logger.error('failed to retrieve execution model before update', err);
                     curryCallback(err, curryParams);
@@ -370,12 +370,12 @@ function _runInstallCommand(curryParams, curryCallback) {
     logger.trace('-play- runInstallCommand');
 
     if (!curryParams.shouldInstall) {
-        var status = {'code' : 0};
+        var status = {'code': 0};
 
         services.logs.writeStatus(JSON.stringify(status, null, 4) + '\n', curryParams.executionId);
         services.logs.appendOutput('Install finished successfully.\n', curryParams.executionId);
 
-        sendEmailAfterInstall( curryParams );
+        sendEmailAfterInstall(curryParams);
 
         curryCallback(null, curryParams);
         return;
@@ -408,11 +408,11 @@ function _runInstallCommand(curryParams, curryCallback) {
     // we want to remove the execution model when the execution is over
     services.cloudifyCli.executeCommand(command, function (exErr/*, exResult*/) {
         if (!!exErr) {
-            logger.error('error while running install from cli',exErr);
+            logger.error('error while running install from cli', exErr);
             return;
         }
 
-        sendEmailAfterInstall( curryParams );
+        sendEmailAfterInstall(curryParams);
         // TODO change execution status
     });
 
@@ -427,14 +427,14 @@ function _generateKeyPair(curryParams, curryCallback) {
         curryCallback(null, curryParams);
     }
 
-    services.ec2Api.createKeyPair(executionDetails.EC2.params.apiKey, executionDetails.EC2.params.secretKey, 'us-east-1', 'Cloudify-Widget-' + curryParams.executionId, function(err, data) {
+    services.ec2Api.createKeyPair(executionDetails.EC2.params.apiKey, executionDetails.EC2.params.secretKey, 'us-east-1', 'Cloudify-Widget-' + curryParams.executionId, function (err, data) {
         if (err) {
             curryCallback(err, curryParams);
         }
 
         //create pem file
         var keyPairPemFile = curryParams.executionDownloadsPath + path.sep + curryParams.widget.executionDetails.providerRootPath + path.sep + 'upload/keyFile.pem';
-        fs.appendFile(keyPairPemFile, data.KeyMaterial, function(err) {
+        fs.appendFile(keyPairPemFile, data.KeyMaterial, function (err) {
             if (err) {
                 curryCallback(err, curryParams);
             }
@@ -457,22 +457,22 @@ function _generateKeyPair(curryParams, curryCallback) {
     });
 }
 
-function _modifyImageAttributes(curryParams, curryCallback) {
+function _modifyImages(curryParams, curryCallback) {
     var executionDetails = curryParams.executionDetails;
 
     if (!executionDetails.EC2) {
+        // not EC2, nothing to do.
         curryCallback(null, curryParams);
     }
 
-    services.ec2Api.modifyImageAttribute(executionDetails.EC2.params.apiKey, executionDetails.EC2.params.secretKey,
-                                         executionDetails.privateImageRegion, executionDetails.privateImageId, function (err) {
-
+    services.ec2Api.modifyImages(executionDetails.EC2.params.apiKey, executionDetails.EC2.params.secretKey, executionDetails.privateImages, function(err) {
         if (err) {
             curryCallback(err, curryParams);
-        } else {
-            curryCallback(null, curryParams);
         }
+
+        curryCallback(null, curryParams);
     });
+
 }
 
 function _getPropertiesUpdateLine(executionDetails, executionId) {
@@ -510,7 +510,7 @@ function _getPropertiesUpdateLine(executionDetails, executionId) {
             'keyFile="keyFile.pem"\n' +
             'machineNamePrefix="cloudify-agent-widget-' + executionId + '"\n' +
             'managementGroup="cloudify-manager-widget-' + executionId + '"\n' +
-            'privateImageId="'+ executionDetails.privateImageId + '"\n' +
+            'privateImageId="' + executionDetails.privateImageId + '"\n' +
             'privateImageRegion="' + executionDetails.privateImageRegion + '"\n';
     }
 
@@ -545,26 +545,26 @@ function _overrideCloudPropertiesFile(curryParams, curryCallback) {
 }
 
 /*
-function _runTeardownCommand(curryParams, curryCallback) {
-    logger.info('-stopRemote- runClieTeardown');
+ function _runTeardownCommand(curryParams, curryCallback) {
+ logger.info('-stopRemote- runClieTeardown');
 
-    var teardownPath = path.resolve(path.join(curryParams.executionModel.downloadsPath, curryParams.widget.executionDetails.providerRootPath));
-    var command = {
-        arguments: [
-            'teardown-cloud',
-            teardownPath
-        ],
-        logsDir: curryParams.executionModel.logsPath,
-        executionId: curryParams.executionObjectId.toHexString()
-    };
+ var teardownPath = path.resolve(path.join(curryParams.executionModel.downloadsPath, curryParams.widget.executionDetails.providerRootPath));
+ var command = {
+ arguments: [
+ 'teardown-cloud',
+ teardownPath
+ ],
+ logsDir: curryParams.executionModel.logsPath,
+ executionId: curryParams.executionObjectId.toHexString()
+ };
 
-    logger.info('-command ', command);
+ logger.info('-command ', command);
 
-    services.cloudifyCli.executeCommand(command);
+ services.cloudifyCli.executeCommand(command);
 
-    curryCallback(null, curryParams);
-}
-*/
+ curryCallback(null, curryParams);
+ }
+ */
 
 function _runBootstrapAndInstallCommands(curryParams, curryCallback) {
     logger.info('-playRemote- runCliBootstrapCommand, executionLogsPath:', curryParams.executionLogsPath, 'installCommand:', curryParams.widget.recipeType.installCommand);
@@ -640,7 +640,7 @@ function _playFinally(err, curryParams) {
 
 function _getExecutionModel(curryParams, curryCallback) {
 
-    exports.getExecutionModelById(curryParams.executionId, function(err, result) {
+    exports.getExecutionModelById(curryParams.executionId, function (err, result) {
         if (!!err) {
             curryCallback(err, curryParams);
             return;
@@ -694,7 +694,7 @@ function _stopFinally(err, curryParams) {
     curryParams.stopCallback(null, {});
 }
 
-exports.getExecutionModelById = function(executionId, callback) {
+exports.getExecutionModelById = function (executionId, callback) {
     managers.db.connect('widgetExecutions', function (db, collection) {
         collection.findOne({_id: managers.db.toObjectId(executionId)}, function (err, result) {
 
@@ -763,7 +763,7 @@ exports.playSolo = function (widgetId, executionDetails, playCallback) {
             _downloadRecipe,
             _downloadCloudProvider,
             _generateKeyPair,
-            _modifyImageAttributes,
+            _modifyImages,
             _overrideCloudPropertiesFile,
             _runBootstrapAndInstallCommands
         ],
@@ -793,7 +793,7 @@ exports.stop = function (widgetId, executionId, isSoloMode, stopCallback) {
 
     // if execution is not on a remote machine, the node is in the pool - add a task to expire it
 //    remote ? tasks.push(_runTeardownCommand) : tasks.push(_expireNode);
-    !isSoloMode  && tasks.push(_expireNode);
+    !isSoloMode && tasks.push(_expireNode);
 
     tasks.push(_updateExecutionModelStopped);
 
@@ -805,10 +805,10 @@ exports.stop = function (widgetId, executionId, isSoloMode, stopCallback) {
 
 function getPublicExecutionDetails(execution) {
     var retVal = {};
-    retVal.widget =  _.omit(execution.widget, ['userId']);
+    retVal.widget = _.omit(execution.widget, ['userId']);
 
     if (execution.nodeModel) {
-        retVal.nodeModel =  _.merge(_.pick(execution.nodeModel, ['id']),
+        retVal.nodeModel = _.merge(_.pick(execution.nodeModel, ['id']),
             {'publicIp': execution.nodeModel.machineSshDetails.publicIp },
             {'expires': execution.nodeModel.expires},
             {'state': execution.state});

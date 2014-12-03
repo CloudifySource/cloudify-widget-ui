@@ -75,12 +75,15 @@
                     <input class="col-md-8" type="text" ng-model="widget.executionDetails.providerRootPath" ng-disabled="!widget.executionDetails.isSoloMode"/>
                 </div>
                 <div class="row">
-                    <span class="col-md-4">Private AMI ID: </span>
-                    <input class="col-md-8" type="text" ng-model="widget.executionDetails.privateImageId" ng-disabled="!widget.executionDetails.isSoloMode"/>
-                </div>
-                <div class="row">
-                    <span class="col-md-4">Private AMI region: </span>
-                    <input class="col-md-8" type="text" ng-model="widget.executionDetails.privateImageRegion" ng-disabled="!widget.executionDetails.isSoloMode"/>
+                    Private AMI management: <button ng-click="addPrivateImageItem()">Add item</button>
+                    <div class="row" ng-repeat="item in widget.executionDetails.privateImages">
+                        <span class="col-md-3">{{$index+1}}. Private AMI ID: </span>
+                        <input class="col-md-2" type="text" ng-model="item.imageId" ng-disabled="!widget.executionDetails.isSoloMode"/>
+                        <span class="col-md-3">Private AMI region: </span>
+                        <input class="col-md-2" type="text" ng-model="item.imageRegion" ng-disabled="!widget.executionDetails.isSoloMode"/>
+                        <button style="margin-left: 10px;" ng-click="removePrivateImageItem($index)">-</button>
+                    </div>
+
                 </div>
             </tab>
             <tab heading="Theme" select="navigateTo('theme')">
