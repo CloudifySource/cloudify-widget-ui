@@ -2,7 +2,7 @@
 
 
 var aws = require('aws-sdk');
-var logger = require('log4js').getLogger('index');
+var logger = require('log4js').getLogger('EC2.index');
 var async = require('async');
 
 
@@ -38,32 +38,34 @@ exports.getUser = function getUser(apiKey, secretKey, callback) {
         if (err) {
             logger.error('Could not locate user ', apiKey);
             callback(err, null);
+            return;
         }
 
         callback(null, data);
     });
 };
 
-exports.modifyImage = function modifyImage(apiKey, secretKey, region, imageId, callback) {
+exports.modifyImage = function modifyImage(apiKey, secretKey, image, callback) {
     //todo: add support for all regions (if region is undefined) - try each one until one succeeds or all failed.
 
     var creds = {
         'accessKeyId': apiKey,
         'secretAccessKey': secretKey,
-        'region': region
+        'region': image.imageRegion
     };
 
     var ec2 = new aws.EC2(creds);
 
-    logger.debug('modifying image launch permissions for ', imageId);
+    logger.debug('modifying image launch permissions for ', image.imageId);
 
     exports.getUser(apiKey, secretKey, function (err, data) {
         if (err) {
             callback(err, null);
+            return;
         }
 
         var params = {
-            ImageId: imageId,
+            ImageId: image.imageId,
             LaunchPermission: {
                 Add: [
                     {
@@ -74,7 +76,16 @@ exports.modifyImage = function modifyImage(apiKey, secretKey, region, imageId, c
             }
         };
 
-        ec2.modifyImageAttribute(params, callback);
+        ec2.modifyImageAttribute(params, function(err) {
+            if (err) {
+                image.fail = true;
+                image.err = err;
+            } else {
+                image.fail = false;
+            }
+
+            callback(null, image);
+        });
     });
 
 };
@@ -84,11 +95,11 @@ exports.modifyImages = function modifyImages(apiKey, secretKey, images, callback
 
     function createTask(image) {
         return function (callback) {
-            exports.modifyImage(apiKey, secretKey, image.imageRegion, image.imageId, callback);
+            exports.modifyImage(apiKey, secretKey, image, callback);
         };
     }
 
-    for (var i = 0; i < images; i++) {
+    for (var i = 0; i < images.length; i++) {
         var image = images[i];
         tasks.push(createTask(image));
     }
@@ -96,6 +107,7 @@ exports.modifyImages = function modifyImages(apiKey, secretKey, images, callback
     async.parallel(tasks, function (err, results) {
         if (err) {
             callback(err, {});
+            return;
         }
 
         var failed = '';
