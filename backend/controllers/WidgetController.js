@@ -103,17 +103,18 @@ exports.delete = function (req, res) {
 
 exports.tryImages = function (req, res) {
     logger.info('Trying to modify images: action [%s], apiKey [%s]', req.body.action, req.body.apiKey);
+    var data = req.body;
     var errorStr = '';
 
     //TODO: also support ADD/REMOVE (action property in body)
 
-    if (!req.body.apiKey || !req.body.secretKey || !req.body.images) {
+    if (!data.apiKey || !data.secretKey || !data.images) {
         errorStr = 'missing data (apiKey / secretKey / images)!';
         logger.error(errorStr);
         res.send(500, { 'error': errorStr});
     }
 
-    services.ec2Api.modifyImages(req.body.apiKey, req.body.secretKey, req.body.images, function (err) {
+    services.ec2Api.modifyImages(data, function (err) {
         if (err) {
             errorStr = err.message;
             logger.error(errorStr);

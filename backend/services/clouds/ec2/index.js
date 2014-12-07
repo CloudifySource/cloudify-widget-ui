@@ -45,12 +45,30 @@ exports.getUser = function getUser(apiKey, secretKey, callback) {
     });
 };
 
-exports.modifyImage = function modifyImage(apiKey, secretKey, image, callback) {
-    //todo: add support for all regions (if region is undefined) - try each one until one succeeds or all failed.
+var getModifyImageReqObj = function (image, userId, data) {
+    var reqObj = {
+        ImageId: image.imageId,
+        LaunchPermission: {}
+    };
 
+    var item = {
+        Group: 'all',
+        UserId: userId
+    };
+
+    if (data.action === 'add') {
+        reqObj.LaunchPermission.Add = [item];
+    } else {
+        reqObj.LaunchPermission.Remove = [item];
+    }
+
+    return reqObj;
+};
+
+exports.modifyImage = function modifyImage(data, image, callback) {
     var creds = {
-        'accessKeyId': apiKey,
-        'secretAccessKey': secretKey,
+        'accessKeyId': data.apiKey,
+        'secretAccessKey': data.secretKey,
         'region': image.imageRegion
     };
 
@@ -58,25 +76,15 @@ exports.modifyImage = function modifyImage(apiKey, secretKey, image, callback) {
 
     logger.debug('modifying image launch permissions for ', image.imageId);
 
-    exports.getUser(apiKey, secretKey, function (err, data) {
+    exports.getUser(data.apiKey, data.secretKey, function (err, result) {
         if (err) {
             callback(err, null);
             return;
         }
 
-        var params = {
-            ImageId: image.imageId,
-            LaunchPermission: {
-                Add: [
-                    {
-                        Group: 'all',
-                        UserId: data.User.UserId
-                    }
-                ]
-            }
-        };
+        var reqObj = getModifyImageReqObj(image, result.User.UserId, data);
 
-        ec2.modifyImageAttribute(params, function(err) {
+        ec2.modifyImageAttribute(reqObj, function (err) {
             if (err) {
                 image.fail = true;
                 image.err = err;
@@ -90,17 +98,17 @@ exports.modifyImage = function modifyImage(apiKey, secretKey, image, callback) {
 
 };
 
-exports.modifyImages = function modifyImages(apiKey, secretKey, images, callback) {
+exports.modifyImages = function modifyImages(data, callback) {
     var tasks = [];
 
     function createTask(image) {
         return function (callback) {
-            exports.modifyImage(apiKey, secretKey, image, callback);
+            exports.modifyImage(data, image, callback);
         };
     }
 
-    for (var i = 0; i < images.length; i++) {
-        var image = images[i];
+    for (var i = 0; i < data.images.length; i++) {
+        var image = data.images[i];
         tasks.push(createTask(image));
     }
 
@@ -128,7 +136,7 @@ exports.modifyImages = function modifyImages(apiKey, secretKey, images, callback
 
 };
 
-exports.describeRegions = function(apiKey, secretKey, callback) {
+exports.describeRegions = function (apiKey, secretKey, callback) {
     var creds = {
         'accessKeyId': apiKey,
         'secretAccessKey': secretKey,
