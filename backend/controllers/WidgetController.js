@@ -106,8 +106,6 @@ exports.tryImages = function (req, res) {
     var data = req.body;
     var errorStr = '';
 
-    //TODO: also support ADD/REMOVE (action property in body)
-
     if (!data.apiKey || !data.secretKey || !data.images) {
         errorStr = 'missing data (apiKey / secretKey / images)!';
         logger.error(errorStr);
