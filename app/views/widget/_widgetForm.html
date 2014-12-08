@@ -89,8 +89,12 @@
 
                     </div>
                     <div class="row"> Try it now:<br>
-                        <span class="col-md-3">accountId: </span>
-                        <input class="col-md-2" type="text" ng-model="tryItNow.privateAmi.accountId" ng-disabled="!widget.executionDetails.isSoloMode"/>
+                        <span class="col-md-3">apiKey: </span>
+                        <input class="col-md-2" type="text" ng-model="tryItNow.apiKey" ng-disabled="!widget.executionDetails.isSoloMode"/>
+                        <span class="col-md-3">secretKey: </span>
+                        <input class="col-md-2" type="text" ng-model="tryItNow.secretKey" ng-disabled="!widget.executionDetails.isSoloMode"/>
+                    </div>
+                    <div>
                         <div class="col-md-1"></div>
                         <button ng-click="tryPrivateImagesNow(true)" ng-disabled="!widget.executionDetails.isSoloMode || !tryItNow.apiKey || !tryItNow.secretKey" >Add</button>
                         <button ng-click="tryPrivateImagesNow(false)" ng-disabled="!widget.executionDetails.isSoloMode || !tryItNow.apiKey || !tryItNow.secretKey" >Remove</button>
@@ -180,7 +184,7 @@
                         Add {{loginType.label}} Support For Widget
                     </button>
                 </div>
-                <button ng-click="trySocialLoginNow(null, widget)">Try Login Now!</button>
+                <button ng-click="tryItNow(null, widget)">Try Login Now!</button>
                 <i>Please note you should save changes before clicking 'Try Login now'.</i>
                 </p>
 
@@ -196,7 +200,7 @@
                     </div>
                     <button ng-click="removeSocialLogin(socialLogin)">Remove Social Login</button>
                     <br/>
-                    <button ng-click="trySocialLoginNow(socialLogin, widget)">Try {{getSocialLoginLabel(socialLogin)}} Login Now!
+                    <button ng-click="tryItNow(socialLogin, widget)">Try {{getSocialLoginLabel(socialLogin)}} Login Now!
                     </button>
                 </div>
                 </p>

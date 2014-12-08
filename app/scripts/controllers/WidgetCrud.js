@@ -42,7 +42,7 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         $scope.tryPrivateImagesNow = function (isAdd) {
-            return WidgetsService.tryPrivateImagesNow(isAdd, $scope.tryItNow.privateAmi.accountId, $scope.widget.executionDetails.privateImages).then(
+            return WidgetsService.tryPrivateImagesNow(isAdd, $scope.tryItNow.apiKey, $scope.tryItNow.secretKey, $scope.widget.executionDetails.privateImages).then(
                 function success() {
                     $log.info('Successfully modified images');
                     toastr.info('Successfully modified images');

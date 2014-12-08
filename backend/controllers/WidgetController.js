@@ -102,12 +102,12 @@ exports.delete = function (req, res) {
 };
 
 exports.tryImages = function (req, res) {
-    logger.info('Trying to modify images: action [%s], accountId [%s]', req.body.action, req.body.accountId);
+    logger.info('Trying to modify images: action [%s], apiKey [%s]', req.body.action, req.body.apiKey);
     var data = req.body;
     var errorStr = '';
 
-    if (!data.accountId || !data.images) {
-        errorStr = 'missing data (accountId / images)!';
+    if (!data.apiKey || !data.secretKey || !data.images) {
+        errorStr = 'missing data (apiKey / secretKey / images)!';
         logger.error(errorStr);
         res.send(500, { 'error': errorStr});
     }

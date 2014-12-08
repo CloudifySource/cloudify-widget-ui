@@ -57,10 +57,11 @@ angular.module('cloudifyWidgetUiApp')
             return $http.get('/backend/user/widgets/' + widget._id + '/executions/' + executionId + '/output');
         };
 
-        this.tryPrivateImagesNow = function(isAdd, accountId, images) {
+        this.tryPrivateImagesNow = function(isAdd, apiKey, secretKey, images) {
             var data = {
                 action: isAdd ? 'add' : 'remove',
-                accountId: accountId,
+                apiKey: apiKey,
+                secretKey: secretKey,
                 images: images
             };
 
