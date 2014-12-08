@@ -405,16 +405,21 @@ function _runInstallCommand(curryParams, curryCallback) {
         logsDir: curryParams.executionLogsPath,
         executionId: curryParams.executionObjectId.toHexString()
     };
-    // we want to remove the execution model when the execution is over
-    services.cloudifyCli.executeCommand(command, function (exErr/*, exResult*/) {
-        if (!!exErr) {
-            logger.error('error while running install from cli',exErr);
-            return;
-        }
 
-        sendEmailAfterInstall( curryParams );
-        // TODO change execution status
-    });
+    if (conf.cloudifyCliService && (!conf.cloudifyCliService.runInline)) {
+        createInstallCommand(command,curryParams);
+    } else {
+        // we want to remove the execution model when the execution is over
+        services.cloudifyCli.executeCommand(command, function (exErr/*, exResult*/) {
+            if (!!exErr) {
+                logger.error('error while running install from cli',exErr);
+                return;
+            }
+
+            sendEmailAfterInstall( curryParams );
+            // TODO change execution status
+        });
+    }
 
     curryCallback(null, curryParams);
 }
@@ -573,7 +578,11 @@ function _runBootstrapAndInstallCommands(curryParams, curryCallback) {
 
     logger.info('-command', command);
 
-    services.cloudifyCli.executeCommand(command);
+    if (conf.cloudifyCliService && (!conf.cloudifyCliService.runInline)) {
+        createInstallCommand(command);
+    } else {
+        services.cloudifyCli.executeCommand(command);
+    }
 
     curryCallback(null, curryParams);
 }
@@ -593,6 +602,28 @@ function updateExecution(executionObjectId, data) {
                 }
                 if (!nUpdated) {
                     logger.error('no widget execution docs updated in the database');
+                    done();
+                    return;
+                }
+                done();
+            });
+    });
+}
+
+function createInstallCommand( command, curryParams ) {
+    managers.db.connect('widgetInstallCommands', function (db, collection, done) {
+        collection.insert([ {
+                command: command,
+                curryParams: curryParams
+            }],
+            function (err, createResult) {
+                if (!!err) {
+                    logger.error('failed creating an install command model', err);
+                    done();
+                    return;
+                }
+                if (!createResult) {
+                    logger.error('no widget install command docs created in the database');
                     done();
                     return;
                 }
