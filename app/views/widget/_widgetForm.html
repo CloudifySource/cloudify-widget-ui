@@ -74,6 +74,33 @@
                     <span class="col-md-4">Cloud Provider root path: </span>
                     <input class="col-md-8" type="text" ng-model="widget.executionDetails.providerRootPath" ng-disabled="!widget.executionDetails.isSoloMode"/>
                 </div>
+                <div class="row">
+                    Private AMI management: <button ng-click="addPrivateImageItem()" ng-disabled="!widget.executionDetails.isSoloMode">Add item</button>
+                    <div class="row" ng-repeat="item in widget.executionDetails.privateImages">
+                        <span class="col-md-3">{{$index+1}}. Private AMI ID: </span>
+                        <input class="col-md-2" type="text" ng-model="item.imageId" ng-disabled="!widget.executionDetails.isSoloMode"/>
+                        <span class="col-md-3">Region: </span>
+                        <input class="col-md-2" type="text" ng-model="item.imageRegion" ng-disabled="!widget.executionDetails.isSoloMode"/>
+                        <button style="margin-left: 10px;" ng-click="removePrivateImageItem($index)" ng-disabled="!widget.executionDetails.isSoloMode">-</button>
+                        <span class="col-md-3">Owner apiKey: </span>
+                        <input class="col-md-2" type="text" ng-model="item.owner.apiKey" ng-disabled="!widget.executionDetails.isSoloMode"/>
+                        <span class="col-md-3">Owner secretKey: </span>
+                        <input class="col-md-2" type="text" ng-model="item.owner.secretKey" ng-disabled="!widget.executionDetails.isSoloMode"/>
+
+                    </div>
+                    <div class="row"> Try it now:<br>
+                        <span class="col-md-3">apiKey: </span>
+                        <input class="col-md-2" type="text" ng-model="tryItNow.apiKey" ng-disabled="!widget.executionDetails.isSoloMode"/>
+                        <span class="col-md-3">secretKey: </span>
+                        <input class="col-md-2" type="text" ng-model="tryItNow.secretKey" ng-disabled="!widget.executionDetails.isSoloMode"/>
+                    </div>
+                    <div>
+                        <div class="col-md-1"></div>
+                        <button ng-click="tryPrivateImagesNow(true)" ng-disabled="!widget.executionDetails.isSoloMode || !tryItNow.apiKey || !tryItNow.secretKey" >Add</button>
+                        <button ng-click="tryPrivateImagesNow(false)" ng-disabled="!widget.executionDetails.isSoloMode || !tryItNow.apiKey || !tryItNow.secretKey" >Remove</button>
+                    </div>
+
+                </div>
             </tab>
             <tab heading="Theme" select="navigateTo('theme')">
                 <div class="row">

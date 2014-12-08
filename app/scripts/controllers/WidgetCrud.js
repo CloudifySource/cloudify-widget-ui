@@ -7,6 +7,8 @@ angular.module('cloudifyWidgetUiApp')
             return LoginTypesService.getAll();
         };
 
+        $scope.tryItNow = {};
+
         function _getSocialLoginById(id) {
             if (!!$scope.widget && !!$scope.widget.socialLogin && !!$scope.widget.socialLogin.data) {
                 for (var i = 0; i < $scope.widget.socialLogin.data.length; i++) {
@@ -35,8 +37,22 @@ angular.module('cloudifyWidgetUiApp')
 
         var popupWindow = null;
 
-        $scope.tryItNow = function (socialLogin, widget) {
+        $scope.trySocialLoginNow = function (socialLogin, widget) {
             popupWindow = LoginService.performSocialLogin(socialLogin, widget, $scope);
+        };
+
+        $scope.tryPrivateImagesNow = function (isAdd) {
+            return WidgetsService.tryPrivateImagesNow(isAdd, $scope.tryItNow.apiKey, $scope.tryItNow.secretKey, $scope.widget.executionDetails.privateImages).then(
+                function success() {
+                    $log.info('Successfully modified images');
+                    toastr.info('Successfully modified images');
+
+                },
+                function error(err) {
+                    toastr.error(err.data.error);
+                    $log.error(err.data.error);
+                }
+            );
         };
 
         $scope.isTypeSupportsMailchimp = function (socialLogin) {
@@ -135,6 +151,18 @@ angular.module('cloudifyWidgetUiApp')
         function redirectToWidgets() {
             $location.path('/widgets');
         }
+
+        $scope.addPrivateImageItem = function() {
+            if (!$scope.widget.executionDetails.privateImages) {
+                $scope.widget.executionDetails.privateImages = [];
+            }
+
+            $scope.widget.executionDetails.privateImages.push({});
+        };
+
+        $scope.removePrivateImageItem = function(index) {
+            $scope.widget.executionDetails.privateImages.splice(index, 1);
+        };
 
         $scope.delete = function () {
             WidgetsService.deleteWidget($scope.widget);

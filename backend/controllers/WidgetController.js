@@ -101,6 +101,29 @@ exports.delete = function (req, res) {
     });
 };
 
+exports.tryImages = function (req, res) {
+    logger.info('Trying to modify images: action [%s], apiKey [%s]', req.body.action, req.body.apiKey);
+    var data = req.body;
+    var errorStr = '';
+
+    if (!data.apiKey || !data.secretKey || !data.images) {
+        errorStr = 'missing data (apiKey / secretKey / images)!';
+        logger.error(errorStr);
+        res.send(500, { 'error': errorStr});
+    }
+
+    services.ec2Api.modifyImages(data, function (err) {
+        if (err) {
+            errorStr = err.message;
+            logger.error(errorStr);
+            res.send(500, { 'error': errorStr});
+            return;
+        }
+
+        res.send(200, {});
+    });
+};
+
 exports.play = function (req, res) {
     logger.info('calling widget play for user id [%s], widget id [%s], solo mode [%s]', req.params.widgetId, req.body.executionDetails.isSoloMode);
 
