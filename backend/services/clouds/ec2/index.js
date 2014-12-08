@@ -45,6 +45,15 @@ exports.getUser = function getUser(apiKey, secretKey, callback) {
     });
 };
 
+/**
+ *
+ * @param image
+ * @param accountId - accountId
+ * @param data = {
+ *  'action' : 'add','remove'
+ * }
+ * @returns {{ImageId: *, LaunchPermission: {}}}
+ */
 var getModifyImageReqObj = function (image, accountId, data) {
     var reqObj = {
         ImageId: image.imageId,
@@ -65,6 +74,16 @@ var getModifyImageReqObj = function (image, accountId, data) {
     return reqObj;
 };
 
+/**
+ *
+ * @param data = {
+ *  'apiKey' : __,
+ *  'secretKey' : __,
+ *  'action' : 'add' , 'remove'
+ * }
+ * @param image
+ * @param callback
+ */
 exports.modifyImage = function modifyImage(data, image, callback) {
     var creds = {
         'accessKeyId': image.owner.apiKey,
@@ -101,26 +120,43 @@ exports.modifyImage = function modifyImage(data, image, callback) {
 
 };
 
+/**
+ *
+ * shares or unshares an image
+ *
+ * @param data = {
+                action: isAdd ? 'add' : 'remove',
+                apiKey: apiKey,
+                secretKey: secretKey,
+                images: images
+            };
+ *
+ * @param callback - function (err, result)
+ */
 exports.modifyImages = function modifyImages(data, callback) {
     var tasks = [];
 
+    // define the function that shares
     function createTask(image) {
-        return function (callback) {
+        return function doShare(callback) {
             exports.modifyImage(data, image, callback);
         };
     }
 
+    // define list of tasks to run in parallel
     for (var i = 0; i < data.images.length; i++) {
         var image = data.images[i];
-        tasks.push(createTask(image));
+        tasks.push(createTask(image)); // add a 'share' task
     }
 
-    async.parallel(tasks, function (err, results) {
+    // run all 'share' tasks in parallel
+    async.parallel(tasks, function doneSharing(err, results) {
         if (err) {
             callback(err, {});
             return;
         }
 
+        // gather failures into a readable message
         var failed = '';
         for (var i = 0; i < results.length; i++) {
             var image = results[i];
@@ -138,6 +174,15 @@ exports.modifyImages = function modifyImages(data, callback) {
     });
 
 };
+
+/**
+ *
+ * gets list of regions defined on user
+ *
+ * @param apiKey
+ * @param secretKey
+ * @param callback - function( err, result )
+ */
 
 exports.describeRegions = function (apiKey, secretKey, callback) {
     var creds = {
