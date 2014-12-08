@@ -73,6 +73,7 @@ var getModifyImageReqObj = function (imageId, accountId, action) {
 };
 
 /**
+ * shares or unshares an image
  *
  * @param data = {
  *  'apiKey' : __,
@@ -120,7 +121,7 @@ exports.modifyImage = function modifyImage(data, image, callback) {
 
 /**
  *
- * shares or unshares an image
+ * shares or unshares an collection of images
  *
  * @param data = {
                 action: isAdd ? 'add' : 'remove',
