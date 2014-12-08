@@ -3,7 +3,7 @@
 describe('Controller: AdminUserPoolsCtrl', function () {
 
     // load the controller's module
-    beforeEach(module('cloudifyWidgetUiApp'));
+    beforeEach(module('cloudifyWidgetUiApp','unit-test-mocks'));
 
     var AdminUserPoolsCtrl,
         scope;
@@ -12,7 +12,11 @@ describe('Controller: AdminUserPoolsCtrl', function () {
     beforeEach(inject(function ($controller, $rootScope) {
         scope = $rootScope.$new();
         AdminUserPoolsCtrl = $controller('AdminUserPoolsCtrl', {
-            $scope: scope
+            $scope: scope,
+            $routeParams: {
+                'accountId' : 'mock',
+                'poolId' : 'mock'
+            }
         });
     }));
 
