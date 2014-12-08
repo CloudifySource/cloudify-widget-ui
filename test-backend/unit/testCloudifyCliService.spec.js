@@ -2,7 +2,7 @@
  * Created by liron on 11/27/14.
  */
 
-
+process.env.WIDGET_UI_ME_CONF_JSON = require('path').resolve(__dirname, '../conf/test-conf.json');
 var logger = require('log4js').getLogger('CloudifyCliService.spec');
 var fs = require('fs');
 var q = require('q');
