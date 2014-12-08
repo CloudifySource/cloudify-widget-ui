@@ -22,26 +22,44 @@ angular.module('cloudifyWidgetUiApp')
             };
 
             this.getAccountPools = function (accountId) {
+                if ( !accountId ){
+                    throw new Error('accountId is missing');
+                }
                 return $http.get('/backend/admin/accounts/' + accountId + '/pools');
             };
 
             this.getAccountPool = function (accountId, poolId) {
+                if ( !accountId ){
+                    throw new Error('accountId is missing');
+                }
                 return $http.get('/backend/admin/accounts/' + accountId + '/pools/' + poolId);
             };
 
             this.addAccountPool = function (accountId, poolSettings) {
+                if ( !accountId ){
+                    throw new Error('accountId is missing');
+                }
                 return $http.post('/backend/admin/accounts/' + accountId + '/pools', poolSettings);
             };
 
             this.updateAccountPool = function (accountId, poolId, poolSettings) {
+                if ( !accountId ){
+                    throw new Error('accountId is missing');
+                }
                 return $http.post('/backend/admin/accounts/' + accountId + '/pools/' + poolId, poolSettings);
             };
 
             this.deleteAccountPool = function (accountId, poolId) {
+                if ( !accountId ){
+                    throw new Error('accountId is missing');
+                }
                 return $http.post('/backend/admin/accounts/' + accountId + '/pools/' + poolId + '/delete');
             };
 
             this.cleanAccountPool = function (accountId, poolId) {
+                if ( !accountId ){
+                    throw new Error('accountId is missing');
+                }
                 return $http.post('/backend/admin/accounts/' + accountId + '/pools/' + poolId + '/clean');
             };
 

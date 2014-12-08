@@ -8,11 +8,15 @@ module.exports = function (config) {
 // list of files / patterns to load in the browser
         //   console.log(JASMINE, JASMINE_ADAPTER);
         files: [
-            'app/bower_components/jquery/jquery.js',
+            'app/bower_components/jquery/dist/jquery.js',
+            'app/bower_components/i18next/release/i18next-1.7.1.min.js',
             'app/bower_components/angular/angular.js',
             'app/bower_components/angular-cookies/angular-cookies.js',
             'app/bower_components/angular-route/angular-route.js',
             'app/bower_components/angular-sanitize/angular-sanitize.js',
+            'app/bower_components/angular-bootstrap/ui-bootstrap-tpls.js',
+            'app/bower_components/underscore/underscore.js',
+            'app/bower_components/angular-underscore/angular-underscore.js',
             'app/bower_components/ngstorage/ngStorage.js',
             'app/bower_components/angular-resource/angular-resource.js',
             'app/bower_components/angular-mocks/angular-mocks.js',
@@ -36,7 +40,7 @@ module.exports = function (config) {
 
 // test results reporter to use
 // possible values: dots || progress || growl
-        reporters: ['progress', 'coverage'],
+        reporters: ['story', 'coverage', 'junit', 'failed'],
 
 // web server port
         port: 8080,
@@ -52,7 +56,7 @@ module.exports = function (config) {
         logLevel: config.LOG_INFO,
 
 // enable / disable watching file and executing tests whenever any file changes
-        autoWatch: false,
+        autoWatch: true,
 
 // Start these browsers, currently available:
 // - Chrome
@@ -81,6 +85,13 @@ module.exports = function (config) {
             }
         },
 
+        customLaunchers: {
+            Chrome_travis_ci: {
+                base: 'Chrome',
+                flags: ['--no-sandbox']
+            }
+        },
+
         plugins: [
             'karma-jasmine',
             'karma-coverage',
@@ -89,10 +100,16 @@ module.exports = function (config) {
             'karma-firefox-launcher',
             'karma-coverage',
             'karma-spec-reporter',
-            'karma-junit-reporter'
+            'karma-junit-reporter',
+            'karma-failed-reporter',
+            'karma-story-reporter'
         ]
 
     };
+
+    if (process.env.TRAVIS) {
+        configuration.browsers = ['Chrome_travis_ci'];
+    }
 
     config.set(configuration);
 

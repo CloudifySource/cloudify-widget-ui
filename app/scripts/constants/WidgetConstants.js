@@ -11,7 +11,8 @@ angular.module('cloudifyWidgetUiApp')
         PARENT_LOADED: 'parent_loaded',
         STATUS: 'widget_status',
         PLAYED: 'widget_played',
-        STOPPED: 'widget_stopped'
+        STOPPED: 'widget_stopped',
+        RECIPE_PROPERTIES: 'widget_recipe_properties'
     })
     .value('PoolConstants', {
         APPROVAL: [

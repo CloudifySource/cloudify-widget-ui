@@ -11,3 +11,5 @@ build.id
 artifacts
 cloudify-folder
 coverage
+test-results.xml
+backend-coverage
