@@ -12,7 +12,7 @@ var mountFolder = function (connect, dir) {
 module.exports = function (grunt) {
 
     require('time-grunt')(grunt);
-    // load all grunt tasks
+    // load all grunt tasks.
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
 
