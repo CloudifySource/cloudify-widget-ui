@@ -37,7 +37,7 @@ angular.module('cloudifyWidgetUiApp')
 
         var popupWindow = null;
 
-        $scope.tryItNow = function (socialLogin, widget) {
+        $scope.trySocialLoginNow = function (socialLogin, widget) {
             popupWindow = LoginService.performSocialLogin(socialLogin, widget, $scope);
         };
 
