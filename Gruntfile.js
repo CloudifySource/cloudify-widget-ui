@@ -357,7 +357,7 @@ module.exports = function (grunt) {
                         src: [ '*.js', '*.sh', 'package.json', 'build/**/*', 'backend/**/*', 'conf/**/*', 'build.id' ]
                     },
                     {
-                        //liron
+                        
                         expand: true,
                         dot: true,
                         cwd: '.',
@@ -591,13 +591,13 @@ module.exports = function (grunt) {
         'usemin'
     ]);
 
-    //liron
+    
     grunt.registerTask('backend', function () {
         grunt.config.set('jshint.options.jshintrc', '.backendhintrc');
         grunt.task.run('jshint:backend');
     });
 
-    //liron
+    
     grunt.registerTask('default', [
         'jshint',
         'test:all',
