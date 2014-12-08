@@ -45,7 +45,7 @@ exports.getUser = function getUser(apiKey, secretKey, callback) {
     });
 };
 
-var getModifyImageReqObj = function (image, userId, data) {
+var getModifyImageReqObj = function (image, accountId, data) {
     var reqObj = {
         ImageId: image.imageId,
         LaunchPermission: {}
@@ -53,7 +53,7 @@ var getModifyImageReqObj = function (image, userId, data) {
 
     var item = {
         Group: 'all',
-        UserId: userId
+        UserId: accountId
     };
 
     if (data.action === 'add') {
@@ -67,8 +67,8 @@ var getModifyImageReqObj = function (image, userId, data) {
 
 exports.modifyImage = function modifyImage(data, image, callback) {
     var creds = {
-        'accessKeyId': data.apiKey,
-        'secretAccessKey': data.secretKey,
+        'accessKeyId': image.owner.apiKey,
+        'secretAccessKey': image.owner.secretKey,
         'region': image.imageRegion
     };
 
@@ -82,7 +82,10 @@ exports.modifyImage = function modifyImage(data, image, callback) {
             return;
         }
 
-        var reqObj = getModifyImageReqObj(image, result.User.UserId, data);
+        // on some accounts, the UserId might be different than the accountId.
+        // So, we must extract the accountId from the Arn, it's format is arn:aws:iam::<accountId>:user/<userName>
+        var accountId = result.User.Arn.split('::')[1].split(':')[0];
+        var reqObj = getModifyImageReqObj(image, accountId, data);
 
         ec2.modifyImageAttribute(reqObj, function (err) {
             if (err) {

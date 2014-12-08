@@ -82,14 +82,15 @@
                         <span class="col-md-3">Region: </span>
                         <input class="col-md-2" type="text" ng-model="item.imageRegion" ng-disabled="!widget.executionDetails.isSoloMode"/>
                         <button style="margin-left: 10px;" ng-click="removePrivateImageItem($index)" ng-disabled="!widget.executionDetails.isSoloMode">-</button>
+                        <span class="col-md-3">Owner apiKey: </span>
+                        <input class="col-md-2" type="text" ng-model="item.owner.apiKey" ng-disabled="!widget.executionDetails.isSoloMode"/>
+                        <span class="col-md-3">Owner secretKey: </span>
+                        <input class="col-md-2" type="text" ng-model="item.owner.secretKey" ng-disabled="!widget.executionDetails.isSoloMode"/>
+
                     </div>
                     <div class="row"> Try it now:<br>
-                        <span class="col-md-3">apiKey: </span>
-                        <input class="col-md-2" type="text" ng-model="tryItNow.apiKey" ng-disabled="!widget.executionDetails.isSoloMode"/>
-                        <span class="col-md-3">secretKey: </span>
-                        <input class="col-md-2" type="text" ng-model="tryItNow.secretKey" ng-disabled="!widget.executionDetails.isSoloMode"/>
-                    </div>
-                    <div>
+                        <span class="col-md-3">accountId: </span>
+                        <input class="col-md-2" type="text" ng-model="tryItNow.privateAmi.accountId" ng-disabled="!widget.executionDetails.isSoloMode"/>
                         <div class="col-md-1"></div>
                         <button ng-click="tryPrivateImagesNow(true)" ng-disabled="!widget.executionDetails.isSoloMode || !tryItNow.apiKey || !tryItNow.secretKey" >Add</button>
                         <button ng-click="tryPrivateImagesNow(false)" ng-disabled="!widget.executionDetails.isSoloMode || !tryItNow.apiKey || !tryItNow.secretKey" >Remove</button>
