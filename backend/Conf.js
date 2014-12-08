@@ -1,3 +1,8 @@
+
+// for tests you can add the following line:
+// process.env.WIDGET_UI_ME_CONF_JSON = require('path').resolve(__dirname, '../conf/test-conf.json');
+
+
 var fs = require('fs');
 var path = require('path');
 var _  = require('lodash');

@@ -14,14 +14,21 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         this.listPools = function () {
-            return $http.get('/backend/user/account/pools');
+
+            return $http.get('/backend/user/account/pools');    // todo: this is a duplicate. see AccountPoolCrudService
         };
 
         this.getPublicWidget = function (widgetId) {
+            if ( !widgetId ){
+                throw new Error('widgetId is missing');
+            }
             return $http.get('/backend/widgets/' + widgetId);
         };
 
         this.getWidget = function (widgetId) {
+            if ( !widgetId ){
+                throw new Error('missing widgetId');
+            }
             return $http.get('/backend/user/widgets/' + widgetId);
         };
 

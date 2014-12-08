@@ -3,7 +3,7 @@
 describe('Controller: WidgetViewCtrl', function () {
 
     // load the controller's module
-    beforeEach(module('cloudifyWidgetUiApp'));
+    beforeEach(module('cloudifyWidgetUiApp', 'unit-test-mocks'));
 
     var WidgetViewCtrl,
         scope;
@@ -12,7 +12,10 @@ describe('Controller: WidgetViewCtrl', function () {
     beforeEach(inject(function ($controller, $rootScope) {
         scope = $rootScope.$new();
         WidgetViewCtrl = $controller('WidgetViewCtrl', {
-            $scope: scope
+            $scope: scope,
+            $routeParams: {
+                'widgetId' : 'mock'
+            }
         });
     }));
 
