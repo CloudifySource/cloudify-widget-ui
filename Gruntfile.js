@@ -12,7 +12,7 @@ var mountFolder = function (connect, dir) {
 module.exports = function (grunt) {
 
     require('time-grunt')(grunt);
-    // load all grunt tasks
+    // load all grunt tasks.
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
 
@@ -380,7 +380,7 @@ module.exports = function (grunt) {
                         src: [ '*.js', '*.sh', 'package.json', 'build/**/*', 'backend/**/*', 'conf/**/*', 'build.id' ]
                     },
                     {
-                        //liron
+                        
                         expand: true,
                         dot: true,
                         cwd: '.',
@@ -446,6 +446,10 @@ module.exports = function (grunt) {
             unit: {
                 configFile: 'karma.conf.js',
                 singleRun: true
+            },
+            debug:{
+                configFile: 'karma.conf.js',
+                singleRun: false
             },
             single: {
                 configFile: 'karma.conf.js',
@@ -614,13 +618,13 @@ module.exports = function (grunt) {
         'usemin'
     ]);
 
-    //liron
+    
     grunt.registerTask('backend', function () {
         grunt.config.set('jshint.options.jshintrc', '.backendhintrc');
         grunt.task.run('jshint:backend');
     });
 
-    //liron
+    
     grunt.registerTask('default', [
         'jshint',
         'test:all',
