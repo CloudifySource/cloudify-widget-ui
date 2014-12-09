@@ -5,6 +5,7 @@ var aws = require('aws-sdk');
 var logger = require('log4js').getLogger('EC2.index');
 var async = require('async');
 
+exports.securityGroup = require('./SecurityGroup');
 
 exports.createKeyPair = function createKeyPair(apiKey, secretKey, region, keyName, callback) {
     var ec2 = new aws.EC2({
