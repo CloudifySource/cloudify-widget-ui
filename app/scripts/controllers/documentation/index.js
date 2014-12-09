@@ -33,11 +33,11 @@ angular.module('cloudifyWidgetUiApp').controller('DocsIndexCtrl', function ( $sc
 
         {
             'name' : 'Message I Receive',
-            'data' :['widget_recipe_properties','widget_play','widget_stop','widget_advanced_data', 'widget_login_details']
+            'data' :['widget_recipe_properties','widget_play','widget_stop']
         },
         {
             'name' : 'Messages I Post',
-            'data' : ['widget_stopped', 'widget_loaded']
+            'data' : ['widget_played', 'widget_stopped', 'widget_loaded', 'widget_status']
         }
 
     ];
