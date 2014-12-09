@@ -12,7 +12,7 @@ var mountFolder = function (connect, dir) {
 module.exports = function (grunt) {
 
     require('time-grunt')(grunt);
-    // load all grunt tasks
+    // load all grunt tasks.
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
 
@@ -30,8 +30,8 @@ module.exports = function (grunt) {
     var deployOpts;
     try { // optional file
         deployOpts = grunt.file.readJSON('dev/deploy.json');
-    }catch(e){
-        deployOpts = { 'privateKey' : 'Gruntfile.js'};
+    } catch (e) {
+        deployOpts = { 'privateKey': 'Gruntfile.js'};
     }
 
     grunt.initConfig({
@@ -41,16 +41,16 @@ module.exports = function (grunt) {
         sftp: {
             upload: {
                 files: {
-                    'artifacts' : 'artifacts/**'
+                    'artifacts': 'artifacts/**'
                 },
                 options: {
-                    'username' : '<%=deployOpts.username%>',
-                    'privateKey' : grunt.file.read(deployOpts.privateKey),
-                    'host' : '<%=deployOpts.host%>',
-                    'path' : '<%=deployOpts.path%>/<%=pkg.name%>/<%=pkg.version%>',
-                    'createDirectories' : true,
+                    'username': '<%=deployOpts.username%>',
+                    'privateKey': grunt.file.read(deployOpts.privateKey),
+                    'host': '<%=deployOpts.host%>',
+                    'path': '<%=deployOpts.path%>/<%=pkg.name%>/<%=pkg.version%>',
+                    'createDirectories': true,
                     'showProgress': true,
-                    'srcBasePath' : 'artifacts'
+                    'srcBasePath': 'artifacts'
                 }
             }
         },
@@ -148,7 +148,7 @@ module.exports = function (grunt) {
             artifacts: {
                 files: [
                     {
-                        dot:true,
+                        dot: true,
                         src: [
                             'artifacts'
                         ]
@@ -167,7 +167,10 @@ module.exports = function (grunt) {
                     }
                 ]
             },
-            server: '.tmp'
+            server: '.tmp',
+            coverageBackend: ['backend-coverage'],
+            coverageFrontend: ['coverage'],
+            instrumentBackend: ['backend-instrument']
         },
         jshint: {
 
@@ -202,9 +205,32 @@ module.exports = function (grunt) {
                         'test/**/*.js'
                     ]
                 }
+            },
+            testBackend: {
+                options: {
+                    jshintrc: 'testBackend.jshintrc'
+                },
+                files: {
+                    'src': [
+                        'test-backend/**/*.js'
+                    ]
+                }
             }
         },
-
+        fixmyjs: {
+            options: {
+                jshintrc: 'testBackend.jshintrc',
+                indentpref: 'spaces'
+            },
+            testBackend: {
+                files: [
+                    {
+                        src: ['test-backend/**/*.js'],
+                        expand:true
+                    }
+                ]
+            }
+        },
         compass: {
             options: {
                 sassDir: '<%= yeoman.app %>/styles',
@@ -250,7 +276,7 @@ module.exports = function (grunt) {
             }
         },
         usemin: {
-            html: ['<%= yeoman.dist %>/*.html','<%= yeoman.dist %>/views/**/*.html'],
+            html: ['<%= yeoman.dist %>/*.html', '<%= yeoman.dist %>/views/**/*.html'],
             css: ['<%= yeoman.dist %>/styles/**/*.css'],
             options: {
                 dirs: ['<%= yeoman.dist %>']
@@ -352,10 +378,25 @@ module.exports = function (grunt) {
                         expand: true,
                         dest: '<%= yeoman.dist %>',
                         src: [ '*.js', '*.sh', 'package.json', 'build/**/*', 'backend/**/*', 'conf/**/*', 'build.id' ]
+                    },
+                    {
+                        
+                        expand: true,
+                        dot: true,
+                        cwd: '.',
+                        dest: '<%= yeoman.dist %>',
+                        src: [
+                            '.npmignore',
+                            'package.json',
+                            'server.js',
+                            'test-backend/**/*',
+                            'logs/gsui.log'
+
+                        ]
                     }
                 ]
             },
-            artifacts : {
+            artifacts: {
                 files: [
                     {
                         dest: 'artifacts/',
@@ -364,20 +405,28 @@ module.exports = function (grunt) {
                         ]
                     },
                     {
-                        'expand':true,
-                        'dest' : 'artifacts/',
-                        'cwd' : '<%= yeoman.dist %>',
-                        'src' : '*.tgz'
+                        'expand': true,
+                        'dest': 'artifacts/',
+                        'cwd': '<%= yeoman.dist %>',
+                        'src': '*.tgz'
 
                     },
                     {
-                        'expand':true,
+                        'expand': true,
                         'dest': 'artifacts/',
-                        'cwd' : 'build',
-                        'src' : ['install.sh']
+                        'cwd': 'build',
+                        'src': ['install.sh']
                     }
                 ]
+            },
+
+            backendCoverageTests: {
+
+                expand: true,
+                dest: 'backend-instrument',
+                src: ['test-backend/**/*','conf/**/*']
             }
+
         },
         concurrent: {
             server: [
@@ -397,6 +446,10 @@ module.exports = function (grunt) {
             unit: {
                 configFile: 'karma.conf.js',
                 singleRun: true
+            },
+            debug:{
+                configFile: 'karma.conf.js',
+                singleRun: false
             },
             single: {
                 configFile: 'karma.conf.js',
@@ -450,27 +503,54 @@ module.exports = function (grunt) {
                 }
             }
         },
-        'run':{
+
+        'run': {
             'installProduction': {
                 options: {
-                    'cwd' : 'dist'
+                    'cwd': 'dist'
                 },
-                cmd : 'npm',
+                cmd: 'npm',
                 args: [
                     'install',
                     '--production'
                 ]
 
             },
-            'packDist' : {
-                'options' : {
-                    'cwd' : 'dist'
+            'packDist': {
+                'options': {
+                    'cwd': 'dist'
                 },
-                'cmd' : 'npm',
-                'args' : [
+                'cmd': 'npm',
+                'args': [
                     'pack'
                 ]
             }
+        },
+        instrument: {
+            files: 'backend/**/*.js',
+            options: {
+                lazy: true,
+                basePath: 'backend-instrument/'
+            }
+        },
+        storeCoverage: {
+            options: {
+                dir: 'backend-coverage/reports'
+            }
+        },
+        makeReport: {
+            src: 'backend-coverage/reports/**/*.json',
+            options: {
+                type: 'html',
+                dir: 'backend-coverage/html/reports',
+                print: 'detail'
+            }
+        },
+        /*jshint camelcase: false */
+        jasmine_node: {
+            unit: ['test-backend/unit'],
+            unitInstrument: ['backend-instrument/test-backend/unit']
+            // integration: ['test-backend/integration/jasmine/']
         }
     });
 
@@ -496,6 +576,26 @@ module.exports = function (grunt) {
         'karma:unit'
     ]);
 
+    grunt.registerTask('test', function (testBackend) {
+        var tasks = [];
+        if (testBackend === undefined || testBackend === '' || testBackend === 'all' || testBackend === 'frontend') { // default
+            tasks = [
+                'jshint',
+                'clean:server',
+                'concurrent:test',
+                'connect:test',
+                'html2js',
+                'karma:unit'
+            ];
+        }
+
+        if (testBackend === undefined || testBackend === '' || testBackend === 'all' || testBackend === 'backend') {
+            // guy - we always use code coverage in grunt.. when debug from the IDE so no need for no instrumented mode in grunt.
+            tasks = tasks.concat(['clean:instrumentBackend','clean:coverageBackend', 'instrument', 'copy:backendCoverageTests', 'jasmine_node:unitInstrument', 'storeCoverage', 'makeReport', 'clean:instrumentBackend']);
+        }
+        grunt.task.run(tasks);
+    });
+
     grunt.registerTask('testSingle', [
         'clean:server',
         'concurrent:test',
@@ -518,12 +618,21 @@ module.exports = function (grunt) {
         'usemin'
     ]);
 
+    
+    grunt.registerTask('backend', function () {
+        grunt.config.set('jshint.options.jshintrc', '.backendhintrc');
+        grunt.task.run('jshint:backend');
+    });
+
+    
     grunt.registerTask('default', [
         'jshint',
-//        'test',
-        'build'
+        'test:all',
+        'build',
+        'backend'
     ]);
 
+    grunt.loadNpmTasks('grunt-fixmyjs');
 
     grunt.registerTask('pack', [
         'run:installProduction',
@@ -531,8 +640,8 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('writeBuildId',
-        function(){
-            grunt.file.write('build.id', require('os').hostname()  + '-' + new Date().getTime());
+        function () {
+            grunt.file.write('build.id', require('os').hostname() + '-' + new Date().getTime());
         }
     );
 

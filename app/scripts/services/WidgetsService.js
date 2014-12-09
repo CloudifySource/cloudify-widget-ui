@@ -14,14 +14,21 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         this.listPools = function () {
-            return $http.get('/backend/user/account/pools');
+
+            return $http.get('/backend/user/account/pools');    // todo: this is a duplicate. see AccountPoolCrudService
         };
 
         this.getPublicWidget = function (widgetId) {
+            if ( !widgetId ){
+                throw new Error('widgetId is missing');
+            }
             return $http.get('/backend/widgets/' + widgetId);
         };
 
         this.getWidget = function (widgetId) {
+            if ( !widgetId ){
+                throw new Error('missing widgetId');
+            }
             return $http.get('/backend/user/widgets/' + widgetId);
         };
 
@@ -48,5 +55,16 @@ angular.module('cloudifyWidgetUiApp')
 
         this.getOutput = function (widget, executionId) {
             return $http.get('/backend/user/widgets/' + widget._id + '/executions/' + executionId + '/output');
+        };
+
+        this.tryPrivateImagesNow = function(isAdd, apiKey, secretKey, images) {
+            var data = {
+                action: isAdd ? 'add' : 'remove',
+                apiKey: apiKey,
+                secretKey: secretKey,
+                images: images
+            };
+
+            return $http.post('/backend/widgets/images/try', data);
         };
     });

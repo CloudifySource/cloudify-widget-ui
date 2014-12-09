@@ -77,6 +77,7 @@ domain.run(function () {
     app.get('/backend/user/widgets/:widgetId', controllers.widgets.read);
     app.post('/backend/user/widgets/:widgetId/update', controllers.widgets.update);
 
+    app.post('/backend/widgets/images/try', controllers.widgets.tryImages);
 
     // public urls for playing the widget
     app.post('/backend/widgets/:widgetId/play', controllers.widgets.play);

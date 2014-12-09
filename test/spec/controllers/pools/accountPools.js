@@ -3,7 +3,7 @@
 describe('Controller: AccountPoolCtrl', function () {
 
     // load the controller's module
-    beforeEach(module('cloudifyWidgetUiApp'));
+    beforeEach(module('cloudifyWidgetUiApp','unit-test-mocks'));
 
     var AccountPoolCtrl,
         scope;
