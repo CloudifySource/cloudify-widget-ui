@@ -48,25 +48,23 @@ exports.getUser = function getUser(apiKey, secretKey, callback) {
 
 /**
  *
- * @param image
- * @param userId - accountId
- * @param data = {
- *  'action' : 'add','remove'
+ * @param imageId
+ * @param accountId - accountId
+ * @param action 'add','remove'
  * }
  * @returns {{ImageId: *, LaunchPermission: {}}}
  */
-var getModifyImageReqObj = function (image, userId, data) {
+var getModifyImageReqObj = function (imageId, accountId, action) {
     var reqObj = {
-        ImageId: image.imageId,
+        ImageId: imageId,
         LaunchPermission: {}
     };
 
     var item = {
-        Group: 'all',
-        UserId: userId
+        UserId: accountId
     };
 
-    if (data.action === 'add') {
+    if (action === 'add') {
         reqObj.LaunchPermission.Add = [item];
     } else {
         reqObj.LaunchPermission.Remove = [item];
@@ -76,6 +74,7 @@ var getModifyImageReqObj = function (image, userId, data) {
 };
 
 /**
+ * shares or unshares an image
  *
  * @param data = {
  *  'apiKey' : __,
@@ -87,8 +86,8 @@ var getModifyImageReqObj = function (image, userId, data) {
  */
 exports.modifyImage = function modifyImage(data, image, callback) {
     var creds = {
-        'accessKeyId': data.apiKey,
-        'secretAccessKey': data.secretKey,
+        'accessKeyId': image.owner.apiKey,
+        'secretAccessKey': image.owner.secretKey,
         'region': image.imageRegion
     };
 
@@ -102,7 +101,10 @@ exports.modifyImage = function modifyImage(data, image, callback) {
             return;
         }
 
-        var reqObj = getModifyImageReqObj(image, result.User.UserId, data);
+        // on some accounts, the UserId might be different than the accountId.
+        // So, we must extract the accountId from the Arn, it's format is arn:aws:iam::<accountId>:user/<userName>
+        var accountId = result.User.Arn.split('::')[1].split(':')[0];
+        var reqObj = getModifyImageReqObj(image.imageId, accountId, data.action);
 
         ec2.modifyImageAttribute(reqObj, function (err) {
             if (err) {
@@ -120,7 +122,7 @@ exports.modifyImage = function modifyImage(data, image, callback) {
 
 /**
  *
- * shares or unshares an image
+ * shares or unshares an collection of images
  *
  * @param data = {
                 action: isAdd ? 'add' : 'remove',
