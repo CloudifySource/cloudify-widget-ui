@@ -198,6 +198,10 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
                 templateUrl: 'views/login.html',
                 controller: 'LoginCtrl'
             })
+            .when('/documentation', {
+                templateUrl: 'views/documentation/index.html',
+                controller: 'DocsIndexCtrl'
+            })
             .when('/embed-demo', {
                 templateUrl: 'views/embed-demo.html',
                 controller: 'EmbedDemoCtrl'

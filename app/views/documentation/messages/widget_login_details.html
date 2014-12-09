@@ -1,0 +1,22 @@
+<h2>widget_login_details</h2>
+
+<div plunkr link="http://plnkr.co/edit/wisBvSYyjKttZo8NdCXc?p=preview"></div>
+
+
+<div class="section">
+    This message allows you to send login details and skip login with google (or some other method).<br/>
+    This method is suitable if you already have the user's email.<br/>
+    The event looks like this:<br/>
+    <div snippet>
+    {
+        'name' : 'widget_login_details' ,
+        'data' :
+        {
+            'userId' : $routeParams.userId,
+            'email': $routeParams.email,
+            'name' : $routeParams.firstName,
+            'lastName' : $routeParams.lastName
+        }
+    }
+    </div>
+</div>
