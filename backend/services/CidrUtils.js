@@ -1,3 +1,5 @@
+'use strict';
+/*jshint bitwise: false*/
 var rangeCheck = require('range_check');
 /**
  *
@@ -15,8 +17,8 @@ exports.parse = function(CIDR) {
     //Beginning IP address
     var beg = CIDR.substr(CIDR,CIDR.indexOf('/'));
     var end = beg;
-    var off = (1<<(32-parseInt(CIDR.substr(CIDR.indexOf('/')+1))))-1;
-    var sub = beg.split('.').map(function(a){return parseInt(a)});
+    var off = (1<<(32-parseInt(CIDR.substr(CIDR.indexOf('/')+1),10)))-1;
+    var sub = beg.split('.').map(function(a){return parseInt(a,10);});
 
     //An IPv4 address is just an UInt32...
     var buf = new ArrayBuffer(4); //4 octets

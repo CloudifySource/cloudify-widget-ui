@@ -1,3 +1,4 @@
+'use strict';
 /**
 
  class to help with functions for security group such as "get" and "validate"
@@ -9,7 +10,6 @@ var aws = require('aws-sdk');
 var logger = require('log4js').getLogger('EC2.index');
 var CidrUtils = require('../../CidrUtils');
 var _ = require('lodash');
-var Netmask = require('netmask').Netmask;
 
 
 /**
@@ -83,7 +83,7 @@ exports.get = function( details, callback ){
                 'Name' : 'group-name',
                 'Values' : [name]
             }
-        ]
+        ];
     }
 
     logger.info('getting secuirty groups', JSON.stringify(opts));
@@ -107,15 +107,15 @@ function PortRange(from, to){
         if ( typeof(port) === 'string' ){
             if ( port.indexOf('-') > 0 ) {
                 var args = port.split('-');
-                _from = parseInt(args[0]);
-                _to = parseInt(args[0]);
+                _from = parseInt(args[0],10);
+                _to = parseInt(args[1],10);
             }else{
-                _from =_to = parseInt(port);
+                _from =_to = parseInt(port,10);
             }
         }
 
         return from <= _from && to >= _to;
-    }
+    };
 }
 
 /**
@@ -219,7 +219,7 @@ exports.isSiteGroupOpen = function( securityGroup , requirements ){
             if (allIpsInRange(item, requirements.ips)) {
                 // find which ports this supports, and remove them from required ports.
                 requiredIps = _.reject(requiredIps, function (portRequired) {
-                    return exports.portsInRange({ 'from': item.FromPort, 'to': item.ToPort }, portRequired) || hasNoPorts
+                    return exports.portsInRange({ 'from': item.FromPort, 'to': item.ToPort }, portRequired) || hasNoPorts;
                 });
             }
 
