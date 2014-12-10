@@ -4,7 +4,7 @@
 
 'use strict';
 
-angular.module('cloudifyWidgetUiApp').controller('DocsIndexCtrl', function ( $scope, $routeParams, $location, $log, WidgetsService ) {
+angular.module('cloudifyWidgetUiApp').controller('DocsIndexCtrl', function ( $scope, $routeParams, $location, $log) {
     $scope.docsSections = [
 //        {
 //            'label' : 'Configuration',
@@ -53,7 +53,7 @@ angular.module('cloudifyWidgetUiApp').controller('DocsIndexCtrl', function ( $sc
 
 
     function _doNavigation () {
-        $scope.currentSection = _.find($scope.docsSections, {'id': $routeParams.section });
+        $scope.currentSection = $scope.find($scope.docsSections, {'id': $routeParams.section });
     }
     $scope.$watch( function(){ return $routeParams.section; },  _doNavigation );
 
