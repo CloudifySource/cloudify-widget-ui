@@ -116,7 +116,8 @@
     "fs-extra",
     "password",
     "aws-sdk",
-    "mandrill-api"
+    "mandrill-api",
+    "range_check"
   ],
   "engines": {
     "node": ">=0.8.0"
