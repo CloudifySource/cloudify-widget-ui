@@ -73,16 +73,17 @@ angular.module('cloudifyWidgetUiApp')
         function play(widget) {
             //check if social login is required
             var socialLoginRequired = false;
-            if (widget.socialLogin && widget.socialLogin.data && widget.socialLogin.data.length !== 0) {
-                socialLoginRequired = $scope.find(widget.socialLogin.data, { 'enabled': true}) !== undefined;
-            }
 
             // override properties in the scope widget from the message widget.
             $scope.widget = $scope.merge({}, $scope.widget, widget);
 
+            if ($scope.widget.socialLogin && $scope.widget.socialLogin.data && $scope.widget.socialLogin.data.length !== 0) {
+                socialLoginRequired = $scope.find($scope.widget.socialLogin.data, { 'enabled': true}) !== undefined;
+            }
+
             if (socialLoginRequired) {
                 // show the social login popup
-                popupWindow = LoginService.performSocialLogin(/*socialLogin*/null, widget, $scope);
+                popupWindow = LoginService.performSocialLogin(/*socialLogin*/null, $scope.widget, $scope);
             } else {
                 // no social login, just play.
                 playInternal();
