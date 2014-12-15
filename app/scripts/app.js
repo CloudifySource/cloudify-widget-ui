@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngResource', 'ngSanitize', 'ui.bootstrap', 'angular-underscore', 'gsUiInfraApp'])
+angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngResource', 'ngSanitize', 'ui.bootstrap', 'angular-lodash', 'gsUiInfraApp'])
 // register the interceptor as a service
     .factory('myHttpInterceptor', function ($q, $rootScope, $location) {
         var $scope = $rootScope;
@@ -197,6 +197,10 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
             .when('/login', {
                 templateUrl: 'views/login.html',
                 controller: 'LoginCtrl'
+            })
+            .when('/documentation', {
+                templateUrl: 'views/documentation/index.html',
+                controller: 'DocsIndexCtrl'
             })
             .when('/embed-demo', {
                 templateUrl: 'views/embed-demo.html',

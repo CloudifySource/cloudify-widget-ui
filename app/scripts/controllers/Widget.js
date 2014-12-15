@@ -77,7 +77,8 @@ angular.module('cloudifyWidgetUiApp')
                 socialLoginRequired = $scope.find(widget.socialLogin.data, { 'enabled': true}) !== undefined;
             }
 
-            $scope.widget = widget;
+            // override properties in the scope widget from the message widget.
+            $scope.widget = $scope.merge({}, $scope.widget, widget);
 
             if (socialLoginRequired) {
                 // show the social login popup
