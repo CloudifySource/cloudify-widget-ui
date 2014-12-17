@@ -95,6 +95,12 @@ angular.module('cloudifyWidgetUiApp')
             _resetWidgetStatus();
             $scope.widgetStatus.state = STATE_RUNNING;
 
+            if (!$scope.widget.executionDetails) {
+                $scope.widget.executionDetails = {
+                    isSoloMode: false
+                };
+            }
+
             if ($scope.recipeProperties) {
                 $scope.widget.executionDetails.recipeProperties = $scope.recipeProperties;
             }
