@@ -460,12 +460,19 @@ function _generateKeyPair(curryParams, curryCallback) {
 function _modifyImages(curryParams, curryCallback) {
     var executionDetails = curryParams.executionDetails;
 
-    if (!executionDetails.EC2) {
-        // not EC2, nothing to do.
+    if (!executionDetails.EC2 || !executionDetails.privateImages || executionDetails.privateImages.length === 0) {
+        // not EC2 or no private images, nothing to do.
         curryCallback(null, curryParams);
     }
 
-    services.ec2Api.modifyImages(executionDetails.EC2.params.apiKey, executionDetails.EC2.params.secretKey, executionDetails.privateImages, function(err) {
+    var data = {
+        action: 'add',
+        apiKey: executionDetails.EC2.params.apiKey,
+        secretKey: executionDetails.EC2.params.secretKey,
+        images: executionDetails.privateImages
+    };
+
+    services.ec2Api.modifyImages(data, function(err) {
         if (err) {
             curryCallback(err, curryParams);
         }
