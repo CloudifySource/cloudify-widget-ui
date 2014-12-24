@@ -136,12 +136,14 @@ function Call() {
     }
 
     this.invoke = function (method, url, args, callback) {
+
         var myArgs = args;
         if (args instanceof ArgsBuilder) {
             myArgs = args.done();
         }
         logger.info('POST: ', url);
         var myUrl = _url(url);
+        logger.debug(myArgs);
         var myCallback = _callbackWrapper(callback);
         try {
             var req;

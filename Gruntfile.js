@@ -89,7 +89,7 @@ module.exports = function (grunt) {
                 {
                     context: '/backend',
                     host: '127.0.0.1',
-                    port: 9001,
+                    port: 9003,
                     https: false,
                     changeOrigin: false,
                     xforward: false
@@ -449,7 +449,8 @@ module.exports = function (grunt) {
             },
             debug:{
                 configFile: 'karma.conf.js',
-                singleRun: false
+                singleRun: false,
+                autoWatch:true
             },
             single: {
                 configFile: 'karma.conf.js',

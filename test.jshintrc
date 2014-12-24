@@ -25,6 +25,8 @@
         "inject":false,
         "beforeEach":false,
         "describe":false,
-        "angular":false
+        "angular":false,
+        "spyOn" : false,
+        "$": false
     }
 }
