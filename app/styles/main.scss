@@ -12,7 +12,9 @@
   padding: 2px;
 }
 
+
 // ------------------------------------------------
+
 
 // hide multiple layouts layers for "logged-in-layout" - means that if I have 2 pages one within another with the layout, the other layout will be hidden.
 #logged-in-layout {
@@ -223,4 +225,9 @@
 #documentation .plunkr-link:active {
   position: relative;
   top: 1px;
+}
+
+[pool-error] pre{
+  font-size:10px;
+  width:800px;
 }

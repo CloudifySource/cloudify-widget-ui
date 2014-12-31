@@ -21,7 +21,7 @@
                 <td>{{ node.machineId }}</td>
                 <td>{{ node.poolId }}</td>
                 <td>{{ node.nodeStatus }}</td>
-                <td><pre>{{ asJson(node.machineSshDetails) | json }}</pre></td>
+                <td><div download-pem="node.machineSshDetails"></div><pre>{{ asJson(node.machineSshDetails) | json }}</pre></td>
                 <td>{{ node.expires | date:"medium" }} </td>
                 <td>
                     <button ng-if="node.id" ng-click="pingNode(model.poolId, node.id)">ping</button><br>

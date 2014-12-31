@@ -23,6 +23,7 @@
     "angular": false,
       "confirm":false,
       "$":false,
-      "toastr":false
+      "toastr":false,
+      "_" : false
   }
 }
