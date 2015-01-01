@@ -14,6 +14,7 @@
  *
  *           .. use collection as defined in node-mongo documentation
  *           https://github.com/mongodb/node-mongodb-native
+ *           http://mongodb.github.io/node-mongodb-native/markdown-docs/queries.html
  *
  *           no need to disconnect, or such. just do what you need with the collection.
  *
