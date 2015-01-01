@@ -87,12 +87,49 @@ upgrade_main(){
 
 }
 
+setup_local_env(){
+
+    if [ ! -f softlayer_widget/bin/activate ];then
+        echo updating apt cache
+        sudo apt-get -y update
+
+        # install prereqs
+        echo installing prerequisites
+        sudo apt-get install -y curl python-dev vim
+
+        # install pip
+        curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
+        # go home
+        cd ~
+
+        # virtualenv
+        echo installing virtualenv
+        sudo pip install virtualenv==1.11.4
+        echo creating cloudify virtualenv
+        virtualenv softlayer_widget
+        source softlayer_widget/bin/activate
+
+        # install cli
+        pip install cloudify==3.1
+
+        # add cfy bash completion
+        activate_cfy_bash_completion
+    else
+        echo "local environment already installed"
+    fi
+
+
+}
+
 set -e
 if [ "$1" = "upgrade" ];then
     echo "upgrading"
-    upgrade_main
+    setup_local_env
+
 else
     echo "installing..."
     install_main
+
 fi
+
 set +e
