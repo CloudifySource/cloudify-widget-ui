@@ -11,7 +11,9 @@ var fse = require('fs-extra');
 var util = require('util');
 var exec = require('child_process').exec, child;
 
+//var dbMAnager
 
+//
 
 /**
  *
@@ -37,10 +39,18 @@ var runCommand = function (command, callback) {
                 logger.error('exec error: ', error, stderr);
                 callback( new Error('command [' + command + '] failed'), output );
             } else {
+                logger.debug('all is well. calling callback');
                 callback(null, output);
             }
         });
 };
+
+function noOutputCallback( callback ){
+    return function( err, output ){
+        callback(err);
+    }
+}
+
 
 
 /**
@@ -103,18 +113,19 @@ module.exports = function LocalSoloExecutor(){
 
     this.init = function (callback) {
         logger.debug('initializing.. ');
-        runCommand(conf.initCommand, callback);
+        runCommand(conf.initCommand, noOutputCallback(callback) );
     };
 
     // install workflow
     this.installWorkflow = function( callback ){
         logger.debug('installing workflow');
-        runCommand(conf.installWfCommand, callback );
+        logger.info(arguments);
+        runCommand(conf.installWfCommand, noOutputCallback(callback) );
     };
 
     this.clean = function( callback ){
         logger.debug('cleaning');
-        runCommand(util.format('rm -r %s', conf.tmpDir) , callback );
+        runCommand(util.format('rm -r %s', conf.tmpDir) , noOutputCallback(callback) );
     };
 
 };

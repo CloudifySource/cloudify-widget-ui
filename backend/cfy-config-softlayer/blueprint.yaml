@@ -57,7 +57,7 @@ inputs:
 
 node_templates:
   # defining a single node template that will serve as our test node
-  test_node:
+  dev-node:
 #    type: cloudify.softlayer.nodes.WindowsVirtualServer
     type: cloudify.softlayer.nodes.VirtualServer
     properties:

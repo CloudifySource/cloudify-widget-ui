@@ -1,4 +1,29 @@
 'use strict';
+
+
+/**
+ * @module DbManager
+ * @description
+ *
+ *
+ * use this manager
+ *
+ * <pre>
+ *     var dbManager = require('...path...');
+ *     dbManager.connect('collectionName', function(db, collection){
+ *
+ *           .. use collection as defined in node-mongo documentation
+ *           https://github.com/mongodb/node-mongodb-native
+ *
+ *           no need to disconnect, or such. just do what you need with the collection.
+ *
+ *     });
+ *</pre>
+ *
+ *
+ * @type {exports}
+ */
+
 //var logger = require('log4js').getLogger('DbManager');
 var conf = require('../Conf');
 var ObjectID = require('mongodb').ObjectID;
