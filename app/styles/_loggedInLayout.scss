@@ -1,0 +1,25 @@
+#logged-in-layout{
+  .navbar{
+    border-radius:0;
+    .nav{
+      li{
+        padding-right:5px;
+        margin-left:-3px;
+        a{
+          color:white;
+          padding:15px 15px;
+          margin-right:0;
+
+        }
+      }
+
+      li.active-section, li:hover{
+        background:white;
+        a{
+          color:black;
+          background:white;
+        }
+      }
+    }
+  }
+}

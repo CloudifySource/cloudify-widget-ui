@@ -73,7 +73,8 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
 //            })
             .when('/pools', {
                 templateUrl: 'views/pools/accountPools.html',
-                controller: 'AccountPoolCtrl'
+                controller: 'AccountPoolCtrl',
+                section:'pools'
             })
             .when('/pools/create', {
                 templateUrl: 'views/pools/accountPoolCreate.html',
@@ -151,7 +152,8 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
 
             .when('/widgets', {
                 templateUrl: 'views/dashboard.html',
-                controller: 'DashboardCtrl'
+                controller: 'DashboardCtrl',
+                section:'widgets'
             })
             .when('/widgets/:widgetId/read', {
                 templateUrl: 'views/widget/read.html',
@@ -180,6 +182,7 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
             .when('/widgets/:widgetId/embed', {
                 templateUrl: 'views/widget/themes/widgetEmbed.html',
                 controller: 'WidgetEmbedCtrl'
+
             })
             .when('/widgets/:widgetId/blank', {
                 templateUrl: 'views/widget/themes/blank.html',

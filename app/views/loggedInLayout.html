@@ -1,4 +1,4 @@
-<div class="container" id="logged-in-layout" ng-class="{'logged-in' : !!$root.user}">
+<div id="logged-in-layout" ng-class="{'logged-in' : !!$root.user}">
     <div class="require-login header navbar">
         <div class="logged-in-layout">
             <div class="pull-left logotype" style="margin:5px;">
@@ -9,16 +9,16 @@
                 <span >hello {{user.email}}</span>
             </div>
             <ul class="nav pull-right">
-                <li><a admin ng-href="#/admin/users">manage users</a></li>
-                <li><a admin ng-href="#/admin/myUser">my user</a></li>
-                <li><a admin ng-href="#/admin/system">system</a></li>
-                <li><a admin ng-href="#/admin/pools">manage pools</a></li>
-                <li><a admin ng-href="#/admin/pools/status">pools status</a></li>
-                <li><a ng-href="#/widgets">My widgets</a></li>
-                <li><a ng-href="#/pools">My pools</a></li>
+                <li admin><a ng-href="#/admin/users">manage users</a></li>
+                <li admin><a ng-href="#/admin/myUser">my user</a></li>
+                <li admin><a ng-href="#/admin/system">system</a></li>
+                <li admin><a ng-href="#/admin/pools">manage pools</a></li>
+                <li admin><a ng-href="#/admin/pools/status">pools status</a></li>
+                <li section="widgets"><a ng-href="#/widgets">My widgets</a></li>
+                <li section="pools"><a ng-href="#/pools">My pools</a></li>
                 <li><a ng-href="#/documentation">Documentation</a></li>
                 <li>
-                    <button ng-click="logout()">logout</button>
+                    <a ng-click="logout()">logout</a>
                 </li>
             </ul>
 
