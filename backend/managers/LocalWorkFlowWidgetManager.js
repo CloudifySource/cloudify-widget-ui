@@ -19,13 +19,26 @@ exports.localSoloInstallationProcess = function ( opts, callback ) {
         opts = _.merge({'configPrototype': path.resolve(__dirname, '..', 'cfy-config-softlayer')}, opts);
 
         var soloExecutor = new LocalSoloExecutor();
+
         soloExecutor.setConfiguration(opts);
 
+        var updateDB = function(id, callback){
+            soloExecutor.updateDb(id);
+            callback(null)
+        }
+
         var tasks = [
-            soloExecutor.setupDirectory,
-            soloExecutor.init,
-            soloExecutor.installWorkflow
+
+            //soloExecutor.setupDirectory,
+            soloExecutor.getStringIdFromReturnedJson,
+            updateDB
+
+           // soloExecutor.editInputsFile
+            //soloExecutor.init,
+            //soloExecutor.installWorkflow
         ];
+
+
 
         // wrap tasks with try/catch to propagate errors properly.
         tasks = _.map(tasks, function(fn){
@@ -43,7 +56,7 @@ exports.localSoloInstallationProcess = function ( opts, callback ) {
             logger.debug('finished running solo installation process');
             logger.debug('removing the library');
             try {
-                soloExecutor.clean();
+               // soloExecutor.clean();
             }catch(e){
                 logger.warn('unable to clean',e);
             }
@@ -53,6 +66,7 @@ exports.localSoloInstallationProcess = function ( opts, callback ) {
                 return;
             }
         });
+
     }catch(e){
         logger.error('solo installation failed',e);
         callback(new Error('unable to run solo installation : ' + e.message));

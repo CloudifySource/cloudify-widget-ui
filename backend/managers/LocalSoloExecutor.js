@@ -10,8 +10,7 @@ var path = require('path');
 var fse = require('fs-extra');
 var util = require('util');
 var exec = require('child_process').exec, child;
-
-//var dbMAnager
+var dbManager = require('./DbManager');
 
 //
 
@@ -69,6 +68,8 @@ module.exports = function LocalSoloExecutor(){
 
     this.setConfiguration = function( _conf ){
         conf = _conf;
+
+        logger.debug('new conf is: '+conf);
     };
 
     this.getConfiguration = function(){
@@ -83,12 +84,15 @@ module.exports = function LocalSoloExecutor(){
         conf.tmpDirName = 'cp_' + uuid.v1();
 
         conf.tmpDir = path.resolve(__dirname, '..', conf.tmpDirName );
+        conf.executionDetails = path.join(conf.tmpDir, 'executionDetails.json' );
 
         fse.copy( conf.configPrototype , conf.tmpDir, function (err) {
             if (!!err) {
                 logger.error('failed at copying config files to temp folder', err);
                 callback(err);
                 return;
+            } else {
+                callback();
             }
         });
 
@@ -98,18 +102,35 @@ module.exports = function LocalSoloExecutor(){
 
         logger.debug('configuration update. now it is \n', JSON.stringify(conf,{},4));
 
-        callback();
     };
 
+
     this.editInputsFile = function(callback){
+        logger.debug('editing softlayer_inputs.json .. ');
         var inputsFile= path.join(conf.tmpDir, 'softlayer_inputs.json' );
+
+        logger.debug('inputsFile: ' , inputsFile);
         var softlayerInputs = require( inputsFile );
+
+        logger.debug('softlayerInputs: ' , softlayerInputs);
         softlayerInputs.username = conf.softlayerDetails.username;
-        softlayerInputs.apiKey = conf.softlayerDetails.apiKey;
+        softlayerInputs.api_key = conf.softlayerDetails.apiKey;
+
+        logger.debug('softlayerInputs after setting inputs: ' , softlayerInputs);
+
+        logger.debug('writing to input file .. ' , 'softlayerInputs '+softlayerInputs);
         fse.writeJSONFile( inputsFile, softlayerInputs, callback);
 
     };
 
+
+    this.getStringIdFromReturnedJson = function(callback){
+        var responseFile = conf.executionDetails;
+        //var ed = require( responseFile );
+        var id = responseFile._id;
+        logger.debug('id is: ' , id);
+        callback(null, id);
+    };
 
     this.init = function (callback) {
         logger.debug('initializing.. ');
@@ -128,4 +149,22 @@ module.exports = function LocalSoloExecutor(){
         runCommand(util.format('rm -r %s', conf.tmpDir) , noOutputCallback(callback) );
     };
 
+
+    this.updateDb = function (id){
+
+        logger.debug('connecting to DB');
+        var collection = 'example';
+        dbManager.connect(collection, function(){
+            logger.debug('connected to ' +  collection);
+        });
+        logger.debug('connecting to DB ' +  id);
+        //dbManager.toObjectId(id);
+        //todo - need to modify dbmangaer so I could get the mongoClient for using - update + findOne methods.
+
+        dbManager.update( { _id : ed._id },  { $insert : { 'output' : output } }, callback );
+
+
+
+
+    }
 };
