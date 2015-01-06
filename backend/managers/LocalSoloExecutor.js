@@ -10,7 +10,7 @@ var path = require('path');
 var fse = require('fs-extra');
 var util = require('util');
 var exec = require('child_process').exec, child;
-var dbManager = require('./DbManager');
+
 
 //
 
@@ -152,6 +152,7 @@ module.exports = function LocalSoloExecutor(){
 
     this.updateDb = function (id){
 
+        var dbManager = require('./DbManager');
         logger.debug('connecting to DB');
         var collection = 'example';
         dbManager.connect(collection, function(){
@@ -161,10 +162,67 @@ module.exports = function LocalSoloExecutor(){
         //dbManager.toObjectId(id);
         //todo - need to modify dbmangaer so I could get the mongoClient for using - update + findOne methods.
 
-        dbManager.update( { _id : ed._id },  { $insert : { 'output' : output } }, callback );
+        var dbHandler = new DbHandler();
+        dbHandler.updateDB();
 
 
+
+        }
+
+};
+
+/** constructor */
+
+var DbHandler = function(){
+
+
+    var MongoClient = require('mongodb').MongoClient;
+
+    var mongoClient = new MongoClient();
+
+    var dbConnection = null;
+
+    var getConnection = function(){
+
+        if (dbConnection !== null) {
+            callback(null, dbConnection);
+        } else {
+            mongoClient.connect(conf.mongodbUrl, { 'auto_reconnect': true }, function (err, db) {
+                dbConnection = db;
+                callback(err, db);
+            }); }
+    }
+
+    var updateMongo = function(document, callback){
+
+        mongoClient.update({ _id : executionDetails._id },  { $insert : { 'output' : output } }, callback );
+
+    }
+
+    var findById = function(callback){
+
+        mongoClient.findOne( { _id : executionDetails._id },  function( err, document ){
+            if ( !document.output ){
+                document.output = [];
+            }
+            document.output.push(outputLine);
+
+        });
+
+    }
+
+
+
+    this.updateDB = function(){
+
+        async.waterfall([
+            getConnection,
+            findById,
+            updateMongo
+
+        ], function(error, result){})
 
 
     }
-};
+
+}
