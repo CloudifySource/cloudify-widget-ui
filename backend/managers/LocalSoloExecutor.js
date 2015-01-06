@@ -9,7 +9,10 @@ var uuid = require('node-uuid');
 var path = require('path');
 var fse = require('fs-extra');
 var util = require('util');
-var exec = require('child_process').exec, child;
+var exec = require('child_process').exec;
+var async = require('async');
+var dbManager = require('./DbManager');
+var GsReadline = require('../services/GsReadline');
 
 
 //
@@ -21,11 +24,14 @@ var exec = require('child_process').exec, child;
  */
 var runCommand = function (command, callback) {
 
+    if ( !callback ){
+        callback = function(){}; // noop
+    }
     logger.debug('running command [', command ,']');
     if ( !command ){
         callback(new Error('command is blank'));
     }
-    child = exec(command,
+    var child = exec(command,
         function (error, stdout, stderr) {
             var output = {
                 stderr : stderr,
@@ -42,6 +48,8 @@ var runCommand = function (command, callback) {
                 callback(null, output);
             }
         });
+
+    return child;
 };
 
 function noOutputCallback( callback ){
@@ -49,8 +57,6 @@ function noOutputCallback( callback ){
         callback(err);
     }
 }
-
-
 
 /**
  * @class SoloExecutor
@@ -84,7 +90,6 @@ module.exports = function LocalSoloExecutor(){
         conf.tmpDirName = 'cp_' + uuid.v1();
 
         conf.tmpDir = path.resolve(__dirname, '..', conf.tmpDirName );
-        conf.executionDetails = path.join(conf.tmpDir, 'executionDetails.json' );
 
         fse.copy( conf.configPrototype , conf.tmpDir, function (err) {
             if (!!err) {
@@ -124,105 +129,57 @@ module.exports = function LocalSoloExecutor(){
     };
 
 
-    this.getStringIdFromReturnedJson = function(callback){
-        var responseFile = conf.executionDetails;
-        //var ed = require( responseFile );
-        var id = responseFile._id;
-        logger.debug('id is: ' , id);
-        callback(null, id);
-    };
-
     this.init = function (callback) {
         logger.debug('initializing.. ');
-        runCommand(conf.initCommand, noOutputCallback(callback) );
+        //runCommand(conf.initCommand, noOutputCallback(callback) );
+        this.listenOutput(exec(conf.initCommand, noOutputCallback(callback)));
     };
 
-    // install workflow
     this.installWorkflow = function( callback ){
         logger.debug('installing workflow');
         logger.info(arguments);
-        runCommand(conf.installWfCommand, noOutputCallback(callback) );
+        this.listenOutput(exec(conf.installWfCommand, noOutputCallback(callback) ));
     };
 
     this.clean = function( callback ){
         logger.debug('cleaning');
-        runCommand(util.format('rm -r %s', conf.tmpDir) , noOutputCallback(callback) );
+        fse.rmdir(conf.tmpDir,callback);
+        //exec(util.format('rm -r %s', conf.tmpDir) , noOutputCallback(callback) );
     };
 
 
-    this.updateDb = function (id){
 
-        var dbManager = require('./DbManager');
-        logger.debug('connecting to DB');
-        var collection = 'example';
-        dbManager.connect(collection, function(){
-            logger.debug('connected to ' +  collection);
+    this.listenOutput = function( childProcess ){
+        dbManager.connect('example', function (db, collection) {
+            function handleLines( type ){
+                return function( lines ) {
+                    lines = _.map(lines, function(line){
+                        logger.trace( type + ' :: [' + line + ']');
+                        return { 'type' : type, 'line' : line};
+                    });
+                    collection.update({_id: conf.executionDetails._id}, {$push: {'output': {$each: lines}}}, function () {
+                    });
+                }
+            }
+
+            new GsReadline( childProcess.stdout).on('lines', handleLines('info') );
+            new GsReadline( childProcess.stderr).on('lines', handleLines('error') );
         });
-        logger.debug('connecting to DB ' +  id);
-        //dbManager.toObjectId(id);
-        //todo - need to modify dbmangaer so I could get the mongoClient for using - update + findOne methods.
 
-        var dbHandler = new DbHandler();
-        dbHandler.updateDB();
-
-
-
-        }
-
+    };
 };
 
-/** constructor */
-
-var DbHandler = function(){
-
-
-    var MongoClient = require('mongodb').MongoClient;
-
-    var mongoClient = new MongoClient();
-
-    var dbConnection = null;
-
-    var getConnection = function(){
-
-        if (dbConnection !== null) {
-            callback(null, dbConnection);
-        } else {
-            mongoClient.connect(conf.mongodbUrl, { 'auto_reconnect': true }, function (err, db) {
-                dbConnection = db;
-                callback(err, db);
-            }); }
-    }
-
-    var updateMongo = function(document, callback){
-
-        mongoClient.update({ _id : executionDetails._id },  { $insert : { 'output' : output } }, callback );
-
-    }
-
-    var findById = function(callback){
-
-        mongoClient.findOne( { _id : executionDetails._id },  function( err, document ){
-            if ( !document.output ){
-                document.output = [];
-            }
-            document.output.push(outputLine);
-
-        });
-
-    }
 
 
 
-    this.updateDB = function(){
-
-        async.waterfall([
-            getConnection,
-            findById,
-            updateMongo
-
-        ], function(error, result){})
 
 
-    }
 
-}
+
+
+
+
+
+
+
+

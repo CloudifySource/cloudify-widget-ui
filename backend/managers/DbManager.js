@@ -25,7 +25,7 @@
  * @type {exports}
  */
 
-//var logger = require('log4js').getLogger('DbManager');
+var logger = require('log4js').getLogger('DbManager');
 var conf = require('../Conf');
 var ObjectID = require('mongodb').ObjectID;
 var MongoClient = require('mongodb').MongoClient;
@@ -39,9 +39,11 @@ var dbConnection = null;
 // according to the documentation, this is the preferred way
 // http://mongodb.github.io/node-mongodb-native/driver-articles/mongoclient.html#mongoclient-connection-pooling
 function getConnection(callback) {
+
     if (dbConnection !== null) {
         callback(null, dbConnection);
     } else {
+        logger.trace('connecting', conf.mongodbUrl);
         MongoClient.connect(conf.mongodbUrl, { 'auto_reconnect': true }, function (err, db) {
             dbConnection = db;
             callback(err, db);
@@ -51,8 +53,9 @@ function getConnection(callback) {
 
 
 exports.connect = function (collectionName, callback) {
-
+    logger.trace('connecting to ',  collectionName);
     getConnection(function (err, db) {
+        logger.trace('got connection', err );
         if (err) {
             throw err;
         }

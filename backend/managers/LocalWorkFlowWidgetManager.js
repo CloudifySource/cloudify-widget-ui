@@ -22,20 +22,19 @@ exports.localSoloInstallationProcess = function ( opts, callback ) {
 
         soloExecutor.setConfiguration(opts);
 
-        var updateDB = function(id, callback){
-            soloExecutor.updateDb(id);
-            callback(null)
-        }
+        var updateDB = function(callback){
+            soloExecutor.updateDb( callback );
+
+        };
 
         var tasks = [
 
-            //soloExecutor.setupDirectory,
-            soloExecutor.getStringIdFromReturnedJson,
-            updateDB
+            soloExecutor.setupDirectory,
+
 
            // soloExecutor.editInputsFile
-            //soloExecutor.init,
-            //soloExecutor.installWorkflow
+            soloExecutor.init,
+            soloExecutor.installWorkflow
         ];
 
 
