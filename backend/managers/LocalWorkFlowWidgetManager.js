@@ -53,16 +53,17 @@ exports.localSoloInstallationProcess = function ( opts, callback ) {
 
         async.waterfall( tasks , function (err) {
             logger.debug('finished running solo installation process');
-            logger.debug('removing the library');
+
             try {
-               // soloExecutor.clean();
+               soloExecutor.clean();
             }catch(e){
                 logger.warn('unable to clean',e);
             }
 
             if ( !!err ){
                 callback('failed installing solo',err);
-                return;
+               // throw new Error(err.getMessage());
+                //return;
             }
         });
 

@@ -10,7 +10,7 @@ var path = require('path');
 var fse = require('fs-extra');
 var util = require('util');
 var exec = require('child_process').exec;
-var async = require('async');
+//var async = require('async');
 var dbManager = require('./DbManager');
 var GsReadline = require('../services/GsReadline');
 
@@ -55,7 +55,7 @@ var runCommand = function (command, callback) {
 function noOutputCallback( callback ){
     return function( err, output ){
         callback(err);
-    }
+    };
 }
 
 /**
@@ -102,7 +102,7 @@ module.exports = function LocalSoloExecutor(){
         });
 
         // fill in paths to be reused
-        conf.initCommand = util.format('cfy local init -p %s/blueprint.yaml --install-plugins -i %s/softlayer_inputs.json', conf.tmpDir, conf.tmpDir);
+        conf.initCommand = util.format('cfy local init -p %s/blu_sl_blueprint.yaml --install-plugins -i %s/blu_sl.json', conf.tmpDir, conf.tmpDir);
         conf.installWfCommand = 'cfy local execute -w install';
 
         logger.debug('configuration update. now it is \n', JSON.stringify(conf,{},4));
@@ -111,8 +111,8 @@ module.exports = function LocalSoloExecutor(){
 
 
     this.editInputsFile = function(callback){
-        logger.debug('editing softlayer_inputs.json .. ');
-        var inputsFile= path.join(conf.tmpDir, 'softlayer_inputs.json' );
+        logger.debug('editing blu_sljson .. ');
+        var inputsFile= path.join(conf.tmpDir, 'blu_sl.json' );
 
         logger.debug('inputsFile: ' , inputsFile);
         var softlayerInputs = require( inputsFile );
@@ -123,7 +123,7 @@ module.exports = function LocalSoloExecutor(){
 
         logger.debug('softlayerInputs after setting inputs: ' , softlayerInputs);
 
-        logger.debug('writing to input file .. ' , 'softlayerInputs '+softlayerInputs);
+        logger.debug('writing to input file .. ' , 'blu_sl '+softlayerInputs);
         fse.writeJSONFile( inputsFile, softlayerInputs, callback);
 
     };
@@ -142,15 +142,15 @@ module.exports = function LocalSoloExecutor(){
     };
 
     this.clean = function( callback ){
-        logger.debug('cleaning');
-        fse.rmdir(conf.tmpDir,callback);
-        //exec(util.format('rm -r %s', conf.tmpDir) , noOutputCallback(callback) );
+        logger.debug('removing the library');
+        fse.remove(conf.tmpDir, noOutputCallback(callback));
+
     };
 
 
 
     this.listenOutput = function( childProcess ){
-        dbManager.connect('example', function (db, collection) {
+        dbManager.connect('widgetExecutions', function (db, collection) {
             function handleLines( type ){
                 return function( lines ) {
                     lines = _.map(lines, function(line){
@@ -159,7 +159,7 @@ module.exports = function LocalSoloExecutor(){
                     });
                     collection.update({_id: conf.executionDetails._id}, {$push: {'output': {$each: lines}}}, function () {
                     });
-                }
+                };
             }
 
             new GsReadline( childProcess.stdout).on('lines', handleLines('info') );
