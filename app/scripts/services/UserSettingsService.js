@@ -11,6 +11,14 @@ console.log('loading user settings');
 angular.module('cloudifyWidgetUiApp')
     .service('UserSettingsService', function ($http) {
 
+        /**
+         *
+         * @param {object} details
+         * @param {string} details.newPassword
+         * @param {string} details.newPasswordAgain
+         * @param {string} details.oldPassword
+         * @returns {HttpPromise}
+         */
         this.changePassword = function (details) {
             return $http.post('/backend/userSettings/changePassword', details);
         };
@@ -37,6 +45,6 @@ angular.module('cloudifyWidgetUiApp')
 
         this.getUserSettings = function() {
             return $http.get('/backend/userSettings/read');
-        }
+        };
 
     });

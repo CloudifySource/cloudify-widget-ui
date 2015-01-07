@@ -9,6 +9,8 @@ angular.module('cloudifyWidgetUiApp')
         $scope.resetChanges = function () {
             WidgetClient.userSettings.getUserSettings().then(function (result) {
                 $scope.myUser = result.data;
+            }, function(){
+                toastr.error('unable to get user settings');
             });
         };
 
@@ -37,7 +39,7 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.setPoolKey = function (newPoolKey) {
             $scope.page.message = null;
-            Widgetclient.userSettings.setPoolKey({ 'poolKey': newPoolKey }).then(function (result) {
+            WidgetClient.userSettings.setPoolKey({ 'poolKey': newPoolKey }).then(function (result) {
                     $scope.myUser = result.data;
                     $scope.page.message = 'operation was a success';
                 },

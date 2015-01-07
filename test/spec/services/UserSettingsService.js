@@ -11,9 +11,19 @@ describe('Service: UserSettingsService', function () {
         mUserSettingsService = UserSettingsService;
     }));
 
-    it('changePassword', inject(function ( $httpBackend ) {
+    it('should change password', inject(function ( $httpBackend ) {
         $httpBackend.expectPOST('/backend/userSettings/changePassword').respond(200,{});
         mUserSettingsService.changePassword({});
+    }));
+
+    it('should set poolKey', inject(function($httpBackend){
+        $httpBackend.expectPOST('/backend/admin/myUser/setPoolKey').respond(200,{});
+        mUserSettingsService.setPoolKey({});
+    }));
+
+    it('should test pool key', inject(function($httpBackend){
+        $httpBackend.expectPOST('/backend/admin/myUser/testAdminPoolKey').respond(200,{});
+        mUserSettingsService.testPoolKey({});
     }));
 
 });

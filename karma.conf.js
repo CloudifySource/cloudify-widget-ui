@@ -9,6 +9,7 @@ module.exports = function (config) {
         //   console.log(JASMINE, JASMINE_ADAPTER);
         files: [
             'app/bower_components/jquery/dist/jquery.js',
+            'app/bower_components/toastr/toastr.js',
             'app/bower_components/i18next/release/i18next-1.7.1.min.js',
             'app/bower_components/angular/angular.js',
             'app/bower_components/angular-cookies/angular-cookies.js',

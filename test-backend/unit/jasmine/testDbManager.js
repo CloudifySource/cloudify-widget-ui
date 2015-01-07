@@ -4,7 +4,7 @@
  */
 var logger = require('log4js').getLogger('testDbManager.spec');
 describe('Backend: managers', function () {
-    var dbManager = require('../../backend/managers/DbManager');
+    var dbManager = require('../../../backend/managers/DbManager');
     it('test dbManager', function () {
         logger.info('01: test throw exception ');
         var ObjectID = require('mongodb').ObjectID;

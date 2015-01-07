@@ -21,6 +21,7 @@
     "expr": true,
     "globals": {
         "expect":false,
+        "toastr": false,
         "it":false,
         "inject":false,
         "beforeEach":false,

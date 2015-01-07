@@ -380,7 +380,7 @@ module.exports = function (grunt) {
                         src: [ '*.js', '*.sh', 'package.json', 'build/**/*', 'backend/**/*', 'conf/**/*', 'build.id' ]
                     },
                     {
-                        
+
                         expand: true,
                         dot: true,
                         cwd: '.',
@@ -547,6 +547,27 @@ module.exports = function (grunt) {
                 print: 'detail'
             }
         },
+        mochaTest: {
+            unit: {
+                options: {
+                    reporter: 'xunit-file'
+                },
+                src: ['test-backend/unit/mocha/**/*js']
+            },
+            develop: {
+                options: {
+                    reporter: 'spec'
+                },
+                src: ['test-backend/unit/mocha/**/*js']
+            }
+
+        },
+        /*jshint camelcase: false */
+        mocha_istanbul: {
+            coverage: {
+                'src' : 'test-backend/unit/mocha/**/*'
+            }
+        },
         /*jshint camelcase: false */
         jasmine_node: {
             unit: ['test-backend/unit'],
@@ -619,13 +640,13 @@ module.exports = function (grunt) {
         'usemin'
     ]);
 
-    
+
     grunt.registerTask('backend', function () {
         grunt.config.set('jshint.options.jshintrc', '.backendhintrc');
         grunt.task.run('jshint:backend');
     });
 
-    
+
     grunt.registerTask('default', [
         'jshint',
         'test:all',
