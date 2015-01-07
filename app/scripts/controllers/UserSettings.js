@@ -7,7 +7,7 @@ angular.module('cloudifyWidgetUiApp')
 
 
         $scope.resetChanges = function () {
-            $http.get('/backend/userSettings/read').then(function (result) {
+            WidgetClient.userSettings.getUserSettings().then(function (result) {
                 $scope.myUser = result.data;
             });
         };
@@ -28,7 +28,7 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.testPoolKey = function () {
             $scope.page.message = null;
-            $http.post('/backend/admin/myUser/testAdminPoolKey', { 'poolKey': $scope.myUser.poolKey }).then(function () {
+            WidgetClient.userSettings.testPoolKey( { 'poolKey': $scope.myUser.poolKey }).then(function () {
                 $scope.page.message = 'success';
             }, function () {
                 $scope.page.message = 'error!';
@@ -37,7 +37,7 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.setPoolKey = function (newPoolKey) {
             $scope.page.message = null;
-            $http.post('/backend/admin/myUser/setPoolKey', { 'poolKey': newPoolKey }).then(function (result) {
+            Widgetclient.userSettings.setPoolKey({ 'poolKey': newPoolKey }).then(function (result) {
                     $scope.myUser = result.data;
                     $scope.page.message = 'operation was a success';
                 },

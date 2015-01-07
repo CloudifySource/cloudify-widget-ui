@@ -11,8 +11,9 @@ describe('Service: UserSettingsService', function () {
         mUserSettingsService = UserSettingsService;
     }));
 
-    it('should do something', function () {
-        expect(!!mUserSettingsService).toBe(true);
-    });
+    it('changePassword', inject(function ( $httpBackend ) {
+        $httpBackend.expectPOST('/backend/userSettings/changePassword').respond(200,{});
+        mUserSettingsService.changePassword({});
+    }));
 
 });
