@@ -212,7 +212,19 @@ module.exports = function (grunt) {
                 },
                 files: {
                     'src': [
-                        'test-backend/**/*.js'
+                        'test-backend/**/*.js',
+                        '!test-backend/unit/mocha/**/*'
+                    ]
+                }
+            },
+            mochaTestBackend: {
+                options: {
+                    jshintrc: 'test-backend/unit/mocha/.jshintrc'
+                },
+                files: {
+                    'src': [
+                        '!test-backend/unit/jasmine',
+                        'test-backend/unit/mocha/**/*.js'
                     ]
                 }
             }
