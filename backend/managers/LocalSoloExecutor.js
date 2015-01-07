@@ -10,47 +10,11 @@ var path = require('path');
 var fse = require('fs-extra');
 var util = require('util');
 var exec = require('child_process').exec;
-//var async = require('async');
 var dbManager = require('./DbManager');
 var GsReadline = require('../services/GsReadline');
+var keypair = require('keypair');
 
 
-//
-
-/**
- *
- * @param {string} command
- * @param {function} callback e.g. function(error, output)
- */
-var runCommand = function (command, callback) {
-
-    if ( !callback ){
-        callback = function(){}; // noop
-    }
-    logger.debug('running command [', command ,']');
-    if ( !command ){
-        callback(new Error('command is blank'));
-    }
-    var child = exec(command,
-        function (error, stdout, stderr) {
-            var output = {
-                stderr : stderr,
-                stdout : stdout,
-                error : error
-            };
-
-            logger.debug('stdout: ', stdout);
-            if (error !== null) {
-                logger.error('exec error: ', error, stderr);
-                callback( new Error('command [' + command + '] failed'), output );
-            } else {
-                logger.debug('all is well. calling callback');
-                callback(null, output);
-            }
-        });
-
-    return child;
-};
 
 function noOutputCallback( callback ){
     return function( err, output ){
@@ -87,7 +51,8 @@ module.exports = function LocalSoloExecutor(){
         callback = callback || _.noop;
 
         logger.debug('copying config files to temp folder');
-        conf.tmpDirName = 'cp_' + uuid.v1();
+        var setid = uuid.v1();
+        conf.tmpDirName = 'cp_' + setid;
 
         conf.tmpDir = path.resolve(__dirname, '..', conf.tmpDirName );
 
@@ -101,6 +66,27 @@ module.exports = function LocalSoloExecutor(){
             }
         });
 
+        var pair = keypair();
+        var publicKey = conf.tmpDir + '/public' + setid + '.pub';
+        var privateKey = conf.tmpDir + '/private' + setid + '.pem';
+
+        logger.debug('creating keypairs ...');
+        fse.outputFile(publicKey, pair.public, function(err) {
+            //todo: cp ~/.ssh/
+
+            if (!!err){
+                logger.error('error writing public key');
+            }
+            fse.outputFile(privateKey, pair.private, function(err) {
+                if (!!err){
+
+                    logger.error('error writing public key');
+                }
+            });
+
+        });
+
+
         // fill in paths to be reused
         conf.initCommand = util.format('cfy local init -p %s/blu_sl_blueprint.yaml --install-plugins -i %s/blu_sl.json', conf.tmpDir, conf.tmpDir);
         conf.installWfCommand = 'cfy local execute -w install';
@@ -109,6 +95,7 @@ module.exports = function LocalSoloExecutor(){
 
     };
 
+    //todo: add the sshkey specification
 
     this.editInputsFile = function(callback){
         logger.debug('editing blu_sljson .. ');
@@ -131,7 +118,6 @@ module.exports = function LocalSoloExecutor(){
 
     this.init = function (callback) {
         logger.debug('initializing.. ');
-        //runCommand(conf.initCommand, noOutputCallback(callback) );
         this.listenOutput(exec(conf.initCommand, noOutputCallback(callback)));
     };
 

@@ -30,11 +30,9 @@ exports.localSoloInstallationProcess = function ( opts, callback ) {
         var tasks = [
 
             soloExecutor.setupDirectory,
-
-
            // soloExecutor.editInputsFile
-            soloExecutor.init,
-            soloExecutor.installWorkflow
+            //soloExecutor.init,
+            //soloExecutor.installWorkflow
         ];
 
 
@@ -55,7 +53,7 @@ exports.localSoloInstallationProcess = function ( opts, callback ) {
             logger.debug('finished running solo installation process');
 
             try {
-               soloExecutor.clean();
+             //  soloExecutor.clean();
             }catch(e){
                 logger.warn('unable to clean',e);
             }
