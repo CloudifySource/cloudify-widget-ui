@@ -1,18 +1,29 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('AdminMyUserCtrl', function ($scope, $http) {
+    .controller('UserSettingsCtrl', function ($scope, $http, WidgetClient, $log ) {
 
         $scope.page = {};
 
 
         $scope.resetChanges = function () {
-            $http.get('/backend/admin/myUser').then(function (result) {
+            $http.get('/backend/userSettings/read').then(function (result) {
                 $scope.myUser = result.data;
             });
         };
 
         $scope.resetChanges();
+
+
+        $scope.changePassword = function(){
+            $log.info('changing password');
+            WidgetClient.userSettings.changePassword($scope.page.changePassword).then(function(){
+                toastr.success('password updated');
+            }, function( result ){
+
+                toastr.error( result.data.error, 'error updating password' );
+            });
+        };
 
 
         $scope.testPoolKey = function () {
