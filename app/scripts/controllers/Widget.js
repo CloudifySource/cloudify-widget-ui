@@ -29,6 +29,10 @@ angular.module('cloudifyWidgetUiApp')
         $scope.widget = {  '_id': $routeParams.widgetId };
         WidgetsService.getPublicWidget($routeParams.widgetId).then(function (result) {
             $scope.widget = result.data;
+            parentLoaded(null, $scope.widget)
+        }, function( result ){
+            $log.info('error loading widget');
+            parentLoaded( result.data , null );
         });
 
         $scope.executionId = null;
@@ -123,9 +127,9 @@ angular.module('cloudifyWidgetUiApp')
                 });
         }
 
-        function parentLoaded() {
+        function parentLoaded( err, widget ) {
             $log.info('posting widget_loaded message');
-            _postMessage({'name': 'widget_loaded'});
+            _postMessage({'name': 'widget_loaded', 'data' : { 'error' : err, 'widget' : widget } });
         }
 
         function stop() {
@@ -217,10 +221,12 @@ angular.module('cloudifyWidgetUiApp')
             }
 
             if (data.name === WidgetConstants.PLAY) {
+                $log.info('got message to play widget');
                 play(data.widget);
             }
 
             if (data.name === WidgetConstants.STOP) {
+                $log.info('got message to stop widget');
                 stop();
             }
 
@@ -235,6 +241,6 @@ angular.module('cloudifyWidgetUiApp')
 
         });
 
-        parentLoaded();
+
         $timeout(loadState, 1);
     });
