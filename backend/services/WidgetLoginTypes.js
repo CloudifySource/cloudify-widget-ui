@@ -11,6 +11,16 @@ var loginTypes = [
         'data' : {
             'mailchimp' : true
         }
+    },{
+        'id': 'googleplus',
+        'label': 'Google Plus',
+        'size': {
+            'width': 100,
+            'height': 100
+        },
+        'data' : {
+            'mailchimp' : true
+        }
     },
     {
         'id': 'custom',

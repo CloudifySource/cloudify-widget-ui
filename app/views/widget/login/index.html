@@ -2,8 +2,10 @@
 
 <div>
     <div ng-repeat="login in loginTypes(widget.socialLogin.data)" class="thumb">
-        <a ng-href="/backend/widgets/{{widget._id}}/login/{{login.id}}">
+
+        <a ng-show="login.id !== 'googleplus'" ng-href="/backend/widgets/{{widget._id}}/login/{{login.id}}">
             <div class="social-login-icon login-{{login.id}}"></div>
         </a>
     </div>
+    <div id="googleplus" ng-show="hasGoogleplus()"></div>
 </div>

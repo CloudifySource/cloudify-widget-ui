@@ -15,7 +15,9 @@
       <link href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet"/>
         <!-- build:css({.tmp,app}) styles/main.css -->
         <link rel="stylesheet" href="styles/main.css">
+
         <!-- endbuild -->
+      <script src="/backend/conf"></script>
 </head>
   <body ng-app="cloudifyWidgetUiApp">
     <!--[if lt IE 7]>
@@ -27,8 +29,33 @@
       <script src="bower_components/json3/lib/json3.min.js"></script>
     <![endif]-->
 
+   <!-- <script>
+        function signInCallback(authResult) {
+            console.log('authResult is', authResult);
+            if (authResult.code) {
+                $.post('/backend/widgets/1/login/googleplus/callback', { code: authResult.code})
+                    .done(function(data) {
+
+                        $('#signinButton').hide();
+                    });
+            } else if (authResult.error) {
+                console.log('There was an error: ' + authResult.error);
+            }
+        };
+    </script>
+
+    <div id="signinButton">
+  <span class="g-signin"
+        data-scope="https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/plus.login"
+        data-clientid="261414243191-a8clsk3vtt28t8ggjl86vqqb9ssglohp.apps.googleusercontent.com"
+        data-cookiepolicy="single_host_origin"
+        data-callback="signInCallback">
+  </span>
+    </div>
+    <div id="result"></div>-->
     <!-- Add your site or application content here -->
     <div ng-view></div>
+
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
     <script>
@@ -39,6 +66,8 @@
     </script>
 
     <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer>
+    </script>
     <script src="bower_components/angular/angular.js"></script>
     <!--<script src="scripts/templates.js"></script>-->
 
@@ -119,6 +148,7 @@
 
 
       <script src="scripts/services/UserSettingsService.js"></script>
+      <script src="scripts/services/GoogleplusLoginService.js"></script>
       <!-- endbuild -->
 
     <!-- on purpose, taking this file out, making it debuggable on environments -->

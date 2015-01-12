@@ -11,6 +11,13 @@ var managers = require('./backend/managers');
 var middleware = require('./backend/middleware');
 
 var passport = require('passport');
+passport.serializeUser(function (user, done) {
+    done(null, user);
+});
+
+passport.deserializeUser(function (user, done) {
+    done(null, user);
+});
 var conf = require('./backend/Conf');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
@@ -139,6 +146,12 @@ domain.run(function () {
     app.get('/backend/user/account/pools/:poolId/status', controllers.pool.accountReadPoolStatus);
     app.get('/backend/user/account/pools/status', controllers.pool.accountReadPoolsStatus);
 
+    // jsonp like response for public configuration.
+    app.get('/backend/conf', function(req, res){
+        var confName = req.param.name || 'conf';
+        res.send('var ' + confName + ' = ' + JSON.stringify(conf.public) );
+    });
+
     //// user management
     app.post('/backend/userSettings/changePassword',
         middleware.session.loggedUser,
@@ -158,6 +171,7 @@ domain.run(function () {
     app.get('/backend/widgets/:widgetId', controllers.widgets.getPublicInfo);
     app.get('/backend/widgets/login/types', controllers.widgetLogin.getTypes);
     app.get('/backend/widgets/:widgetId/login/:loginType', controllers.widgetLogin.widgetLogin);
+
     app.post('/backend/widgets/:widgetId/login/custom',
         function (req, res, next) {
             req.params.loginType = 'custom';
@@ -168,7 +182,38 @@ domain.run(function () {
             res.send(200);
         }
     );
-    app.get('/backend/widgets/:widgetId/login/:loginType/callback', controllers.widgetLogin.widgetLoginCallback);
+    app.all('/backend/widgets/:widgetId/login/:loginType/callback', controllers.widgetLogin.widgetLoginCallback);
+
+    //console.log('passport is defined');
+    //var passport = require('passport');
+
+
+    //var GooglePlusStrategy = require('passport-google-plus');
+
+    //passport.use(new GooglePlusStrategy({
+    //        clientId: conf.googleplus.clientId,
+    //        clientSecret: conf.googleplus.clientSecret//,
+    //    },
+    //    function(tokens, profile, done) {
+    //        logger.info('here',  tokens, profile);
+    //        // Create or update user, call done() when complete...
+    //        done(null, profile, tokens);
+    //    }
+    //));
+
+
+    //app.post('/backend/widgets/login/googleplus/callback',   controllers.widgetLogin.widgetGoogleplusCallback);
+    //function(req, res) {
+    //    logger.info('i am in googleplus callback', req.body);
+    //    passport.authorize('google')(req, res, function(){
+    //        logger.info('after authenticate', req);
+    //        res.send(req.user);
+    //    });
+    //    // Return user back to client
+    //
+    //});
+
+
 
 
     var widgetPort = process.argv[2] || 9001;

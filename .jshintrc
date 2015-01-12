@@ -24,6 +24,8 @@
       "confirm":false,
       "$":false,
       "toastr":false,
-      "_" : false
+      "_" : false,
+      "gapi" : false,
+      "conf" : false
   }
 }
