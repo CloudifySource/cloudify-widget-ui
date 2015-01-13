@@ -1,46 +1,55 @@
 {
-    "name" : "new-widget",
-    "cloudifyCloudsDir" : "cloudify-folder/clouds",
-    "cloudifyExecutable" : "cloudify-folder/bin/cloudify.sh",
-    "logsDir" : "/var/log/cloudify-widget/logs",
-    "downloadsDir" : "/var/opt/cloudify-widget/downloads",
-    "log4js" : {
-        "levels" : {
-            "WidgetManager" : "INFO" ,
-            "WidgetController" : "INFO"
+    "name": "new-widget",
+    "cloudifyCloudsDir": "cloudify-folder/clouds",
+    "cloudifyExecutable": "cloudify-folder/bin/cloudify.sh",
+    "logsDir": "/var/log/cloudify-widget/logs",
+    "downloadsDir": "/var/opt/cloudify-widget/downloads",
+    "log4js": {
+        "levels": {
+            "WidgetManager": "INFO",
+            "WidgetController": "INFO"
         },
         "appenders": [
-            {  "level":"ERROR", "type":"console"}
+            {
+                "level": "ERROR",
+                "type": "console"
+            }
         ]
-
     },
     "mongodbUrl": "mongodb://127.0.0.1:27017/test",
-    "adminUser" : { "email" : "__admin_email__" , "password" : "__password__" , "poolKey" : "__poolKey__"},
+    "adminUser": {
+        "email": "__admin_email__",
+        "password": "__password__",
+        "poolKey": "__poolKey__"
+    },
     "linkedIn": {
-        "apiKey" : "linkedin_api_key",
-        "secretKey" : "linkedin_secret_key"
+        "apiKey": "linkedin_api_key",
+        "secretKey": "linkedin_secret_key"
     },
-    "twitter" : {
-        "apiKey" : "twitter_api_key",
-        "secretKey" : "twitter_secret_key"
+    "twitter": {
+        "apiKey": "twitter_api_key",
+        "secretKey": "twitter_secret_key"
     },
-
-    "facebook" : {
-        "apiKey" : "facebook_api_key",
-        "secretKey" : "facebook_secret_key"
+    "facebook": {
+        "apiKey": "facebook_api_key",
+        "secretKey": "facebook_secret_key"
     },
-    "github" : {
-        "apiKey" : "github_api_key",
-        "secretyKey" : "github_secret_key"
+    "github": {
+        "apiKey": "github_api_key",
+        "secretyKey": "github_secret_key"
     },
-    "poolRestUrl" :{
-        "protocol" : "http",
-        "domain" : "localhost",
-        "port" : "8011"
+    "poolRestUrl": {
+        "protocol": "http",
+        "domain": "localhost",
+        "port": "8011"
     },
     "cloudifyCliService": {
         "newDir": "/var/opt/cloudify-widget/cli-service/new",
         "executingDir": "/var/opt/cloudify-widget/cli-service/executing"
+    },
+    "public": {
+        "googleplus": {
+            "clientId": "google_user_account_id"
+        }
     }
-
 }
