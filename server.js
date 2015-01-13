@@ -11,13 +11,6 @@ var managers = require('./backend/managers');
 var middleware = require('./backend/middleware');
 
 var passport = require('passport');
-passport.serializeUser(function (user, done) {
-    done(null, user);
-});
-
-passport.deserializeUser(function (user, done) {
-    done(null, user);
-});
 var conf = require('./backend/Conf');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
