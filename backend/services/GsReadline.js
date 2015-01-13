@@ -1,3 +1,4 @@
+'use strict';
 /***
  * @class GsReadline
  *
@@ -36,7 +37,7 @@ function GsReadline( stream ) {
     events.EventEmitter.call(this);
     var me = this;
     this.data = '';
-    stream.on('data', function(data){
+    stream.on('data', function(){
         me.handleData.apply(me, arguments);
     });
 

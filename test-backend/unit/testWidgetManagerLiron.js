@@ -5,8 +5,8 @@
 
 
 var logger = require('log4js').getLogger('LocalWorkFlowWidgetManager');
-var fs = require('fs-extra');
-var util = require('util');
+//var fs = require('fs-extra');
+//var util = require('util');
 var DbManager = require('../../backend/managers/DbManager');
 
 var executionDetails;
