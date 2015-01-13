@@ -95,9 +95,11 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
                 controller: 'AdminUsersIndexCtrl'
 //                controller: 'AdminPoolCrudCtrl'
             })
-            .when('/admin/myUser', {
-                templateUrl: 'views/admin/myUser.html',
-                controller: 'AdminMyUserCtrl'
+            .when('/userSettings', {
+                templateUrl: 'views/userSettings.html',
+                controller: 'UserSettingsCtrl',
+                section: 'settings'
+
             })
             .when('/admin/system', {
                 templateUrl: 'views/admin/system.html',
@@ -212,7 +214,16 @@ angular.module('cloudifyWidgetUiApp', ['ngCookies', 'ngRoute', 'ngStorage', 'ngR
 
         $httpProvider.interceptors.push('myHttpInterceptor');
 
-        $logProvider.debugEnabled(false);
+
+        try {
+            if (location.origin.indexOf('localhost') >= 0) {
+                $logProvider.debugEnabled(true);
+            } else {
+                $logProvider.debugEnabled(false);
+            }
+        }catch(e){
+
+        }
     })
     .run(function(I18next, $rootScope) {
         $rootScope.$watch('currentLanguage', function(newVal/*, oldVal*/) {

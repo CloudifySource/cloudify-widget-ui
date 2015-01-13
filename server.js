@@ -89,9 +89,7 @@ domain.run(function () {
         res.send(managers.users.getPublicUserDetails(req.user));
     });
 
-    app.get('/backend/admin/myUser', function (req, res) {
-        res.send(req.user);
-    });
+
     app.get('/backend/admin/threadpools', controllers.pool.readThreadPools);
     app.get('/backend/admin/datasources', controllers.pool.readDataSourcesStatus);
     app.post('/backend/admin/myUser/setPoolKey', controllers.adminUsers.setAdminPoolKey);
@@ -141,9 +139,32 @@ domain.run(function () {
     app.get('/backend/user/account/pools/:poolId/status', controllers.pool.accountReadPoolStatus);
     app.get('/backend/user/account/pools/status', controllers.pool.accountReadPoolsStatus);
 
+    // jsonp like response for public configuration.
+    app.get('/backend/conf', function(req, res){
+        var confName = req.param.name || 'conf';
+        res.send('var ' + confName + ' = ' + JSON.stringify(conf.public) );
+    });
+
+    //// user management
+    app.post('/backend/userSettings/changePassword',
+        middleware.session.loggedUser,
+        middleware.users.userOnRequestDefaultToMe,
+        middleware.users.userCanManageUser,
+        controllers.userSettings.changePassword );
+
+    app.get('/backend/userSettings/read',
+        middleware.session.loggedUser,
+        middleware.users.userOnRequestDefaultToMe,
+        middleware.users.userCanManageUser,
+        controllers.userSettings.read
+    );
+
+    //// widgets
+
     app.get('/backend/widgets/:widgetId', controllers.widgets.getPublicInfo);
     app.get('/backend/widgets/login/types', controllers.widgetLogin.getTypes);
     app.get('/backend/widgets/:widgetId/login/:loginType', controllers.widgetLogin.widgetLogin);
+
     app.post('/backend/widgets/:widgetId/login/custom',
         function (req, res, next) {
             req.params.loginType = 'custom';
@@ -154,7 +175,7 @@ domain.run(function () {
             res.send(200);
         }
     );
-    app.get('/backend/widgets/:widgetId/login/:loginType/callback', controllers.widgetLogin.widgetLoginCallback);
+    app.all('/backend/widgets/:widgetId/login/:loginType/callback', controllers.widgetLogin.widgetLoginCallback);
 
 
     var widgetPort = process.argv[2] || 9001;

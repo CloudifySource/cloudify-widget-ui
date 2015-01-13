@@ -23,7 +23,7 @@ describe('ec2.securityGroup', function () {
         };
     };
 
-    var SecurityGroup = require('../../backend/services/clouds/ec2/SecurityGroup');
+    var SecurityGroup = require('../../../backend/services/clouds/ec2/SecurityGroup');
 
     describe('get', function () {
 
@@ -170,7 +170,7 @@ describe('ec2.securityGroup', function () {
         });
 
         it('should handle exceptions', function () {
-            var CidrUtils = require('../../backend/services/CidrUtils');
+            var CidrUtils = require('../../../backend/services/CidrUtils');
             spyOn(CidrUtils, 'parse').andCallFake(function () {
                 throw new Error('this is an error');
             });

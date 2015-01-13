@@ -10,6 +10,7 @@ var LinkedInStrategy = require('passport-linkedin').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 var GitHubStrategy = require('passport-github').Strategy;
 var CustomStrategy = require('../services/WidgetCustomLoginStrategy').Strategy;
+var GooglePlusStrategy = require('passport-google-plus');
 //var _ = require('lodash');
 
 //var https = require('https');
@@ -28,38 +29,49 @@ passport.deserializeUser(function (user, done) {
     done(null, user);
 });
 
+passport.use(new GooglePlusStrategy({
+        clientId: conf.googleplus.clientId,
+        clientSecret: conf.googleplus.clientSecret//,
+    },
+    function(tokens, profile, done) {
+        // Create or update user, call done() when complete...
+        done(null, profile, tokens);
+    }
+));
 /***
- *
- *
- * This controller allows login with social network.
- *
- * The expected profile construct is:
- *
- *    {
- *          displayName: 'Guy Mograbi',
+*
+*
+* This controller allows login with social network.
+*
+* The expected profile construct is:
+*
+*    {
+*          displayName: 'Guy Mograbi',
             emails: [ { value: 'guym.at.gigaspaces@gmail.com' } ],
- name: { familyName: 'Mograbi', givenName: 'Guy' }
- }
- *
- *
- * However, it seems not all social networks supply enough info for passport to construct this.
- *
- * For example - github MAY or MAY NOT supply the info. It depends on user's profile.
- *
- * So not all logins can integrate with mailchimp.
- *
- ***/
+name: { familyName: 'Mograbi', givenName: 'Guy' }
+}
+*
+*
+* However, it seems not all social networks supply enough info for passport to construct this.
+*
+* For example - github MAY or MAY NOT supply the info. It depends on user's profile.
+*
+* So not all logins can integrate with mailchimp.
+*
+***/
 
 /**
- *
- * @param req
- * @returns {*}
- * @private
- */
+*
+* @param req
+* @returns {*}
+* @private
+*/
 
 function _returnURL(req) {
     return req.absoluteUrl('/backend/widgets/' + req.params.widgetId + '/login/' + req.params.loginType + '/callback');
 }
+
+
 
 
 var strategies = {
@@ -72,6 +84,24 @@ var strategies = {
             done(null, profile);
         });
     },
+
+    'googleplus': function (/*req*/) { //https://www.npmjs.com/package/passport-google-plus
+        logger.info(conf.googleplus.clientId, conf.googleplus.clientSecret);
+        var result =  new GooglePlusStrategy({
+            clientId: conf.googleplus.clientId,
+
+            clientSecret: conf.googleplus.clientSecret//,
+
+
+        }, function (token, profile, done) {
+            logger.info('google plus login', token, profile);
+            done(null, profile);
+        });
+
+        result.skipAuthenticate = true;
+        return result;
+    },
+
     'linkedin': function (req) {
         return new LinkedInStrategy({
                 consumerKey: conf.linkedIn.apiKey,
@@ -202,6 +232,15 @@ var authenticateParams = {
     }
 };
 
+function createStrategy( loginType, req  ){
+    if (!strategies.hasOwnProperty(loginType)) {
+        throw new Error('strategy :: ' + loginType + ' is not defined');
+    }
+
+
+    return strategies[loginType](req);
+}
+
 // Redirect the user to Google for authentication.  When complete, Google
 // will redirect the user back to the application at
 //     /auth/google/return
@@ -209,12 +248,9 @@ exports.widgetLogin = function (req, res, next) {
     var widgetId = req.params.widgetId;
     var loginType = req.params.loginType;
 
-    if (!strategies.hasOwnProperty(loginType)) {
-        throw new Error('strategy :: ' + loginType + ' is not defined');
-    }
-
+    var strategy = createStrategy( loginType, req  );
     logger.info('defining', 'widget-' + widgetId + '-' + loginType);
-    passport.use('widget-' + widgetId + '-' + loginType, strategies[loginType](req));
+    passport.use('widget-' + widgetId + '-' + loginType,strategy);
 
     if (authenticateParams.hasOwnProperty(loginType)) {
         var scopeParams = authenticateParams[loginType];
@@ -254,20 +290,33 @@ function _loginCallback(req, res) {
 // the process by verifying the assertion.  If valid, the user will be
 // logged in.  Otherwise, authentication has failed.
 exports.widgetLoginCallback = function (req, res, next) {
+
     var loginType = req.params.loginType;
-    logger.info('authorizing', 'widget-' + req.params.widgetId + '-' + loginType);
-    passport.authorize('widget-' + req.params.widgetId + '-' + loginType)(req, res, function () {
-        logger.info('this is account', req.account);
+    var widgetId = req.params.widgetId;
+    logger.trace('authorizing', 'widget-' + widgetId + '-' + loginType);
+
+    logger.trace('checking if authenticate was used');
+    var strategy = createStrategy( loginType, req  );
+    if ( !!strategy.skipAuthenticate ){ // for backward compatibility, we cannot use !useAuthenticate.
+        logger.trace('defining', 'widget-' + widgetId + '-' + loginType);
+        passport.use('widget-' + widgetId + '-' + loginType,strategy);
+    }else{
+        logger.trace('seems like authenticate was used. skipping');
+    }
+
+    passport.authorize('widget-' + widgetId + '-' + loginType)(req, res, function () {
+        logger.trace('this is account', req.account);
 
         try {
             var loginDetails = { 'name': req.account.name.givenName, 'lastName': req.account.name.familyName, 'email': req.account.emails[0].value};
 
-            managers.widgetLogins.handleWidgetLogin(loginType, req.params.widgetId, loginDetails, _loginCallback(req, res));
+            managers.widgetLogins.handleWidgetLogin(loginType, widgetId, loginDetails, _loginCallback(req, res));
         } catch (e) {
             next(e);
         }
     });
 };
+
 
 //
 //exports.twitterLogin = function ( req, res, next ){
@@ -291,7 +340,6 @@ exports.widgetLoginCallback = function (req, res, next) {
 //exports.twitterLoginCallback = function( req, res ){
 //    res.send(req.query);
 //};
-
 
 exports.getAllLogins = function (req, res) {
     managers.widgetLogins.getWidgetLogins(req.user._id, function (err, result) {

@@ -1,5 +1,6 @@
 'use strict';
 exports.conf = require('../Conf');
+exports.db= require('./DbService');
 exports.cloudifyCli = require('./CloudifyCliService');
 exports.dl = require('./DownloadService');
 exports.files = require('./FilesService');
@@ -8,3 +9,4 @@ exports.widgetLoginsTypes = require('./WidgetLoginTypes');
 exports.mandrill = require('./MandrillService');
 exports.crypto = require('./CryptoService');
 exports.ec2Api = require('./clouds/ec2');
+exports.errorResponse = require('./ErrorResponseService');
