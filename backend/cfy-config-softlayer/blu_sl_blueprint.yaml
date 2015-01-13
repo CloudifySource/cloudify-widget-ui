@@ -19,64 +19,83 @@ inputs:
   endpoint_url:
     default: ''
   location:
-    default: '352494'
+    default: '168642'
     # 352494 - hong kong 2
     # 168642 - san jose
   domain:
-    default: 'blu-solo.org'
+    default: 'blu.cfy.org'
   ram:
-    default: 864
-  cpu:
-    default: 859
-  disk:
-    default: 1178
+    default: 1155
   os:
-    default: 4174
+    default: ''
+    # When you use a FLEX image , leave the os empty ('').
+    # 3908 - CentOS 6 OS image ID.
     # 4248 - OS_WINDOWS_2008_FULL_STD_64_BIT_R2_SP1
     # 4174 - Ubuntu Linux 12.04 LTS Precise Pangolin - Minimal Install (64 bit)
   image_template_id:
     default: ''
-  private_network_only:
-    type: boolean
-    default: false
+    # '320838'
+  image_template_global_id:
+    default: 'b700cf71-3aee-4c67-9040-cfa140ae40cd'
+  cpu:
+    default: 860
+  disk:
+    default: 3876
   port_speed:
-    type: integer
-    default: 187
-  private_vlan:
-    type: integer
-    default: ''
-  public_vlan:
-    type: integer
-    default: ''
+    default: 188
+    # 188 - 1 Gbps Public & Private Network Uplinks
+    # 497 - 100 Mbps Private Network Uplink
+    # 187 - 100 Mbps Public & Private Network Uplinks
+  private_network_only:
+    default: false
   provision_scripts:
-    default: []
+    default:  ['']
+  private_vlan:
+    default: ''
+    # 486330 # Private VLAN 964 on bcr01a.hkg02
+  public_vlan:
+    default: ''
+    # 486454 # Public VLAN 862 on fcr01a.hkg02
   additional_ids:
-    default: []
+    default: [
+    # 397
+    # McAfee VirusScan Anti-Virus - Windows
+    ]
   ssh_keys:
-    default: [121388]
+    default: [REPLACE_THIS_WITH_YOUR_SL_KEY_ITEM_ID]
+  ssh_key_filename:
+    default: '~/.ssh/id_rsa'
 
 node_templates:
   # defining a single node template that will serve as our test node
-  dev-node:
-#    type: cloudify.softlayer.nodes.WindowsVirtualServer
+  blu_node:
     type: cloudify.softlayer.nodes.VirtualServer
     properties:
       api_config: { get_property: [softlayer_configuration, api_config] }
       location: { get_input: location }
       domain: { get_input: domain }
       ram: { get_input: ram }
-      cpu: { get_input: cpu }
-      disk: { get_input: disk }
       os: { get_input: os }
       image_template_id: { get_input: image_template_id }
-      private_network_only: { get_input: private_network_only }
+      image_template_global_id: { get_input: image_template_global_id }
+      cpu: { get_input: cpu }
+      disk: { get_input: disk }
+#      agents_user: { get_input: agents_user }
+      ssh_keys: { get_input: ssh_keys }
       port_speed: { get_input: port_speed }
+      private_network_only: { get_input: private_network_only }
       private_vlan: { get_input: private_vlan }
       public_vlan: { get_input: public_vlan }
       provision_scripts: { get_input: provision_scripts }
       additional_ids: { get_input: additional_ids }
-      ssh_keys: { get_input: ssh_keys }
       install_agent: false
+
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          implementation: softlayer.softlayer_plugin.server.start
+          inputs:
+            transactions_ended_timeout_secs: 10800
 
   softlayer_configuration:
     type: softlayer_configuration
@@ -85,3 +104,11 @@ node_templates:
         username: { get_input: username }
         api_key: { get_input: api_key }
         endpoint_url: { get_input: endpoint_url }
+
+outputs:
+  blu_ip:
+    value: { get_attribute: [blu_node, public_ip] }
+  blu_username:
+    value: { get_attribute: [blu_node, username] }
+  blue_password:
+    value: { get_attribute: [blu_node, password] }

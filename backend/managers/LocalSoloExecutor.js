@@ -177,7 +177,7 @@ module.exports = function LocalSoloExecutor(){
                     logger.info('got the keyId: ' + keyId );
                     var idAsNumber = Number(keyId);
                     logger.info('got the idAsNumber: ' + idAsNumber );
-                    callback(idAsNumber);
+                    callback(null, idAsNumber);
 
 
 
@@ -188,12 +188,12 @@ module.exports = function LocalSoloExecutor(){
 
     };
 
-    this.editInputsFile = function(callback){
+    this.editInputsFile = function(keyId, callback){
         logger.debug('editing blu_sljson .. ');
 
         var inputsFile= path.join(conf.tmpDir, 'blu_sl.json' );
-
-        logger.debug('inputsFile: ' , inputsFile);
+        //var inputsFile =  path.resolve(__dirname, '..', 'cp_65c7cff0-9a37-11e4-bd6c-dbf4669c6109/blu_sl.json' );
+        logger.debug('inputsFile path is : ' , inputsFile);
         var softlayerInputs = require( inputsFile );
 
         logger.debug('softlayerInputs: ' , softlayerInputs);
@@ -201,9 +201,9 @@ module.exports = function LocalSoloExecutor(){
         softlayerInputs.api_key = conf.softlayerDetails.apiKey;
 
         //todo:
-        softlayerInputs.ssh_keys = callback;
-        logger.debug('ssh_keys ' , callback);
-        softlayerInputs.ssh_key_filename =
+        softlayerInputs.ssh_keys = keyId;//136986;
+        logger.debug('ssh_keys ' , keyId);
+        softlayerInputs.ssh_key_filename = process.cwd() + '/' + '671e1120-9a37-11e4-bd6c-dbf4669c6109';
 
         logger.debug('softlayerInputs after setting inputs: ' , softlayerInputs);
 
@@ -214,14 +214,24 @@ module.exports = function LocalSoloExecutor(){
 
 
     this.init = function (callback) {
-        logger.debug('initializing.. ');
+        logger.debug('initializing..  ' + conf.initCommand);
         this.listenOutput(exec(conf.initCommand, noOutputCallback(callback)));
     };
 
     this.installWorkflow = function( callback ){
-        logger.debug('installing workflow');
-        logger.info(arguments);
-        this.listenOutput(exec(conf.installWfCommand, noOutputCallback(callback) ));
+        logger.debug('installing workflow: ' + conf.installWfCommand);
+
+       // this.listenOutput(exec(conf.installWfCommand, noOutputCallback(callback) ));
+        exec(conf.installWfCommand, function(err, output){
+
+            logger.trace('cfy install ef command output: ' + output);
+            if(!!err){
+                logger.error('failed running install workflow command');
+                callback(new Error('failed running install workflow command'));
+                return;
+            }
+            callback();
+        })
     };
 
     this.clean = function( callback ){
@@ -231,9 +241,9 @@ module.exports = function LocalSoloExecutor(){
     };
 
 
-
+//widgetExecutions
     this.listenOutput = function( childProcess ){
-        dbManager.connect('widgetExecutions', function (db, collection) {
+        dbManager.connect('example', function (db, collection) {
             function handleLines( type ){
                 return function( lines ) {
                     lines = _.map(lines, function(line){

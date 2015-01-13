@@ -1,0 +1,22 @@
+{
+    "username": "REPLACE_THIS_WITH_YOUR_SL_USERNAME",
+    "api_key":  "REPLACE_THIS_WITH_YOUR_SL_APIKEY",
+    "endpoint_url": "",
+    "location": "168642",
+    "domain": "blu.cfy.org",
+    "ram": 1155,
+    "cpu": 860,
+    "disk": 3876,
+    "os": "",
+
+    "image_template_global_id": "ef15c58f-ca88-45b4-9cab-966c0f7f9350",
+    "image_template_id": "",
+    "private_network_only": false,
+    "port_speed": 188,
+    "private_vlan": "",
+    "public_vlan": "",
+    "provision_scripts": [],
+    "ssh_keys": "REPLACE_THIS_WITH_YOUR_SL_KEY_ITEM_ID",
+    "ssh_key_filename": "~/.ssh/id_rsa"
+}
+

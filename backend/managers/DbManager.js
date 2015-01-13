@@ -55,8 +55,9 @@ function getConnection(callback) {
 exports.connect = function (collectionName, callback) {
     logger.trace('connecting to ',  collectionName);
     getConnection(function (err, db) {
-        logger.trace('got connection', err );
+        logger.trace('got connection');
         if (err) {
+            logger.trace('got error:', err );
             throw err;
         }
 
