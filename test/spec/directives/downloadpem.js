@@ -49,7 +49,7 @@ describe('Directive: downloadPem', function () {
     it('should create an anchor tag and download file', inject(function( ){
         setup();
         isolateScope.sshDetails = { 'privateKey' : 'this is private key' };
-        spyOn(document, 'createElement').andCallThrough();
+        spyOn(document, 'createElement').and.callThrough();
         $('body').append(element);
         isolateScope.downloadPem();
         expect(document.createElement).toHaveBeenCalledWith('a');

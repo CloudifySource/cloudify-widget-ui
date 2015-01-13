@@ -1,26 +1,9 @@
-
 'use strict';
-
-/***
- *
- *
- *
- *
- *
- *
- *
- *
- *                              DEPRECATED DO NOT DEVELOP FURTHER!!!!!!
- *
- *                              replaced by services/DbService
- *
- *
- * @type {exports}
- */
 //var logger = require('log4js').getLogger('DbManager');
 var conf = require('../Conf');
 var ObjectID = require('mongodb').ObjectID;
 var MongoClient = require('mongodb').MongoClient;
+var logger = require('log4js').getLogger('DbService');
 //var format = require('util').format;
 
 
@@ -43,7 +26,7 @@ function getConnection(callback) {
 
 
 exports.connect = function (collectionName, callback) {
-
+    logger.trace('connecting', collectionName);
     getConnection(function (err, db) {
         if (err) {
             throw err;
@@ -51,14 +34,7 @@ exports.connect = function (collectionName, callback) {
 
         var collection = db.collection(collectionName);
         callback(db, collection, function () {
-//            db.close();
-//            closed = true;
         });
-//        if (!closed) {
-//            logger.warn('connection was not closed by callback');
-//            we just want to warn at the moment, not actually close it.
-//            for some reason, closing the connection here will break functionality
-//        }
     });
 };
 

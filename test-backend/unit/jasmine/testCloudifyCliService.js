@@ -6,7 +6,7 @@ process.env.WIDGET_UI_ME_CONF_JSON = require('path').resolve(__dirname, '../conf
 var logger = require('log4js').getLogger('CloudifyCliService.spec');
 var fs = require('fs');
 describe('Backend: CloudifyCliService Tests', function () {
-    var cloudifyCliService = require('../../backend/services/CloudifyCliService');
+    var cloudifyCliService = require('../../../backend/services/CloudifyCliService');
     it('test executeCommand', function () {
         var testOptions = [
             'pwd',

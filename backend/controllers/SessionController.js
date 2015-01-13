@@ -10,7 +10,7 @@ exports.login = function (req, res) {
     managers.db.connect('users', function (db, collection, done) {
         collection.findOne({email: credentials.email, password: sha1(credentials.password)}, function (err, obj) {
             if (!!err) {
-                res.send(500, {'message': 'unable to login ' + err.message});
+                res.status(500).send({'message': 'unable to login ' + err.message});
                 done();
                 return;
             }
@@ -22,7 +22,7 @@ exports.login = function (req, res) {
                 return;
             } else {
                 logger.info('could not find user with these credentials : ' + credentials.email);
-                res.send(500, {'message': 'wrong username/password'});
+                res.status(500).send({'message': 'wrong username/password'});
                 done();
                 return;
             }
