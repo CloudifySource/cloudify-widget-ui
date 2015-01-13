@@ -29,30 +29,7 @@
       <script src="bower_components/json3/lib/json3.min.js"></script>
     <![endif]-->
 
-   <!-- <script>
-        function signInCallback(authResult) {
-            console.log('authResult is', authResult);
-            if (authResult.code) {
-                $.post('/backend/widgets/1/login/googleplus/callback', { code: authResult.code})
-                    .done(function(data) {
 
-                        $('#signinButton').hide();
-                    });
-            } else if (authResult.error) {
-                console.log('There was an error: ' + authResult.error);
-            }
-        };
-    </script>
-
-    <div id="signinButton">
-  <span class="g-signin"
-        data-scope="https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/plus.login"
-        data-clientid="261414243191-a8clsk3vtt28t8ggjl86vqqb9ssglohp.apps.googleusercontent.com"
-        data-cookiepolicy="single_host_origin"
-        data-callback="signInCallback">
-  </span>
-    </div>
-    <div id="result"></div>-->
     <!-- Add your site or application content here -->
     <div ng-view></div>
 
