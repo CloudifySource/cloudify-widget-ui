@@ -27,10 +27,10 @@ angular.module('cloudifyWidgetUiApp')
         // it will also hold the state for the view (which is now coupled inside Widget.js controller, and should be extracted from there)
 
 
-        $scope.getGoogle = function () {
-
-            return '/#/widgets/' + $routeParams.widgetId + '/blank?timestamp=' + new Date().getTime();
-        };
+        //$scope.getGoogle = function () {
+        //
+        //    return '/#/widgets/' + $routeParams.widgetId + '/blank?timestamp=' + new Date().getTime();
+        //};
 
         // todo : move to "blank"
 //        $window.$windowScope = $scope;   // used to close the login dialog
@@ -181,8 +181,7 @@ angular.module('cloudifyWidgetUiApp')
         function _postMessage(data) {
             $log.info('posting message to widget api frame, message data: ', data);
             // TODO frame ref should not be hard-coded
-            var widgetFrameWindow = $window.frames[0];
-
+            var widgetFrameWindow = $('[post-message-enabled]')[0].contentWindow;
             widgetFrameWindow.postMessage(data, /*$window.location.origin*/ '*');
         }
 

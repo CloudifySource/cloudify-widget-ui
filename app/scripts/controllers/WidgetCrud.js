@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetCrudCtrl', function ($scope, $routeParams, $log, LoginTypesService, WidgetsService, $location, WidgetThemesService, LoginService/*,$timeout*/) {
+    .controller('WidgetCrudCtrl', function ($scope, $routeParams, $log, $timeout, LoginTypesService, GoogleplusLoginService, WidgetsService, $location, WidgetThemesService, LoginService/*,$timeout*/) {
 
         $scope.availableLoginTypes = function () {
             return LoginTypesService.getAll();
@@ -38,7 +38,9 @@ angular.module('cloudifyWidgetUiApp')
         var popupWindow = null;
 
         $scope.trySocialLoginNow = function (socialLogin, widget) {
-            popupWindow = LoginService.performSocialLogin(socialLogin, widget, $scope);
+            if ( !socialLogin || socialLogin.id !== 'googleplus') {
+                popupWindow = LoginService.performSocialLogin(socialLogin, widget, $scope);
+            }
         };
 
         $scope.tryPrivateImagesNow = function (isAdd) {
@@ -77,6 +79,14 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.addLoginType = function (loginType) {
 
+
+            $log.info('adding ', loginType );
+            if ( loginType.id === 'googleplus'){
+                $log.info('will render googleplus');
+                $timeout(function(){
+                    GoogleplusLoginService.render(function(){});
+                });
+            }
             if (_getSocialLoginById(loginType.id)) {
                 $log.info('social login %s already exists', loginType.id);
                 return;
@@ -228,4 +238,8 @@ angular.module('cloudifyWidgetUiApp')
         $scope.navigateTo = function (section) {
             $location.search('section', section);
         };
+
+        $timeout(function(){
+            GoogleplusLoginService.render(function(){});
+        },1000);
     });

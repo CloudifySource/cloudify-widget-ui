@@ -173,7 +173,9 @@ module.exports = function (grunt) {
             instrumentBackend: ['backend-instrument']
         },
         jshint: {
-
+            options: {
+                reporter: require('jshint-stylish')
+            },
             frontend: {
                 options: {
                     jshintrc: '.jshintrc'
@@ -458,6 +460,11 @@ module.exports = function (grunt) {
             unit: {
                 configFile: 'karma.conf.js',
                 singleRun: true
+            },
+            develop: {
+                configFile: 'karma.conf.js',
+                singleRun: true,
+                reporters: ['spec']
             },
             debug:{
                 configFile: 'karma.conf.js',

@@ -15,7 +15,9 @@
       <link href="bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet"/>
         <!-- build:css({.tmp,app}) styles/main.css -->
         <link rel="stylesheet" href="styles/main.css">
+
         <!-- endbuild -->
+      <script src="/backend/conf"></script>
 </head>
   <body ng-app="cloudifyWidgetUiApp">
     <!--[if lt IE 7]>
@@ -27,8 +29,10 @@
       <script src="bower_components/json3/lib/json3.min.js"></script>
     <![endif]-->
 
+
     <!-- Add your site or application content here -->
     <div ng-view></div>
+
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
     <script>
@@ -39,6 +43,8 @@
     </script>
 
     <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer>
+    </script>
     <script src="bower_components/angular/angular.js"></script>
     <!--<script src="scripts/templates.js"></script>-->
 
@@ -119,6 +125,7 @@
 
 
       <script src="scripts/services/UserSettingsService.js"></script>
+      <script src="scripts/services/GoogleplusLoginService.js"></script>
       <!-- endbuild -->
 
     <!-- on purpose, taking this file out, making it debuggable on environments -->

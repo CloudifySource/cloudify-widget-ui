@@ -1,7 +1,6 @@
 <div id="widgetForm" class="col-md-6">
 
     <div class="jumbotron">
-
         <tabset>
             <tab heading="General" select="navigateTo('general')">
                 <div class="row">
@@ -200,7 +199,7 @@
                     </div>
                     <button ng-click="removeSocialLogin(socialLogin)">Remove Social Login</button>
                     <br/>
-                    <button ng-click="trySocialLoginNow(socialLogin, widget)">Try {{getSocialLoginLabel(socialLogin)}} Login Now!
+                    <button id="{{socialLogin.id}}" ng-click="trySocialLoginNow(socialLogin, widget)">Try {{getSocialLoginLabel(socialLogin)}} Login Now!
                     </button>
                 </div>
                 </p>
