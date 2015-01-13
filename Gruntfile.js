@@ -89,7 +89,7 @@ module.exports = function (grunt) {
                 {
                     context: '/backend',
                     host: '127.0.0.1',
-                    port: 9003,
+                    port: 9001,
                     https: false,
                     changeOrigin: false,
                     xforward: false
