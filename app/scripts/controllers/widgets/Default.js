@@ -181,8 +181,7 @@ angular.module('cloudifyWidgetUiApp')
         function _postMessage(data) {
             $log.info('posting message to widget api frame, message data: ', data);
             // TODO frame ref should not be hard-coded
-            var widgetFrameWindow = $window.frames[0];
-
+            var widgetFrameWindow = $('[post-message-enabled]')[0].contentWindow;
             widgetFrameWindow.postMessage(data, /*$window.location.origin*/ '*');
         }
 
