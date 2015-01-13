@@ -7,7 +7,7 @@
  *
  */
 //var dbManager = require('../managers').db;
-var usersManager = require('../managers').users;
+var usersManager = require('../managers').users; // todo: use User model instead
 var logger = require('log4js').getLogger('widgetMiddleware');
 
 

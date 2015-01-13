@@ -27,13 +27,14 @@ angular.module('cloudifyWidgetUiApp')
         // this is to first init the widget on the scope with the bare minimum - the id.
         // then, async, go fetch the entire thing and override.
         $scope.widget = {  '_id': $routeParams.widgetId };
-        WidgetsService.getPublicWidget($routeParams.widgetId).then(function (result) {
-            $scope.widget = result.data;
-            parentLoaded(null, $scope.widget);
-        }, function( result ){
-            $log.info('error loading widget');
-            parentLoaded( result.data , null );
-        });
+        WidgetsService.getPublicWidget($routeParams.widgetId)
+            .then(function success(result) {
+                $scope.widget = result.data;
+                parentLoaded(null, $scope.widget);
+            }, function error(errorResult) {
+                $log.info('error loading widget');
+                parentLoaded(errorResult.data, null);
+            });
 
         $scope.executionId = null;
 
