@@ -177,37 +177,6 @@ domain.run(function () {
     );
     app.all('/backend/widgets/:widgetId/login/:loginType/callback', controllers.widgetLogin.widgetLoginCallback);
 
-    //console.log('passport is defined');
-    //var passport = require('passport');
-
-
-    //var GooglePlusStrategy = require('passport-google-plus');
-
-    //passport.use(new GooglePlusStrategy({
-    //        clientId: conf.googleplus.clientId,
-    //        clientSecret: conf.googleplus.clientSecret//,
-    //    },
-    //    function(tokens, profile, done) {
-    //        logger.info('here',  tokens, profile);
-    //        // Create or update user, call done() when complete...
-    //        done(null, profile, tokens);
-    //    }
-    //));
-
-
-    //app.post('/backend/widgets/login/googleplus/callback',   controllers.widgetLogin.widgetGoogleplusCallback);
-    //function(req, res) {
-    //    logger.info('i am in googleplus callback', req.body);
-    //    passport.authorize('google')(req, res, function(){
-    //        logger.info('after authenticate', req);
-    //        res.send(req.user);
-    //    });
-    //    // Return user back to client
-    //
-    //});
-
-
-
 
     var widgetPort = process.argv[2] || 9001;
     var server = app.listen(widgetPort, function () {
