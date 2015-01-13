@@ -45,10 +45,15 @@ describe('Controller: WidgetsDefault', function () {
     });
 
     describe('show play', function(){
-        it('should change widgetState on scope', function(){
+        it('should indicate showStop/showPlay when state changes', function(){
+            expect(scope.showPlay()).toBe(true); // default is true
+            scope.widgetState = RUNNING;
             expect(scope.showPlay()).toBe(false);
-            scope.widgetStatcee
-            expect(scope.widgateState).toBe('guy');
+            expect(scope.showStop()).toBe(true);
+
+            scope.widgetState = STOPPED;
+            expect(scope.showPlay()).toBe(true);
+            expect(scope.showStop()).toBe(false);
         });
     });
 
