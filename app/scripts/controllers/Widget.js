@@ -29,7 +29,7 @@ angular.module('cloudifyWidgetUiApp')
         $scope.widget = {  '_id': $routeParams.widgetId };
         WidgetsService.getPublicWidget($routeParams.widgetId).then(function (result) {
             $scope.widget = result.data;
-            parentLoaded(null, $scope.widget)
+            parentLoaded(null, $scope.widget);
         }, function( result ){
             $log.info('error loading widget');
             parentLoaded( result.data , null );
