@@ -1,7 +1,6 @@
 <div id="widgetForm" class="col-md-6">
 
     <div class="jumbotron">
-
         <tabset>
             <tab heading="General" select="navigateTo('general')">
                 <div class="row">
@@ -184,7 +183,7 @@
                         Add {{loginType.label}} Support For Widget
                     </button>
                 </div>
-                <button ng-click="tryItNow(null, widget)">Try Login Now!</button>
+                <button ng-click="trySocialLoginNow(null, widget)">Try Login Now!</button>
                 <i>Please note you should save changes before clicking 'Try Login now'.</i>
                 </p>
 
@@ -200,7 +199,7 @@
                     </div>
                     <button ng-click="removeSocialLogin(socialLogin)">Remove Social Login</button>
                     <br/>
-                    <button ng-click="tryItNow(socialLogin, widget)">Try {{getSocialLoginLabel(socialLogin)}} Login Now!
+                    <button id="{{socialLogin.id}}" ng-click="trySocialLoginNow(socialLogin, widget)">Try {{getSocialLoginLabel(socialLogin)}} Login Now!
                     </button>
                 </div>
                 </p>

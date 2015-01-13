@@ -1,13 +1,27 @@
 'use strict';
+
+/**
+ * @module SessionMiddleware
+ * @description
+ * middlewares that operate on the session.
+ *
+ */
 //var dbManager = require('../managers').db;
-var usersManager = require('../managers').users;
+var usersManager = require('../managers').users; // todo: use User model instead
 var logger = require('log4js').getLogger('widgetMiddleware');
 
 
 /**
- * relies on 'loggedUser' middleware.
- * verifies the user on session is admin
- */
+ *
+ * @description
+ * relies on 'loggedUser' middleware.<br/>
+ * verifies the user on session is admin<br/>
+ * return 401 if not<br/>
+ *
+ * @param req the request
+ * @param res the response
+ * @param next next middleware
+ **/
 exports.adminUser = function( req, res, next){
     if ( !req.user.isAdmin ){
         res.send(401, {'message' : 'need to be admin'});
@@ -17,8 +31,17 @@ exports.adminUser = function( req, res, next){
     next();
 };
 
+/**
+ * @description
+ * checks if there is a userId on session cookie. <br/>
+ * find and puts <code>user</code> on <code>req</code> if exists<br/>
+ * otherwise returns code 401.<br/>
+ *
+ * @param req the request
+ * @param res the response
+ * @param next next middleware
+ **/
 exports.loggedUser = function ( req, res, next ){
-
     if ( !req.session ){
         res.send(401, {'message': 'need to login. no session'});
         return;

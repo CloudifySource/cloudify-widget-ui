@@ -2,20 +2,20 @@
     <div class="error">
         {{pageError}}
     </div>
-    <div class="center-block container col-md-12">
+    <div class="center-block col-md-12">
         <form ng-submit="login()" class=" col-md-12">
             <div class="row">
-                <span class="col-md-5">{{ 'login.username' | i18n }}</span>
-                <input class="col-md-7" ng-model="page.email"/>
+                <span class="login-label">{{ 'login.username' | i18n }}</span>
+                <input  ng-model="page.email" type="text"/>
             </div>
             <div class="row">
-                <span class="col-md-5">{{ 'login.password' | i18n }}</span>
-                <input class="col-md-7" ng-model="page.password" type="password"/>
+                <span class="login-label">{{ 'login.password' | i18n }}</span>
+                <input  ng-model="page.password" type="password"/>
             </div>
-            <div class="row pull-right">
+            <div class="row">
                 <input type="submit" value="{{ 'global.buttons.submit' | i18n }}"/>
             </div>
-            <div class="row pull-left" style="margin-left: 30px">
+            <div class="row no-account">
                 <span>{{ 'login.noAccount' | i18n}}</span>
                 <a ng-href="#/signup">{{ 'login.signup' | i18n }}</a>
             </div>

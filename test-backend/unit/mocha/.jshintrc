@@ -3,7 +3,7 @@
     "browser": true,
     "esnext": true,
     "bitwise": true,
-    "camelcase": false,
+    "camelcase": true,
     "curly": true,
     "eqeqeq": true,
     "immed": true,
@@ -20,14 +20,9 @@
     "smarttabs": true,
     "expr": true,
     "globals": {
-        "expect":false,
-        "toastr": false,
         "it":false,
-        "inject":false,
         "beforeEach":false,
         "describe":false,
-        "angular":false,
-        "spyOn" : false,
-        "$": false
+        "spyOn": false
     }
 }

@@ -7,8 +7,20 @@
     border-radius: 20px;
     padding: 15px;
 
+
+
     .row {
       padding: 4px;
+      span{
+        display:inline-block;
+        width:100px;
+      }
+    }
+    .no-account{
+      span{
+        width:auto;
+      }
+      white-space: nowrap;
     }
   }
 }
