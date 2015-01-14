@@ -5,7 +5,6 @@
 'use strict';
 
 var _ = require('lodash');
-var uuid = require('node-uuid');
 var path = require('path');
 var fse = require('fs-extra');
 var util = require('util');
@@ -111,12 +110,12 @@ module.exports = function LocalSoloExecutor() {
 
         logger.debug('running setup for softlayer ssh');
 
-        var randomKey = uuid.v1();
+        var key = conf.executionDetails._id;
 
-        logger.debug('your random key: ' + randomKey);
+        logger.debug('your random key: ' + key);
 
         logger.debug('creating keypairs ...');
-        exec('ssh-keygen -t rsa -N "" -f ' + randomKey, function (err, output) {
+        exec('ssh-keygen -t rsa -N "" -f ' + key, function (err, output) {
             if (!!err) {
 
                 logger.error('failed creating ssh keys: ' + err);
@@ -127,7 +126,7 @@ module.exports = function LocalSoloExecutor() {
 
             logger.debug('success! ' + output);
 
-            exec('sl sshkey add -f ' + process.cwd() + '/' + randomKey + '.pub' + ' ' + randomKey, function (err, output) {
+            exec('sl sshkey add -f ' + process.cwd() + '/' + key + '.pub' + ' ' + key, function (err, output) {
 
                 if (!!err) {
                     logger.error('failed adding ssh key to softlayer: ' + err);
@@ -154,12 +153,12 @@ module.exports = function LocalSoloExecutor() {
                     logger.trace('got sshkey list output', output);
 
                     var line = _.find(output.split('\n'), function (line) {
-                        return line.indexOf(randomKey) >= 0;
+                        return line.indexOf(key) >= 0;
                     });
 
                     if (!line) {
-                        logger.error('expected to find a line with ', +randomKey + ' but could not find one. all I got was, ', output);
-                        callback(new Error('could not find line with id' + randomKey + '. unable to get key id'));
+                        logger.error('expected to find a line with ', +key + ' but could not find one. all I got was, ', output);
+                        callback(new Error('could not find line with id' + key + '. unable to get key id'));
                         return;
                     }
 
@@ -190,9 +189,9 @@ module.exports = function LocalSoloExecutor() {
 
     this.editInputsFile = function (keyId, callback) {
         logger.debug('editing blu_sljson .. ');
-
+        var key = conf.executionDetails._id;
         var inputsFile = path.join(conf.tmpDir, 'blu_sl.json');
-        //var inputsFile =  path.resolve(__dirname, '..', 'cp_65c7cff0-9a37-11e4-bd6c-dbf4669c6109/blu_sl.json' );
+
         logger.debug('inputsFile path is : ', inputsFile);
         var softlayerInputs = require(inputsFile);
 
@@ -201,9 +200,9 @@ module.exports = function LocalSoloExecutor() {
         softlayerInputs.api_key = conf.softlayerDetails.apiKey;
 
         //todo:
-        softlayerInputs.ssh_keys = keyId;//136986;
+        softlayerInputs.ssh_keys = keyId;
         logger.debug('ssh_keys ', keyId);
-        softlayerInputs.ssh_key_filename = process.cwd() + '/' + '671e1120-9a37-11e4-bd6c-dbf4669c6109';
+        softlayerInputs.ssh_key_filename = process.cwd() + '/' + key;
 
         logger.debug('softlayerInputs after setting inputs: ', softlayerInputs);
 

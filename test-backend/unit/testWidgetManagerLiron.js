@@ -41,7 +41,7 @@ function runTest(){
             apiKey: ''
         },
 
-        executionDetails: executionDetails
+        executionDetails: { _id:'myid123'}
 
     };
 
