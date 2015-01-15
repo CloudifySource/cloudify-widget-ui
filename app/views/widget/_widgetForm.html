@@ -2,7 +2,7 @@
 
     <div class="jumbotron">
         <tabset>
-            <tab heading="General" select="navigateTo('general')">
+            <tab heading="General" style="cursor:pointer" select="navigateTo('general')">
                 <div class="row">
                     <span class="col-md-4">Product Name(*) : </span>
                     <input class="col-md-8" type="text" ng-model="widget.productName"/>
@@ -56,7 +56,7 @@
                     <input class="col-md-1" type="checkbox" ng-model="widget.showCloudifyLink"/>
                 </div>
             </tab>
-            <tab heading="Execution Details" select="navigateTo('executionDetails')">
+            <tab heading="Execution Details" style="cursor:pointer" select="navigateTo('executionDetails')">
                 <div class="row">
                     <span class="col-md-4">Run in solo mode: </span>
                     <input class="col-md-1" type="checkbox" ng-model="widget.executionDetails.isSoloMode"/>
@@ -101,7 +101,7 @@
 
                 </div>
             </tab>
-            <tab heading="Theme" select="navigateTo('theme')">
+            <tab heading="Theme" style="cursor:pointer" select="navigateTo('theme')">
                 <div class="row">
                     <span class="col-md-4">Theme : </span>
                     <select class="col-md-8" ng-model="widget.theme" ng-options="c.id as c.label for c in themes"></select>
@@ -133,7 +133,7 @@
                 </div>
 
             </tab>
-            <tab heading="Login" select="navigateTo('login')">
+            <tab heading="Login" style="cursor:pointer" select="navigateTo('login')">
                 <div class="row">
                     <span class="col-md-4">Require Login : </span>
                     <input class="col-md-1" type="checkbox" ng-model="widget.login.require"/>
@@ -167,7 +167,7 @@
                     <textarea class="col-md-12" ng-model="widget.endOfTrialSnippet"></textarea>
                 </div>
             </tab>
-            <tab heading="Social" select="navigateTo('social')">
+            <tab heading="Social" style="cursor:pointer" select="navigateTo('social')">
                 <div class="row">
                     <span class="col-md-12">
                         The social login feature is intended for conversion purposes. <br/>
@@ -204,7 +204,7 @@
                 </div>
                 </p>
             </tab>
-            <tab heading="Mail" select="navigateTo('mail')">
+            <tab heading="Mail" style="cursor:pointer" select="navigateTo('mail')">
                 <div class="row">
                     <strong> Mailchimp</strong>
                 </div>
