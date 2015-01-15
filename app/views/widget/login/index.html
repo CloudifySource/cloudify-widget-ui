@@ -1,11 +1,27 @@
-<h4>Please select authentication service</h4>
+<!--<h4>Please select authentication service</h4>-->
 
-<div>
-    <div ng-repeat="login in loginTypes(widget.socialLogin.data)" class="thumb">
+<div class="panel panel-default-headline">
+    <div class="panel-body-headline">
+        Please select authentication service
 
-        <a ng-show="login.id !== 'googleplus'" ng-href="/backend/widgets/{{widget._id}}/login/{{login.id}}">
-            <div class="social-login-icon login-{{login.id}}"></div>
-        </a>
     </div>
-    <div id="googleplus" ng-show="hasGoogleplus()"></div>
 </div>
+
+<div class="panel panel-default-headline">
+
+    <div>
+        <i class="fa fa-google-plus-square fa-5x"></i> Sign in with Google
+        <div ng-repeat="login in loginTypes(widget.socialLogin.data)" class="thumb">
+            <a ng-show="login.id !== 'googleplus'" ng-href="/backend/widgets/{{widget._id}}/login/{{login.id}}">
+                <div class="social-login-icon login-{{login.id}}"></div>
+            </a>
+        </div>
+        <div> <i class="fa fa-sign-in fa-5x"></i> Sign in using site </div>
+        <div id="googleplus" ng-show="hasGoogleplus()"></div>
+    </div>
+
+</div>
+
+
+
+

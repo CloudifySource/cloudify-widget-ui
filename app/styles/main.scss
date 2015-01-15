@@ -5,6 +5,9 @@
 @import "./login";
 @import "./widgetForm";
 
+$fa-font-path: "/bower_components/font-awesome/fonts";
+@import "font-awesome/scss/font-awesome";
+
 // ---------- bootstrap overrides------------------
 .row {
   margin-left: 15px;
