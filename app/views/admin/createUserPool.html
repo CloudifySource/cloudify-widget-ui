@@ -1,8 +1,10 @@
 <div layout>
-    <a href="#/admin/accounts/{{ model.accountId }}/pools">back to user pools</a>
-    <h3>Create new pool for user {{ model.accountId }}</h3>
+    <a href="#/admin/accounts/{{ accountId }}/pools">back to user pools</a>
+    <h3>Create new pool for user {{ accountId }}</h3>
     <!--<label for="poolSettingsTextarea">pool settings</label>-->
-    <textarea placeholder="pool settings" id="poolSettingsTextarea" ng-model="model.newPoolSettings"></textarea>
+    <textarea placeholder="pool settings" id="poolSettingsTextarea" ng-model="newPoolSettings"></textarea>
+    <textarea placeholder="bootstrap script" id="bootstrapScriptTextarea" ng-model="bootstrapScript.value"></textarea>
+    <button ng-click="getBootstrapScript()">Get Default script</button>
     <br/>
-    <button ng-click="addAccountPool(model.accountId, model.newPoolSettings)">Add Pool</button>
+    <button ng-click="addAccountPool(accountId, newPoolSettings, bootstrapScript.value)">Add Pool</button>
 </div>

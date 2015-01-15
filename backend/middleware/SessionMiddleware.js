@@ -1,11 +1,27 @@
-var dbManager = require('../managers').db;
+'use strict';
+
+/**
+ * @module SessionMiddleware
+ * @description
+ * middlewares that operate on the session.
+ *
+ */
+//var dbManager = require('../managers').db;
+var usersManager = require('../managers').users; // todo: use User model instead
 var logger = require('log4js').getLogger('widgetMiddleware');
 
 
 /**
- * relies on 'loggedUser' middleware.
- * verifies the user on session is admin
- */
+ *
+ * @description
+ * relies on 'loggedUser' middleware.<br/>
+ * verifies the user on session is admin<br/>
+ * return 401 if not<br/>
+ *
+ * @param req the request
+ * @param res the response
+ * @param next next middleware
+ **/
 exports.adminUser = function( req, res, next){
     if ( !req.user.isAdmin ){
         res.send(401, {'message' : 'need to be admin'});
@@ -15,8 +31,17 @@ exports.adminUser = function( req, res, next){
     next();
 };
 
+/**
+ * @description
+ * checks if there is a userId on session cookie. <br/>
+ * find and puts <code>user</code> on <code>req</code> if exists<br/>
+ * otherwise returns code 401.<br/>
+ *
+ * @param req the request
+ * @param res the response
+ * @param next next middleware
+ **/
 exports.loggedUser = function ( req, res, next ){
-
     if ( !req.session ){
         res.send(401, {'message': 'need to login. no session'});
         return;
@@ -28,29 +53,24 @@ exports.loggedUser = function ( req, res, next ){
     }
 
 
-    dbManager.connect('users', function(db, collection, done){
-        collection.findOne({_id: dbManager.toObjectId(userId)}, function(err, result){
-            if ( !!err ){
-                logger.info('unable to verify if user is logged in : ' + err.message );
-                res.send(401, {'message' : 'unable to verify session : '  + err.message });
-                done();
-                return;
-            }
-            if ( !!result ){
-                logger.trace('user is logged in : '  + result.email );
-                req.user = result;
-                done();
-                next();
-                return;
-            }
+    usersManager.findById( userId, function( error, result ){
+        var err = error;
+        if ( !!err ){
+            logger.info('unable to verify if user is logged in : ' + err.message );
+            res.send(401, {'message' : 'unable to verify session : '  + err.message });
+            return;
+        }
+        if ( !!result ){
+            logger.trace('user is logged in : '  + result.email );
+            req.user = result;
+            next();
+            return;
+        }
+        // default behavior if user was not found and we didn't get an error from DB.
+        // lets delete the cookie and redirect to login
 
-            // default behavior if user was not found and we didn't get an error from DB.
-            // lets delete the cookie and redirect to login
+        req.session = null;
+        res.send(401, {'message': 'need to relogin'});
 
-            req.session = null;
-            res.send(401, {'message': 'need to relogin'});
-
-
-        })
-    })
+    } );
 };

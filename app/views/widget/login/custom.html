@@ -1,8 +1,26 @@
 
-
 <form ng-submit="submitForm()">
-    First Name : <input ng-model="page.firstName"/><br/>
-    Last Name : <input ng-model="page.lastName"/><br/>
-    Email Name : <input ng-model="page.email"/><br/>
-    <input type="submit" value="Submit"/>
+
+    <label class="col-lg-4 col-sm-offset-4" >Quick Login!</label>
+
+    <div class="form-group">
+        <div class="col-lg-4 col-sm-offset-4">
+        <input type="text" class="form-control" id="enter-name" ng-model="page.firstName" placeholder="Enter first name">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-lg-4 col-sm-offset-4">
+        <input type="text" class="form-control" id="enter-lname" ng-model="page.lastName" placeholder="Enter last name">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-lg-4 col-sm-offset-4">
+            <input type="email" class="form-control" id="inputEmail3" ng-model="page.email" placeholder="Enter email address">
+        </div>
+    </div>
+    <input type="submit" style="visibility: hidden;" />
 </form>
+
+

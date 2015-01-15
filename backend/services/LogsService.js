@@ -1,95 +1,9 @@
+'use strict';
+
 var logger = require('log4js').getLogger('LogsService');
+var managers = require('../managers');
 
-var fs = require('fs');
-var path = require('path');
-var conf = require('../Conf');
-var files = require('../services/FilesService');
-
-
-exports.readOutput = function (relativePath, callback) {
-    logger.info('reading from output log file');
-    _readLog(_getOutputFilePath(relativePath), callback);
-};
-
-exports.readStatus = function (relativePath, callback) {
-    _readLog(_getStatusFilePath(relativePath), callback);
-};
-
-exports.writeOutput = function (data, relativePath, callback) {
-    _writeLog(data, _getLogDirPath(relativePath), _getOutputFilePath(relativePath), callback);
-};
-
-exports.appendOutput = function (data, relativePath, callback) {
-    _appendLog(data, _getLogDirPath(relativePath), _getOutputFilePath(relativePath), callback);
-};
-
-exports.writeStatus = function (data, relativePath, callback) {
-    _writeLog(data, _getLogDirPath(relativePath), _getStatusFilePath(relativePath), callback);
-};
-
-function _writeLog (data, logsDir, logFilePath, callback) {
-    files.mkdirp(logsDir); // make sure dir exists
-    fs.writeFile(logFilePath, data, function (err) {
-        if (!!err) {
-            logger.error('unable to write to log file', logFilePath, data.toString(), err);
-            _call(callback, err);
-            return;
-        }
-        _call(callback);
-    });
-}
-
-function _appendLog (data, logsDir, logFilePath, callback) {
-    files.mkdirp(logsDir); // make sure dir exists
-    fs.appendFile(logFilePath, data, function (err) {
-        if (!!err) {
-            logger.error('unable to append to log file', logFilePath, data.toString(), err);
-            _call(callback, err);
-            return;
-        }
-        _call(callback);
-    });
-}
-
-function _readLog (logFilePath, callback) {
-
-    if (!logFilePath) {
-        _call(callback, new Error('unable to get output, cannot build log file path'));
-        return;
-    }
-
-    fs.exists(logFilePath, function (exists) {
-
-        if (!exists) {
-            _call(callback, new Error('file does not exist'));
-            return;
-        }
-
-        fs.readFile(logFilePath, function (err, data) {
-            if (!!err) {
-                _call(callback, err);
-                return;
-            }
-            _call(callback, null, data);
-        });
-    });
-}
-
-function _getOutputFilePath(relativePath) {
-    return _getLogFilePath(relativePath, 'output.log');
-}
-
-function _getStatusFilePath(relativePath) {
-    return _getLogFilePath(relativePath, 'status.log');
-}
-
-function _getLogFilePath(relativePath, fileName) {
-    return path.join(_getLogDirPath(relativePath), fileName);
-}
-
-function _getLogDirPath(relativePath) {
-    return path.join(conf.logsDir, relativePath || '');
-}
+var outputBuffer = {};
 
 /**
  * safe callback invocation
@@ -98,5 +12,100 @@ function _getLogDirPath(relativePath) {
 function _call() {
     // first argument is expected to be the callback, the rest are its arguments, if any
     var callback = Array.prototype.shift.call(arguments);
-    callback && ('function' === typeof callback) && callback.apply(this, arguments);
+    callback && ('function' === typeof callback) && callback.apply({}, arguments);
 }
+
+function readFromDB(executionId, field, callback) {
+    managers.db.connect('widgetExecutions', function (db, collection, done) {
+        collection.findOne(
+            { _id: managers.db.toObjectId(executionId) },
+            function (err, execution) {
+                if (!!err) {
+                    _call(callback, err);
+                    done();
+                    return;
+                }
+
+                _call(callback, null, execution[field]);
+            }
+        );
+    });
+}
+
+function writeToDB(data, executionId, field, callback) {
+    var update = {};
+    update[field] = data;
+    logger.info('Updating ' + field + ' for ' + executionId);
+
+    managers.db.connect('widgetExecutions', function (db, collection, done) {
+        collection.update(
+            { _id: managers.db.toObjectId(executionId) },
+            { $set: update },
+            function (err, nUpdated) {
+                if (!!err) {
+                    _call(callback, err);
+                    done();
+                    return;
+                }
+                if (!nUpdated) {
+                    _call(callback, new Error('no widget execution docs updated in the database'));
+                    done();
+                    return;
+                }
+                _call(callback);
+                done();
+            }
+        );
+    });
+}
+
+function appendOutputBufferString(executionId, data) {
+    if (!outputBuffer[executionId]) {
+        outputBuffer[executionId] = '';
+    }
+
+    if (data) {
+        outputBuffer[executionId] += data;
+    }
+
+    return outputBuffer[executionId];
+}
+
+function clearOutputBufferString(executionId) {
+    delete outputBuffer[executionId];
+}
+
+exports.readOutput = function (executionId, callback) {
+    readFromDB(executionId, 'output', callback);
+};
+
+exports.readStatus = function (executionId, callback) {
+    readFromDB(executionId, 'status', callback);
+};
+
+exports.writeOutput = function (data, executionId, callback) {
+    var buffer = appendOutputBufferString(executionId, data);
+    writeToDB(buffer, executionId, 'output', callback);
+};
+
+exports.appendOutput = function (data, executionId, callback) {
+    exports.writeOutput(data, executionId, callback);
+};
+
+exports.writeStatus = function (data, executionId, callback) {
+    writeToDB(data, executionId, 'status', callback);
+};
+
+exports.clearOutputBuffer = function (executionId) {
+    clearOutputBufferString(executionId);
+};
+
+
+
+
+
+
+
+
+
+

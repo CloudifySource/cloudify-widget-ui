@@ -1,9 +1,32 @@
 
-<div layout>
+<div layout id="combinedView">
+
+    <div class="toolbar">
+        <h1>Actions</h1>
+        <a href="#/admin/accounts/{{accountId}}/pools/{{poolId}}/update">Edit Pool</a><br/>
+        <button ng-click="deleteAccountPool(accountId, poolId)">delete pool</button><br/>
+        <button ng-click="cleanAccountPool(accountId, poolId)">clean pool</button><br/>
+    </div>
+
+    <h1>Live View</h1>
+    <a href="#/admin/pools/{{ pool.id }}/nodes">see nodes</a>
+
     <div ng-include src="'views/admin/poolNodes.html'" ng-controller="AdminPoolCrudCtrl"></div>
+    <a href="#/admin/pools/{{ pool.id }}/tasks">see running tasks</a>
+
     <div ng-include src="'views/admin/poolTasks.html'" ng-controller="AdminPoolCrudCtrl"></div>
+
     <div ng-include src="'views/admin/poolStatus.html'" ng-controller="AdminPoolCrudCtrl"></div>
+
+    <a href="#/admin/pools/{{ pool.id }}/errors">see errors</a>
     <div ng-include src="'views/admin/poolErrors.html'" ng-controller="AdminPoolCrudCtrl"></div>
+
+    <a href="#/admin/pools/{{ pool.id }}/decisions">see active decisions</a>
     <div ng-include src="'views/admin/poolDecisions.html'" ng-controller="AdminPoolCrudCtrl"></div>
+
+    <a href="#/admin/pools/{{ pool.id }}/cloud/nodes">see cloud node mappings</a>
     <div ng-include src="'views/admin/poolCloudNodes.html'" ng-controller="AdminPoolCrudCtrl"></div>
+
+    <h3>Thread Pools stats</h3>
+    <pre>{{ model.threadPoolStatus }}</pre>
 </div>

@@ -4,4 +4,25 @@
       font-weight: bolder;
     }
   }
+
+  .row {
+    padding: 8px;
+
+    span {
+      padding-top: 5px;
+    }
+
+    sup {
+      padding-top: 10px;
+      margin-bottom: -10px;
+    }
+
+    input[type="checkbox"] {
+      margin: 8px 0 0 -15px;
+    }
+
+    textarea {
+      margin-left: 10px;
+    }
+  }
 }
