@@ -15,13 +15,16 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="error in model.poolErrors">
+            <tr ng-repeat="error in model.poolErrors track by $index">
                 <td>{{ error.id }}</td>
-                <td>{{ error.timestamp | date:'medium' }}</td>
+                <!--<td>{{ error.timestamp | date:'medium' }}</td>--> <!-- this causes problems for some reason -->
+                <td>{{ error.timestamp }}</td>
                 <td>{{ error.source }}</td>
                 <td>{{ error.poolId }}</td>
                 <td><pre>{{ error.message }}</pre></td>
-                <td><pre>{{ asJson(error.info) | json }}</pre></td>
+                <td>
+                    <div pool-error="error"></div>
+                </td>
             </tr>
         </tbody>
     </table>

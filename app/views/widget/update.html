@@ -1,8 +1,13 @@
-<div ng-include src="'views/widget/_widgetForm.html'"></div>
+<div layout>
+    <h2> Edit widget </h2>
 
+    <div class="row" ng-include src="'views/widget/_widgetForm.html'"></div>
 
-<button ng-click="update()">Update</button>
-<button ng-click="done()">Done</button>
-<button ng-click="view()">Save & View</button>
-<button ng-click="delete()">Delete</button>
-<a href="#/dashboard">Cancel</a>
+    <div class="row">
+        <button ng-click="update()">Update</button>
+        <button ng-click="done()">Done</button>
+        <button ng-click="view()">Save & View</button>
+        <button ng-click="delete()">Delete</button>
+        <a href="#/dashboard">Cancel</a>
+    </div>
+</div>

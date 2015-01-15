@@ -1,3 +1,6 @@
+
+[![Build Status](https://travis-ci.org/CloudifySource/cloudify-widget-ui.svg?branch=cw_200_setup_travis)](https://travis-ci.org/CloudifySource/cloudify-widget-ui)
+
 Description
 ===========
 

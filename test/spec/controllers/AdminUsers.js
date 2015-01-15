@@ -2,11 +2,11 @@
 
 describe('Controller: AdminUsersCtrl', function () {
 
-  // load the controller's module
-  beforeEach(module('cloudifyWidgetUiApp'));
+    // load the controller's module
+    beforeEach(module('cloudifyWidgetUiApp'));
 
-  var AdminUsersCtrl,
-    scope;
+//    var AdminUsersCtrl,
+//        scope;
 
 //  // Initialize the controller and a mock scope
 //  beforeEach(inject(function ($controller, $rootScope) {

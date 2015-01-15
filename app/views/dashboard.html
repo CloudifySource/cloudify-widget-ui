@@ -1,32 +1,37 @@
-<div layout>
+<div layout id="dashboard">
 
     <div class="actions">
         <a href="#/widgets/create">Add Widget</a>
     </div>
 
-
-    <table>
-        <tr>
-            <td>Product</td>
-            <td>Recipe</td>
-            <td>Title</td>
-            <td>Actions</td>
-        </tr>
-        <tr ng-repeat="widget in widgets">
-            <td>
-                {{widget.productName}}
-            </td>
-            <td>
-                {{widget.recipeName}}
-            </td>
-            <td>
-                {{widget.title}}
-            </td>
-            <td>
-                <a href="#/widgets/{{widget._id}}/update">Edit</a>
-                <a href="#/widgets/{{widget._id}}/read">View</a>
-                <button ng-click="delete( widget )">Delete</button>
-            </td>
-        </tr>
-    </table>
+    <div class="col-md-6">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>Product</th>
+                <th>Recipe</th>
+                <th>Title</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="widget in widgets">
+                <td>
+                    {{widget.productName}}
+                </td>
+                <td>
+                    {{widget.recipeName}}
+                </td>
+                <td>
+                    {{widget.title}}
+                </td>
+                <td>
+                    <a href="#/widgets/{{widget._id}}/update">Edit</a>
+                    <a href="#/widgets/{{widget._id}}/read">View</a>
+                    <button ng-click="delete( widget )">Delete</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>

@@ -4,6 +4,12 @@ angular.module('cloudifyWidgetUiApp')
   .service('WidgetThemesService', function WidgetThemesService() {
         this.themes = [
             {
+                'id': 'blank',
+                'label': 'Blank',
+                'height' : '0',
+                'width' : '0'
+            },
+            {
                 'id': 'default',
                 'label': 'Default',
                 'height' : '463px',
