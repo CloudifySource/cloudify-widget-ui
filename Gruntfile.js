@@ -23,6 +23,11 @@ module.exports = function (grunt) {
     };
 
 
+    if ( !grunt.file.exists('./conf/dev/me.json')){
+        grunt.file.write('./conf/dev/me.json',JSON.stringify({}));
+    }else{
+        grunt.log.ok('me.json exists');
+    }
     var widgetUiConf = require('./backend/Conf');
 
 
@@ -622,6 +627,7 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('test', function (testBackend) {
+        //var done = this.async();
         var tasks = [];
         if (testBackend === undefined || testBackend === '' || testBackend === 'all' || testBackend === 'frontend') { // default
             tasks = [
@@ -635,10 +641,23 @@ module.exports = function (grunt) {
         }
 
         if (testBackend === undefined || testBackend === '' || testBackend === 'all' || testBackend === 'backend') {
+            tasks.push('mocha_istanbul');
             // guy - we always use code coverage in grunt.. when debug from the IDE so no need for no instrumented mode in grunt.
-            tasks = tasks.concat(['clean:instrumentBackend','clean:coverageBackend', 'instrument', 'copy:backendCoverageTests', 'jasmine_node:unitInstrument', 'storeCoverage', 'makeReport', 'clean:instrumentBackend']);
+            tasks = tasks.concat([
+                'clean:instrumentBackend',
+                'clean:coverageBackend',
+                'instrument',
+                'copy:backendCoverageTests',
+                'jasmine_node:unitInstrument',
+                'storeCoverage',
+                'makeReport',
+                //'clean:instrumentBackend' // sopped working for some reason - need to investigate
+
+            ]);
         }
         grunt.task.run(tasks);
+
+
     });
 
     grunt.registerTask('testSingle', [
