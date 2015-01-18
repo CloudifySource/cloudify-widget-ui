@@ -22,6 +22,10 @@ module.exports = function (grunt) {
         dist: 'dist'
     };
 
+
+    var widgetUiConf = require('./backend/Conf');
+
+
     try {
         yeomanConfig.app = require('./bower.json').appPath || yeomanConfig.app;
     } catch (e) {
@@ -88,8 +92,8 @@ module.exports = function (grunt) {
             proxies: [
                 {
                     context: '/backend',
-                    host: '127.0.0.1',
-                    port: 9001,
+                    host: widgetUiConf.backend.host,
+                    port: widgetUiConf.backend.port,
                     https: false,
                     changeOrigin: false,
                     xforward: false
