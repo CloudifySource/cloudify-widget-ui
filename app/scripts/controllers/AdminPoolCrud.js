@@ -51,6 +51,8 @@ angular.module('cloudifyWidgetUiApp')
             $log.info('deletePoolNode, poolId: ', poolId, ', nodeId: ', nodeId);
             AdminPoolCrudService.deletePoolNode(poolId, nodeId).then(function (result) {
                 $log.debug('machine deleted, result data is ', result.data);
+                // refresh view when done.
+                $scope.getCloudNodes(poolId);
             });
         };
 
