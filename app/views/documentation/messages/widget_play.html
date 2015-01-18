@@ -1,0 +1,31 @@
+<h2>widget_play</h2>
+
+<div plunkr link="http://plnkr.co/edit/LtobetBInweYb9sklS98?p=preview"></div>
+
+<div class="section">
+    This message allows you to play the widget
+    <div snippet>
+    {
+        'name': 'widget_play'
+    }
+    </div>
+
+    In the case the widget is configured as 'Solo Mode', the message needs to also include the ApiKay and SecretKey.<br/>
+    Each cloud type will have a different structure.
+    <div snippet>
+    {
+        'name': 'widget_play',
+        'widget': {
+            'executionDetails': {
+                'EC2': {
+                    'params': {
+                        'apiKey': 'the api key',
+                        'secretKey': 'the secret key'
+                    }
+                }
+            }
+        }
+    }
+    </div>
+
+</div>

@@ -1,0 +1,30 @@
+<div layout class="admin-my-user">
+
+
+    <div>
+        {{page.message}}
+    </div>
+
+    <h1>Information</h1>
+    <div>
+        My pool key is <code>{{myUser.poolKey}}</code>
+    </div>
+
+    <div admin class="pool-key-settings">
+        <h1> Change Pool Key </h1>
+        <input ng-model="myUser.poolKey"/><br/>
+        <button ng-click="setPoolKey(myUser.poolKey)">Update Pool Key</button><br/>
+        <button ng-click="testPoolKey()">Test Pool Key</button><br/>
+        <button ng-click="resetChanges()">Reset Changes</button>
+    </div>
+
+    <div class="change-password">
+        <h1>Change Password</h1>
+        Old Password: <input ng-model="page.changePassword.oldPassword"/><br/>
+        New Password: <input ng-model="page.changePassword.newPassword"/> <br/>
+        New Password Again:<input ng-model="page.changePassword.newPasswordAgain"/><br/>
+        <button ng-click="changePassword()">Change Password</button>
+    </div>
+
+
+</div>

@@ -1,0 +1,35 @@
+<div class="section">
+    <div>
+        <p>
+            To recieve this info, it is currently necessary to contact GigaSpaces.
+        </p>
+    </div>
+</div>
+
+<h1>GET: backend/admin/pools/__pool_id__/status</h1>
+<div class="section">
+    returns the pool status.<br/>
+    <br/>
+    <!--<span ng-show="!!loggedIn">-->
+    <!--Use the following CURL command to try it out now-->
+    <!--<br/>-->
+    <!--<div snippet>curl http://{{domain}}/backend/application/pool/status --header "AccountUuid: {{accountUuid}}"</div>-->
+    <!--<br/>-->
+    <!--</span>-->
+
+    <div snippet>
+        {
+            "poolId":{
+                "poolId":"pool settings ID",
+                "countPerNodeStatus":{
+                    "CREATED": 2,
+                    "BOOTSTRAPPING":1,
+                    "BOOTSTRAPPED":2
+                },
+                "currentSize":5
+            }
+        }
+    </div>
+
+
+</div>

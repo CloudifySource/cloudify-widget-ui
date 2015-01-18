@@ -2,11 +2,11 @@
 
 describe('Controller: SignupCtrl', function () {
 
-  // load the controller's module
-  beforeEach(module('cloudifyWidgetUiApp'));
+    // load the controller's module
+    beforeEach(module('cloudifyWidgetUiApp'));
 
-  var SignupCtrl,
-    scope;
+//    var SignupCtrl,
+//        scope;
 
 //  // Initialize the controller and a mock scope
 //  beforeEach(inject(function ($controller, $rootScope) {

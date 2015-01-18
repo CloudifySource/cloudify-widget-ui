@@ -1,17 +1,33 @@
-<div clas="error">
-    {{pageError}}
+<div id="login">
+    <div clas="error">
+        {{pageError}}
+    </div>
+
+    <div class="center-block container col-md-12">
+        <form ng-submit="signup()" class=" col-md-12">
+            <div class="row">
+                <span class="col-md-5">Email : </span>
+                <input class="col-md-7" ng-model="userSignup.email"/>
+            </div>
+            <div class="row">
+                <span class="col-md-5">First Name : </span>
+                <input class="col-md-7" ng-model="userSignup.firstName"/>
+            </div>
+            <div class="row">
+                <span class="col-md-5">Last Name : </span>
+                <input class="col-md-7" ng-model="userSignup.lastName"/>
+            </div>
+            <div class="row">
+                <span class="col-md-5">Password : </span>
+                <input class="col-md-7" ng-model="userSignup.password" type="password"/>
+            </div>
+            <div class="row">
+                <span class="col-md-5">Password Confirm : </span>
+                <input class="col-md-7" ng-model="userSignup.passwordConfirm" type="password"/>
+            </div>
+            <div class="row pull-right">
+                <input type="submit" value="{{ 'global.buttons.submit' | i18n }}"/>
+            </div>
+        </form>
+    </div>
 </div>
-
-
-Email : <input ng-model="userSignup.email" type="text"/><br/>
-First Name : <input ng-model="userSignup.firstName" type="text"/><br/>
-Last Name : <input ng-model="userSignup.lastName" type="text"/><br/>
-Password : <input ng-model="userSignup.password" type="password"/><br/>
-Password Confirm : <input ng-model="userSignup.passwordConfirm" type="password"/><br/>
-
-        <button ng-click="signup()">Submit</button>
-
-
-        <br/>
-        Already have a login?<br/>
-        <a ng-href="#/login">Login</a>

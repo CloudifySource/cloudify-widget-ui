@@ -27,23 +27,43 @@ upgrade_main(){
     SYSCONFIG_FILE=widget-ui read_sysconfig
 
 
-    PACKAGE_URL=http://get.gsdev.info/cloudify-widget-ui/1.0.0/cloudify-widget-ui-1.0.0.tgz
-     echo "installing ui npm package from [ $PACKAGE_URL ]"
+    BUILD_ID_FILE="/var/www/cloudify-widget-ui/build.id"
+    BUILD_ID_URL="http://get.gsdev.info/cloudify-widget-ui/1.0.0/build.id"
 
-     mkdir -p /var/www/cloudify-widget-ui
-     npm install $PACKAGE_URL -g --prefix /var/www/cloudify-widget-ui
+    CURRENT_BUILD_ID=""
+    if [ -f "$BUILD_ID_FILE" ];then
+        CURRENT_BUILD_ID=`cat $BUILD_ID_FILE`
+    fi
 
-    echo "converting files to unix format"
-     find /var/www/cloudify-widget-ui -name "*.sh" -type f -print0 | xargs -0 dos2unix
+    AVAILABLE_BUILD_ID=`wget --no-cache --no-check-certificate -O - $BUILD_ID_URL`
+    INSTALL_LOCATION=/var/www/cloudify-widget-ui/package
 
-     echo "chmodding shell scripts for execution"
-     find /var/www/cloudify-widget-ui -name "*.sh" -type f -print0 -exec chmod +x {} \;
+    if [ "$AVAILABLE_BUILD_ID" != "$CURRENT_BUILD_ID" ];then
+        PACKAGE_URL=http://get.gsdev.info/cloudify-widget-ui/1.0.0/cloudify-widget-ui-1.0.0.tgz
+        echo "installing ui npm package from [ $PACKAGE_URL ]"
+
+        mkdir -p /var/www/cloudify-widget-ui
+        cd /var/www/cloudify-widget-ui
+
+        wget "$PACKAGE_URL" -O widget-ui.tgz
+        rm -Rf package
+        tar -xzvf widget-ui.tgz
+
+        # npm install $PACKAGE_URL -g --prefix /var/www/cloudify-widget-ui
+
+        echo "converting files to unix format"
+        find /var/www/cloudify-widget-ui -name "*.sh" -type f -print0 | xargs -0 dos2unix
+
+        echo "chmodding shell scripts for execution"
+        find /var/www/cloudify-widget-ui -name "*.sh" -type f -print0 -exec chmod +x {} \;
 
 
-    echo "installing initd script"
-    INSTALL_LOCATION=/var/www/cloudify-widget-ui/lib/node_modules/cloudify-widget-ui
-    echo "installing service script under widget-ui"
-    SERVICE_NAME=widget-ui SERVICE_FILE=$INSTALL_LOCATION/build/service.sh install_initd_script
+        echo "installing initd script"
+        echo "installing service script under widget-ui"
+        SERVICE_NAME=widget-ui SERVICE_FILE=$INSTALL_LOCATION/build/service.sh install_initd_script
+
+        echo "$AVAILABLE_BUILD_ID" > "$BUILD_ID_FILE"
+    fi
 
     echo "installing me.conf"
     check_exists ME_CONF_URL;

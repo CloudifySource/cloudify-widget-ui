@@ -1,161 +1,247 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetCtrl', function ($scope, LoginTypesService, WidgetsService, $log, $window,  $routeParams, PostParentService, $localStorage, $timeout) {
+    .controller('WidgetCtrl', function ($scope, LoginService, LoginTypesService, WidgetsService, $log, $window, $routeParams, PostParentService, $localStorage, $timeout, WidgetConstants) {
 
-        $window.$windowScope = $scope;
-
-        $scope.collapseAdvanced = false;
+        $log.info('loading widget controller : ' + new Date().getTime());
+        // we need to hold the running state to determine when to stop sending status/output messages back
         $scope.widgetStatus = {};
-        var play = 'RUNNING';
-        var stop = 'STOPPED';
-        var ellipsisIndex = 0;
+        var STATE_RUNNING = 'RUNNING';
+        var STATE_STOPPED = 'STOPPED';
+        var popupWindow = null;
 
+        // when there's an executionId, lets start polling...
+        $scope.$watch('executionId', function (newValue, oldValue) {
+            $log.info('executionId changed', newValue, oldValue);
+            if (!!newValue && !oldValue) {
+                $log.info('detected executionId exists, starting poll');
+                $scope.widgetStatus.state = STATE_RUNNING;
+                _pollStatus(1, { '_id': $scope.widget._id }, newValue.executionId);
+            }
 
-        $scope.showPlay = function () {
-            return $scope.widgetStatus.state === stop;
-        };
+            if (!newValue) {
+                _resetWidgetStatus();
+            }
+        });
 
-        $scope.showStop = function () {
-            return $scope.widgetStatus.state === play;
-        };
+        // this is to first init the widget on the scope with the bare minimum - the id.
+        // then, async, go fetch the entire thing and override.
+        $scope.widget = {  '_id': $routeParams.widgetId };
+        WidgetsService.getPublicWidget($routeParams.widgetId)
+            .then(function success(result) {
+                $scope.widget = result.data;
+                parentLoaded(null, $scope.widget);
+            }, function error(errorResult) {
+                $log.info('error loading widget');
+                parentLoaded(errorResult.data, null);
+            });
 
+        $scope.executionId = null;
 
-        function _resetWidgetStatus() {
-            $scope.widgetStatus = {
-                'state': stop,
-                'reset': true
-            };
+        function saveState() {
+            localStorage.setItem($scope.widget._id, JSON.stringify($scope.executionId));
         }
 
-        _resetWidgetStatus();
-
-        function _hasAdvanced() {
-            return $scope.advancedParams;
+        function deleteState() {
+            localStorage.removeItem($scope.widget._id);
         }
 
-        function _getAdvanced() {
-            return $scope.advancedParams;
+        function cleanUp(executionId) {
+            deleteState();
+            _postStopped(executionId);
+            $scope.executionId = null;
         }
 
-        function _scrollLog(){
-            var log = $('#log')[0];
-            log.scrollTop = log.scrollHeight;
-        }
-
-        function _handleStatus( status, myTimeout ) {
-
-            $log.info(['got status', status]);
-            $localStorage.widgetStatus = status;
-            ellipsisIndex = ellipsisIndex +1;
-            $scope.widgetStatus = status;
-            _getOutput($scope.widget);
-
-            $timeout(_pollStatus, myTimeout || 3000);
-
-            _scrollLog();
-        }
-
-        function _pollStatus(myTimeout) {
-
-            if ($scope.widgetStatus.state !== stop) { // keep polling until widget stops ==> mainly for timeleft..
-                WidgetsService.getStatus( $scope.widget, $scope.executionId ).then(function (result) {
-                    if (!result) {
-                        return;
-                    }
-                    _handleStatus(result.data, myTimeout);
-                }, function (result) {
-                    $log.error(['status error', result]);
-                });
-            } else {
-                $log.info('removing widget status');
-                delete $localStorage.widgetStatus;
+        function loadState() {
+            var executionId = JSON.parse(localStorage.getItem($scope.widget._id));
+            if (!!executionId) {
+                $log.info('resuming execution.. found execution in local storage');
+                $scope.executionId = executionId;
             }
         }
 
         // use this with the following from the popup window:
-        //
-        $scope.loginDone = function( ){
+        // this is called when social logic is complete.
+        $scope.loginDone = function (loginDetailsId) {
             $log.info('login is done');
-            if ( popupWindow !== null ){
+            $scope.loginDetailsId = loginDetailsId;
+
+            if (popupWindow !== null) {
                 popupWindow.close();
                 popupWindow = null;
             }
 
-            $scope.loginDetails = {};   // we will verify this in the backend
-            $timeout(function(){$scope.play();}, 0);
+            // social login is complete, now play.
+            playInternal();
         };
 
-        var popupWindow = null;
-        $scope.play = function () {
+        function play(widget) {
+            //check if social login is required
+            var socialLoginRequired = false;
 
-            if ( !!$scope.widget.socialLogin && !!$scope.widget.socialLogin.data  && $scope.widget.socialLogin.data.length > 0 && !$scope.loginDetails ){
+            // override properties in the scope widget from the message widget.
+            $scope.widget = $scope.merge({}, $scope.widget, widget);
 
-                var size = LoginTypesService.getIndexSize();
+            if ($scope.widget.socialLogin && $scope.widget.socialLogin.data && $scope.widget.socialLogin.data.length !== 0) {
+                socialLoginRequired = $scope.find($scope.widget.socialLogin.data, { 'enabled': true}) !== undefined;
+            }
 
-                var left = (screen.width/2)-(size.width/2);
-                var top = (screen.height/2)-(size.height/2);
+            if (socialLoginRequired) {
+                // show the social login popup
+                popupWindow = LoginService.performSocialLogin(/*socialLogin*/null, $scope.widget, $scope);
+            } else {
+                // no social login, just play.
+                playInternal();
+            }
+        }
 
-                popupWindow = window.open( '/#/widgets/' + $scope.widget._id + '/login/index', 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width='+ size.width +', height='+ size.height +', top='+top+', left='+left);
+        function playInternal() {
+            $log.info('playing widget');
+            _resetWidgetStatus();
+            $scope.widgetStatus.state = STATE_RUNNING;
+
+            if (!$scope.widget.executionDetails) {
+                $scope.widget.executionDetails = {
+                    isSoloMode: false
+                };
+            }
+
+            if ($scope.recipeProperties) {
+                $scope.widget.executionDetails.recipeProperties = $scope.recipeProperties;
+            }
+
+            WidgetsService.playWidget($scope.widget, $scope.loginDetailsId, $scope.widget.executionDetails)
+                .then(function (result) {
+                    $log.info(['play result', result]);
+
+                    $scope.executionId = result.data;
+                    saveState();
+
+                    _postPlayed($scope.executionId);
+                }, function (err) {
+                    $log.info(['play error', err]);
+
+                    var status = {
+                        error: err
+                    };
+                    _postStatus(status);
+                });
+        }
+
+        function parentLoaded( err, widget ) {
+            $log.info('posting widget_loaded message');
+            _postMessage({'name': 'widget_loaded', 'data' : { 'error' : err, 'widget' : widget } });
+        }
+
+        function stop() {
+            //first, stop polling for status (resolves race condition - getStatus before stop finished).
+            _resetWidgetStatus();
+
+            // now stop widget
+            WidgetsService.stopWidget($scope.widget, $scope.executionId.executionId).then(function () {
+                //todo: need to refactor this redundant executionId.executionId.
+                cleanUp($scope.executionId.executionId);
+            });
+        }
+
+        function _resetWidgetStatus() {
+            var output = $scope.widgetStatus.output;
+
+            $scope.widgetStatus = {
+                'state': STATE_STOPPED,
+                'reset': true,
+                'output': output
+            };
+        }
+
+        function _handleStatus(status, myTimeout, widget, executionId) {
+
+            if (!!status && !!status.output) {
+                status.output = status.output.split('\n');
+            }
+            $scope.widgetStatus = status;
+            _postStatus(status);
+            if (!status.error && (!status.nodeModel || status.nodeModel.state === STATE_RUNNING)) {
+                $timeout(function () {
+                    _pollStatus(false, widget, executionId);
+                }, myTimeout || 3000);
+            } else {
+                cleanUp(executionId);
+            }
+        }
+
+        function _pollStatus(myTimeout, widget, executionId) {
+            $log.debug('polling status');
+            if (!$scope.widgetStatus.nodeModel || $scope.widgetStatus.nodeModel.state !== STATE_STOPPED) { // keep polling until widget stops ==> mainly for timeleft..
+                WidgetsService.getStatus(widget._id, executionId).then(function (result) {
+                    if (!result) {
+                        return;
+                    }
+                    _handleStatus(result.data, myTimeout, widget, executionId);
+                }, function (result) {
+                    $log.error(['status error', result]);
+                });
+            }
+        }
+
+        // post outgoing messages
+
+        function _postStatus(status) {
+            _postMessage({name: 'widget_status', data: status});
+        }
+
+
+        function _postPlayed() {
+            _postMessage({name: 'widget_played', executionId: $scope.executionId});
+        }
+
+        function _postStopped(executionId) {
+            _postMessage({name: 'widget_stopped', executionId: executionId});
+        }
+
+        function _postMessage(data) {
+            if ($window.parent !== $window) {
+                $window.parent.postMessage(data, /*$window.location.origin*/ '*');
+            }
+        }
+
+
+//        $log.debug('listening to messages on ', $window);
+        // listen to incoming messages
+        $window.addEventListener('message', function (e) {
+            $log.info('- - - blank received message, user posted: ', e.data);
+            if (!e.data) {
+                $log.error('unable to handle posted message, no data was found');
                 return;
             }
 
-            _resetWidgetStatus();
-            $scope.widgetStatus.state = play;
-            console.log('before check advanced');
-            var advancedParams =  _hasAdvanced() ? _getAdvanced() : null;
-            console.log('After check advanced, options=', advancedParams, '_hasAdvanced()=', _hasAdvanced() );
+            var data = e.data;
 
-            WidgetsService.playWidget($scope.widget, advancedParams, _isRemoteBootstrap())
-                .then(function (result) {
-                    console.log(['play result', result]);
-                    $scope.executionId = result.data;
-                    _pollStatus(1);
-                }, function (err) {
-                    console.log(['play error', err]);
-                    _resetWidgetStatus('We are so hot that we ran out of instances. Please try again later.');
-                });
-        };
-
-        $scope.stop = function () {
-            WidgetsService.stopWidget($scope.widget, $scope.executionId, _isRemoteBootstrap()).then(function () {
-                $scope.widgetStatus.state = stop;
-                _resetWidgetStatus();
-            });
-        };
-
-        $scope.getFormPath = function (widget) {
-            if (widget.remoteBootstrap && widget.remoteBootstrap.cloudifyForm) {
-                return '/views/widget/forms/' + widget.remoteBootstrap.cloudifyForm + '.html';
+            if (typeof(data) === 'string') {
+                data = JSON.parse(data);
             }
-            return '';
-        };
 
+            if (data.name === WidgetConstants.PLAY) {
+                $log.info('got message to play widget');
+                play(data.widget);
+            }
 
-        WidgetsService.getWidget($routeParams.widgetId).then(function (result) {
-            $scope.widget = result.data;
+            if (data.name === WidgetConstants.STOP) {
+                $log.info('got message to stop widget');
+                stop();
+            }
+
+            if (data.name === WidgetConstants.RECIPE_PROPERTIES) {
+                $log.info('widget got new properties info: ', data.data);
+                $scope.recipeProperties = data.data;
+            }
+
+            // this is here because JSHint fails at switch case indentation so it was converted to if statements.
+            if (data.name === WidgetConstants.PARENT_LOADED) {
+            }
+
         });
 
 
-        var emptyList = [];
-
-        function _getOutput (widget) {
-            $log.debug('> > > get output, widget id: ', widget ? widget._id : '', ', execution id: ', $scope.executionId);
-
-            if (!widget || !$scope.executionId) {
-                $scope.output = emptyList;
-            }
-
-            WidgetsService.getOutput(widget, $scope.executionId)
-                .then(function (result) {
-                    $scope.output = result.data.split('\n');
-                }, function (err) {
-                    $log.error(err);
-                });
-        }
-
-        function _isRemoteBootstrap() {
-            return $scope.widget.remoteBootstrap && $scope.widget.remoteBootstrap.active;
-        }
-
+        $timeout(loadState, 1);
     });
