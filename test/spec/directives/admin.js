@@ -1,9 +1,9 @@
 'use strict';
 
 describe('Directive: admin', function () {
-  beforeEach(module('cloudifyWidgetUiApp'));
+    beforeEach(module('cloudifyWidgetUiApp'));
 
-  var element;
+//    var element;
 
 //  it('should make hidden element visible', inject(function ($rootScope, $compile) {
 //    element = angular.element('<admin></admin>');

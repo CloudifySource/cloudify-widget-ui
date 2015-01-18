@@ -1,13 +1,13 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('WidgetCrudCtrl', function ($scope, $routeParams, $log, LoginTypesService, WidgetsService, $location, WidgetThemesService, $window) {
-
+    .controller('WidgetCrudCtrl', function ($scope, $routeParams, $log, $timeout, LoginTypesService, GoogleplusLoginService, WidgetsService, $location, WidgetThemesService, LoginService/*,$timeout*/) {
 
         $scope.availableLoginTypes = function () {
             return LoginTypesService.getAll();
         };
 
+        $scope.tryItNow = {};
 
         function _getSocialLoginById(id) {
             if (!!$scope.widget && !!$scope.widget.socialLogin && !!$scope.widget.socialLogin.data) {
@@ -23,11 +23,12 @@ angular.module('cloudifyWidgetUiApp')
 
         }
 
-
         // use this with the following from the popup window:
         //
-        $scope.loginDone = function () {
+        $scope.loginDone = function (loginDetailsId) {
             $log.info('login is done');
+            $scope.loginDetailsId = loginDetailsId;
+
             if (popupWindow !== null) {
                 popupWindow.close();
                 popupWindow = null;
@@ -36,22 +37,24 @@ angular.module('cloudifyWidgetUiApp')
 
         var popupWindow = null;
 
-        $scope.tryItNow = function (socialLogin, widget) {
-            $window.$windowScope = $scope;
-
-            var size = LoginTypesService.getIndexSize();
-
-            var left = (screen.width / 2) - (size.width / 2);
-            var top = (screen.height / 2) - (size.height / 2);
-
-            var url = null;
-            if (socialLogin === null) {
-                url = '/#/widgets/' + $scope.widget._id + '/login/index';
-            } else {
-                url = '/backend/widgets/' + widget._id + '/login/' + socialLogin.id;
+        $scope.trySocialLoginNow = function (socialLogin, widget) {
+            if ( !socialLogin || socialLogin.id !== 'googleplus') {
+                popupWindow = LoginService.performSocialLogin(socialLogin, widget, $scope);
             }
+        };
 
-            popupWindow = window.open(url, 'Enter Details', 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + size.width + ', height=' + size.height + ', top=' + top + ', left=' + left);
+        $scope.tryPrivateImagesNow = function (isAdd) {
+            return WidgetsService.tryPrivateImagesNow(isAdd, $scope.tryItNow.apiKey, $scope.tryItNow.secretKey, $scope.widget.executionDetails.privateImages).then(
+                function success() {
+                    $log.info('Successfully modified images');
+                    toastr.info('Successfully modified images');
+
+                },
+                function error(err) {
+                    toastr.error(err.data.error);
+                    $log.error(err.data.error);
+                }
+            );
         };
 
         $scope.isTypeSupportsMailchimp = function (socialLogin) {
@@ -76,6 +79,14 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.addLoginType = function (loginType) {
 
+
+            $log.info('adding ', loginType );
+            if ( loginType.id === 'googleplus'){
+                $log.info('will render googleplus');
+                $timeout(function(){
+                    GoogleplusLoginService.render(function(){});
+                });
+            }
             if (_getSocialLoginById(loginType.id)) {
                 $log.info('social login %s already exists', loginType.id);
                 return;
@@ -151,14 +162,21 @@ angular.module('cloudifyWidgetUiApp')
             $location.path('/widgets');
         }
 
+        $scope.addPrivateImageItem = function() {
+            if (!$scope.widget.executionDetails.privateImages) {
+                $scope.widget.executionDetails.privateImages = [];
+            }
+
+            $scope.widget.executionDetails.privateImages.push({});
+        };
+
+        $scope.removePrivateImageItem = function(index) {
+            $scope.widget.executionDetails.privateImages.splice(index, 1);
+        };
+
         $scope.delete = function () {
             WidgetsService.deleteWidget($scope.widget);
             redirectToWidgets();
-        };
-
-
-        $scope.widgetAsJson = function () {
-            return JSON.stringify($scope.widget, {}, 4);
         };
 
         $scope.view = function () {
@@ -167,14 +185,15 @@ angular.module('cloudifyWidgetUiApp')
             });
         };
 
-
         $scope.update = function () {
             return WidgetsService.updateWidget($scope.widget).then(
                 function success() {
                     $log.info('successfully updated the widget');
+                    toastr.info('successfully updated the widget');
 
                 },
                 function error() {
+                    toastr.error('unknown error');
                     $log.error('unable to update the widget');
                 }
             );
@@ -185,6 +204,13 @@ angular.module('cloudifyWidgetUiApp')
         };
 
         $scope.create = function () {
+
+            if (!$scope.widget.executionDetails) {
+                // if there are no executionDetails defined, default to non-solo mode.
+                $scope.widget.executionDetails = {
+                    isSoloMode: false
+                };
+            }
 
             $log.info('creating new widget', $scope.widget);
 
@@ -198,4 +224,22 @@ angular.module('cloudifyWidgetUiApp')
                 }
             );
         };
+
+        WidgetsService.listPools().then(
+            function success(result) {
+                $scope.userPools = result.data;
+            },
+            function error(cause) {
+                $scope.userPools = undefined;
+                $log.error('error getting pools list - ' + cause.data);
+            }
+        );
+
+        $scope.navigateTo = function (section) {
+            $location.search('section', section);
+        };
+
+        $timeout(function(){
+            GoogleplusLoginService.render(function(){});
+        },1000);
     });

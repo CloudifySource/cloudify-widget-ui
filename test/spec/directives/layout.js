@@ -1,10 +1,10 @@
 'use strict';
 
 describe('Directive: layout', function () {
-  beforeEach(module('cloudifyWidgetUiApp'));
+    beforeEach(module('cloudifyWidgetUiApp'));
 
-  var element;
-
+//  var element;
+//
 //  it('should make hidden element visible', inject(function ($rootScope, $compile) {
 //    element = angular.element('<layout></layout>');
 //    element = $compile(element)($rootScope);
