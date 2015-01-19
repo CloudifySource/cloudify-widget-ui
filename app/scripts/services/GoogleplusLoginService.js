@@ -17,7 +17,9 @@ angular.module('cloudifyWidgetUiApp')
                 //'requestvisibleactions': Conf.requestvisibleactions,
                 'scope': 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/plus.login',
                 //'apppackagename': 'your.photohunt.android.package.name',
-                'theme': 'dark',
+                'theme': 'light',
+                'height' :'tall',
+                'width' : 'iconOnly',
                 'cookiepolicy': 'single_host_origin'//,
                 //'accesstype': 'offline'
             });
