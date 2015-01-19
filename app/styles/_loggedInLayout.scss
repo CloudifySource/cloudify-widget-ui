@@ -47,7 +47,6 @@
 
             li {
                 display: inline-block;
-                cursor: pointer;
 
                 a {
                     padding: 15px 20px;
@@ -62,4 +61,9 @@
 
     }
 
+    .nav{
+        a{
+            cursor:pointer;
+        }
+    }
 }

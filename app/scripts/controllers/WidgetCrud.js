@@ -9,18 +9,30 @@ angular.module('cloudifyWidgetUiApp')
 
         $scope.tryItNow = {};
 
-        function _getSocialLoginById(id) {
+        function _getSelectedSocialLogins(){
             if (!!$scope.widget && !!$scope.widget.socialLogin && !!$scope.widget.socialLogin.data) {
-                for (var i = 0; i < $scope.widget.socialLogin.data.length; i++) {
-                    var socialLogin = $scope.widget.socialLogin.data[i];
-                    if (id === socialLogin.id) {
-                        return socialLogin;
-                    }
-                }
-
+                return $scope.widget.socialLogin.data;
             }
-            return null;
+            return [];
+        }
 
+        function _getUnselectedLoginTypes(){
+            var selected = {};
+            _.each(_getSelectedSocialLogins(), function(item){
+                selected[item.id] = item;
+            });
+
+
+            var available = $scope.availableLoginTypes();
+            return _.filter(available, function(item){
+                return  !selected.hasOwnProperty(item.id);
+            });
+        }
+
+        $scope.getUnselectedLoginTypes = _getUnselectedLoginTypes;
+
+        function _getSocialLoginById(id) {
+            return _.find( _getSelectedSocialLogins, {'id' : id });
         }
 
         // use this with the following from the popup window:
@@ -71,6 +83,10 @@ angular.module('cloudifyWidgetUiApp')
             } else {
                 return 'N/A';
             }
+        };
+
+        $scope.hasUnselectedLoginTypes = function(){
+            return $scope.availableLoginTypes().length !== _getSelectedSocialLogins().length;
         };
 
         $scope.loginTypeSelected = function (loginType) {
