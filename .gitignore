@@ -13,3 +13,4 @@ cloudify-folder
 coverage
 test-results.xml
 backend-coverage
+backend-instrument
