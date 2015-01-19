@@ -4,6 +4,7 @@
 @import "./widgetThemeDefault";
 @import "./login";
 @import "./widgetForm";
+@import "./loggedInLayout";
 
 // ---------- bootstrap overrides------------------
 .row {
@@ -14,51 +15,6 @@
 
 // ------------------------------------------------
 
-// hide multiple layouts layers for "logged-in-layout" - means that if I have 2 pages one within another with the layout, the other layout will be hidden.
-#logged-in-layout {
-    .logged-in-layout .require-login {
-        display: none !important;
-
-    }
-    .require-login {
-        display: none;
-    }
-
-    .header {
-        background-color: #181818;
-    }
-
-    .hello {
-        color: lightgray;
-        float: left;
-        margin: 12px 12px 12px 24px;
-    }
-
-    &.logged-in {
-        display: default;
-        width: 100%;
-
-        .require-login {
-            display: block;
-
-        }
-        .logged-out {
-            display: none;
-        }
-
-    }
-    &.container {
-        padding-right: 0px;
-        padding-left: 0px;
-    }
-    .auto-refresh {
-        float: right;
-    }
-    .navbar {
-        border-radius: 0px;
-    }
-
-}
 
 .hidden {
     display: none;
@@ -81,23 +37,6 @@
     }
 }
 
-.nav {
-
-    li {
-        display: inline-block;
-        cursor:pointer;
-
-        a {
-            padding: 15px 20px;
-            color: lightgray;
-        }
-
-        a:hover {
-            color: darkslategray;
-        }
-    }
-
-}
 
 
 #accountPools, #dashboard {
