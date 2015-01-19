@@ -1,26 +1,22 @@
-<!--<h4>Please select authentication service</h4>-->
 
+<div id="login">
 
+    <legend class=".bs-callout-info h4">Login with </legend>
 
-
-
-<form style="padding-top: 25px" class="form-horizontal">
-
-    <label class="col-sm-offset-0">Authenticate with..</label>
-
-        <div class=".form-group">
+    <div class="bg-info">
         <div ng-repeat="login in loginTypes(widget.socialLogin.data)" class="thumb">
-            <a ng-show="login.id !== 'googleplus'" ng-href="/backend/widgets/{{widget._id}}/login/{{login.id}}">
-                <div> <i class="fa fa-sign-in fa-4x -{{login.id}}"></i> Sign-in </div>
+            <a class="btn btn-primary" ng-show="login.id !== 'googleplus'" ng-href="/backend/widgets/{{widget._id}}/login/{{login.id}}">
+                <i class="fa fa-sign-in fa-2x pull-left -{{login.id}}"><h5> Login </h5></i>
             </a>
         </div>
-        </div>
-        <div class=".form-group">
-             <div id="googleplus" ng-show="hasGoogleplus()" ></div>
-        </div>
 
-</form>
+  <legend> </legend>
 
+        <a class="btn btn-primary">
+        <div id="googleplus" ng-show="hasGoogleplus()"></div>
+        </a>
+    </div>
 
+</div>
 
 
