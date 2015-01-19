@@ -89,7 +89,7 @@ module.exports = function (grunt) {
                 {
                     context: '/backend',
                     host: '127.0.0.1',
-                    port: 9003,
+                    port: 9001,
                     https: false,
                     changeOrigin: false,
                     xforward: false
@@ -380,7 +380,7 @@ module.exports = function (grunt) {
                         src: [ '*.js', '*.sh', 'package.json', 'build/**/*', 'backend/**/*', 'conf/**/*', 'build.id' ]
                     },
                     {
-                        
+
                         expand: true,
                         dot: true,
                         cwd: '.',
@@ -619,13 +619,13 @@ module.exports = function (grunt) {
         'usemin'
     ]);
 
-    
+
     grunt.registerTask('backend', function () {
         grunt.config.set('jshint.options.jshintrc', '.backendhintrc');
         grunt.task.run('jshint:backend');
     });
 
-    
+
     grunt.registerTask('default', [
         'jshint',
         'test:all',
