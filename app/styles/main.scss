@@ -29,7 +29,7 @@
     }
 
     .hello {
-        color: white;
+        color: lightgray;
         float: left;
         margin: 12px 12px 12px 24px;
     }
@@ -85,18 +85,20 @@
 
     li {
         display: inline-block;
+        cursor:pointer;
 
         a {
             padding: 15px 20px;
-            color: white;
+            color: lightgray;
         }
 
         a:hover {
-            color: black;
+            color: darkslategray;
         }
     }
 
 }
+
 
 #accountPools, #dashboard {
     .actions {
@@ -106,6 +108,7 @@
     }
 
 }
+
 
 #accountPoolDetails {
     .jumbotron {
