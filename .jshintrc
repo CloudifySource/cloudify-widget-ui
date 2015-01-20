@@ -22,6 +22,10 @@
   "globals": {
     "angular": false,
       "confirm":false,
-      "$":false
+      "$":false,
+      "toastr":false,
+      "_" : false,
+      "gapi" : false,
+      "conf" : false
   }
 }

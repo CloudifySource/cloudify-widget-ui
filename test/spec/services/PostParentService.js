@@ -2,11 +2,11 @@
 
 describe('Service: PostParentService', function () {
 
-  // load the service's module
-  beforeEach(module('cloudifyWidgetUiApp'));
+    // load the service's module
+    beforeEach(module('cloudifyWidgetUiApp'));
 
-  // instantiate service
-  var PostParentService;
+    // instantiate service
+//    var PostParentService;
 //  beforeEach(inject(function (_PostParentService_) {
 //    PostParentService = _PostParentService_;
 //  }));

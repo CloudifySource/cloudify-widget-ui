@@ -1,8 +1,34 @@
+<form ng-submit="submitForm()" xmlns="http://www.w3.org/1999/html">
 
+    <!--<label class="col-lg-4 col-sm-offset-4" >Please Login</label>-->
+    <legend class=".bs-callout-info h4"><label class="col-lg-4 col-sm-offset-4" >Please fill out the following</label> </legend>
 
-<form ng-submit="submitForm()">
-    First Name : <input ng-model="page.firstName"/><br/>
-    Last Name : <input ng-model="page.lastName"/><br/>
-    Email Name : <input ng-model="page.email"/><br/>
-    <input type="submit" value="Submit"/>
+    <div class="bg-info">
+
+    <div class="form-group">
+        <div class="col-lg-4 col-sm-offset-4">
+            <label class="col-lg-4 col-sm-offset-4" >Enter first name</label>
+        <input type="text" class="form-control" id="enter-name" ng-model="page.firstName" placeholder=" e.g Eric . . .">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-lg-4 col-sm-offset-4">
+            <label class="col-lg-4 col-sm-offset-4" >Enter last name</label>
+        <input type="text" class="form-control" id="enter-lname" ng-model="page.lastName" placeholder=" e.g Clapton . . .">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-lg-4 col-sm-offset-4">
+            <label class="col-lg-4 col-sm-offset-4" >Enter email address</label>
+            <input type="email" class="form-control" id="inputEmail3" ng-model="page.email" placeholder=" e.g eric.clapton@gigaspaces.com">
+        </div>
+    </div>
+    <div class="col-lg-4 col-sm-offset-4">
+        <button type="submit" class="btn btn-primary">Go!</button>
+    </div>
+    </div>
 </form>
+
+

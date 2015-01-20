@@ -1,52 +1,45 @@
-
+'use strict';
 var logger = require('log4js').getLogger('DownloadService');
-var fs = require('fs');
-var path = require('path');
-var https = require('https');
-var http = require('http');
-var AdmZip = require('adm-zip');
+//var fs = require('fs');
+//var path = require('path');
+var Download = require('download');
 var files = require('./FilesService');
 
-exports.downloadRecipe = function (options, callback) {
+exports.downloadZipfile = function (options, callback) {
     try {
         var destDir = options.destDir,
-            cloudifyRecipeUrl = options.recipeUrl;
+            zipFileUrl = options.url,
+            extract = options.extract;
 
         if (!destDir) {
             throw new Error('destination directory parameter is missing');
         }
 
-        if (!cloudifyRecipeUrl) {
-            throw new Error('Cloudify Recipe url parameter is missing');
+        if (!zipFileUrl) {
+            throw new Error('Zip file url parameter is missing');
         }
 
         logger.debug('making destination dir [' + destDir + ']');
         files.mkdirp(destDir);
-        var recipeZipFile = destDir + path.sep + 'recipe.zip';
 
-        logger.debug('fetching zip from url [' + cloudifyRecipeUrl + ']');
+        logger.debug('fetching zip from url [' + zipFileUrl + ']');
 
-        var file = fs.createWriteStream(recipeZipFile);
+        var download = new Download({ extract: extract })
+            .get(zipFileUrl)
+            .dest(destDir);
 
-        var protocol = http;
-        if (cloudifyRecipeUrl.indexOf('https') === 0) {
-            protocol = https;
-        }
-        protocol.get(cloudifyRecipeUrl, function (response) {
-            logger.debug('saving zip');
-            response.pipe(file);
-            file.on('finish', function () {
-                file.close();
-                logger.debug('zip saved successfully [' + recipeZipFile + ']');
-                var zip = new AdmZip(recipeZipFile);
-                zip.extractAllTo(destDir, true);
-                logger.debug('zip extracted to [' + destDir + ']');
-                callback && typeof callback === 'function' && callback(null);
-            });
+        download.run(function (err/*, files, stream*/) {
+            if (err) {
+                logger.info('got error from download',err);
+                callback(err);
+            }
+
+            callback && typeof callback === 'function' && callback(null);
         });
+
     }catch(e){
-        logger.error(e);
-//        callback(e);
+        logger.error('error while downloading',e);
+        callback(e);
     }
 };
 
@@ -55,11 +48,11 @@ if (require.main === module) {
     logger.info('running main file, download recipe');
     try {
         var params = {
-            destDir: "downloaded",
-            cloudifyRecipeUrl: "https://dl.dropboxusercontent.com/s/u51vae4947uto0u/biginsights_solo.zip?dl=1&token_hash=AAEi1Dx3f2AFvkYXRe3FgfpspkBkQCZLLaRJb7DYHe-y1w"
+            destDir: 'downloaded',
+            zipFileUrl: 'https://dl.dropboxusercontent.com/s/u51vae4947uto0u/biginsights_solo.zip?dl=1&token_hash=AAEi1Dx3f2AFvkYXRe3FgfpspkBkQCZLLaRJb7DYHe-y1w'
         };
         logger.info('start....');
-        exports.downloadRecipe(params, function () {
+        exports.downloadZipfile(params, function () {
             logger.info('finished...');
         });
 

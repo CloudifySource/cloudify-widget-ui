@@ -1,9 +1,9 @@
 'use strict';
 
 describe('Directive: widgetEmbed', function () {
-  beforeEach(module('cloudifyWidgetUiApp'));
+    beforeEach(module('cloudifyWidgetUiApp'));
 
-  var element;
+//  var element;
 
 //  it('should make hidden element visible', inject(function ($rootScope, $compile) {
 //    element = angular.element('<widget-embed></widget-embed>');

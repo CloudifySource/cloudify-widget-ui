@@ -2,11 +2,11 @@
 
 describe('Controller: AdminPoolCrudCtrl', function () {
 
-  // load the controller's module
-  beforeEach(module('cloudifyWidgetUiApp'));
+    // load the controller's module
+    beforeEach(module('cloudifyWidgetUiApp'));
 
-  var AdminPoolCrudCtrl,
-    scope;
+//    var AdminPoolCrudCtrl,
+//        scope;
 
 //  // Initialize the controller and a mock scope
 //  beforeEach(inject(function ($controller, $rootScope) {

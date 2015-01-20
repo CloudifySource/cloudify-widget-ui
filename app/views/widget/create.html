@@ -1,8 +1,10 @@
 <div layout>
-<h1> Create new widget </h1>
+    <h2> Create new widget </h2>
 
-<div ng-include src="'views/widget/_widgetForm.html'"></div>
+    <div class="row" ng-include src="'views/widget/_widgetForm.html'"></div>
 
-<button ng-click="create()">Create</button>
-<a href="#/dashboard">Cancel</a>
+    <div class="row">
+        <span title="Create"><a class = "btn" ng-click="create()"><i class="fa fa-floppy-o fa-2x"></i></a></span>
+        <span title="Cancel"><a class = "btn" href="#/dashboard"><i class="fa fa-times fa-2x"></i></a></span>
+    </div>
 </div>
