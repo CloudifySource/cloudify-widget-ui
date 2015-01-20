@@ -36,6 +36,9 @@ angular.module('cloudifyWidgetUiApp')
 //            $scope.getUsers();
 //            $scope.getPools();
 
+            // TODO: this should really be refactored into a timing service.
+            // See https://ajsblackbelt.wordpress.com/2014/05/13/timing-service/
+
             if (angular.isDefined($scope.model.poolId)) {
                 $scope.getPoolStatus($scope.model.poolId);
                 $scope.getPoolNodes($scope.model.poolId);
