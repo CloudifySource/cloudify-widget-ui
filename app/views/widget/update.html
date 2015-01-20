@@ -4,10 +4,15 @@
     <div class="row" ng-include src="'views/widget/_widgetForm.html'"></div>
 
     <div class="row">
-        <button ng-click="update()">Update</button>
-        <button ng-click="done()">Done</button>
-        <button ng-click="view()">Save & View</button>
-        <button ng-click="delete()">Delete</button>
-        <a href="#/dashboard">Cancel</a>
+       <!-- <button class="btn" ng-click="update()">Update</button>-->
+
+        <!--<button class="btn" ng-click="view()">Save & View</button>-->
+
+        <!--<button class="btn" ng-click="delete()">Delete</button>-->
+        <span title="Update"><a class = "btn"  ng-click="update()"><i class="fa fa-cloud-upload fa-2x"></i></a></span>
+        <span title="Done"><a class = "btn"  ng-click="done()"><i class="fa fa-flag-checkered fa-2x"></i></a></span>
+        <span title="Save and View"><a class = "btn" ng-click="view()"><i class="fa fa-floppy-o fa-2x"></i></a></span>
+        <span title="Delete"><a class = "btn" ng-click="delete()"><i class="fa fa-trash-o fa-2x"></i></a></span>
+        <span title="Cancel"><a class = "btn" href="#/dashboard"><i class="fa fa-times fa-2x"></i></a></span>
     </div>
 </div>

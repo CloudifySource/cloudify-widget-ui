@@ -4,6 +4,10 @@
 @import "./widgetThemeDefault";
 @import "./login";
 @import "./widgetForm";
+@import "./loggedInLayout";
+
+$fa-font-path: "/bower_components/font-awesome/fonts";
+@import "font-awesome/scss/font-awesome";
 
 // ---------- bootstrap overrides------------------
 .row {
@@ -14,51 +18,6 @@
 
 // ------------------------------------------------
 
-// hide multiple layouts layers for "logged-in-layout" - means that if I have 2 pages one within another with the layout, the other layout will be hidden.
-#logged-in-layout {
-    .logged-in-layout .require-login {
-        display: none !important;
-
-    }
-    .require-login {
-        display: none;
-    }
-
-    .header {
-        background-color: #181818;
-    }
-
-    .hello {
-        color: white;
-        float: left;
-        margin: 12px 12px 12px 24px;
-    }
-
-    &.logged-in {
-        display: default;
-        width: 100%;
-
-        .require-login {
-            display: block;
-
-        }
-        .logged-out {
-            display: none;
-        }
-
-    }
-    &.container {
-        padding-right: 0px;
-        padding-left: 0px;
-    }
-    .auto-refresh {
-        float: right;
-    }
-    .navbar {
-        border-radius: 0px;
-    }
-
-}
 
 .hidden {
     display: none;
@@ -81,22 +40,7 @@
     }
 }
 
-.nav {
 
-    li {
-        display: inline-block;
-
-        a {
-            padding: 15px 20px;
-            color: white;
-        }
-
-        a:hover {
-            color: black;
-        }
-    }
-
-}
 
 #accountPools, #dashboard {
     .actions {
@@ -106,6 +50,7 @@
     }
 
 }
+
 
 #accountPoolDetails {
     .jumbotron {

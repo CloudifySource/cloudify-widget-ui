@@ -185,3 +185,8 @@ domain.run(function () {
 
 
 });
+
+
+process.on('uncaughtException', function( err ){
+    logger.error('uncaught exception happened!!!', err);
+});
