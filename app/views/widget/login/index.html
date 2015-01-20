@@ -1,7 +1,7 @@
 
 <div id="login">
 
-    <legend class=".bs-callout-info h4">Login with </legend>
+    <legend class=".bs-callout-info h4"><label>Choose a way to login </label> </legend>
 
     <div class="bg-info">
         <div ng-repeat="login in loginTypes(widget.socialLogin.data)" class="thumb">
@@ -9,8 +9,6 @@
                 <i class="fa fa-sign-in fa-2x pull-left -{{login.id}}"><h5> Login </h5></i>
             </a>
         </div>
-
-  <legend> </legend>
 
         <a class="btn btn-primary">
         <div id="googleplus" ng-show="hasGoogleplus()"></div>

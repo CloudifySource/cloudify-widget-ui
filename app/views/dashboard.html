@@ -26,9 +26,11 @@
                     {{widget.title}}
                 </td>
                 <td>
-                    <a href="#/widgets/{{widget._id}}/update">Edit</a>
-                    <a href="#/widgets/{{widget._id}}/read">View</a>
-                    <a class = "btn" ng-click="delete( widget )"><i class="fa fa-trash-o fa-2x"></i></a>
+                    <span title="Edit"><a class = "btn" href="#/widgets/{{widget._id}}/update"><i class="fa fa-pencil-square-o fa-2x"></i></a></span>
+
+                    <span title="View"><a class = "btn" href="#/widgets/{{widget._id}}/read"><i class="fa fa-eye fa-2x"></i></a></span>
+
+                    <span title="Delete"><a class = "btn" ng-click="delete( widget )"><i class="fa fa-trash-o fa-2x"></i></a></span>
                 </td>
             </tr>
             </tbody>
