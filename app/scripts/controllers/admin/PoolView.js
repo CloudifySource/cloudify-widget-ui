@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudifyWidgetUiApp')
-    .controller('AdminPoolViewCtrl', function ($scope, $log, AdminPoolCrudService, $routeParams, $location, $interval) {
+    .controller('AdminPoolViewCtrl', function ($scope, $log, AdminPoolCrudService, $routeParams, $location, TimingSrv, PollingConstants) {
 
         $scope.accountId = $routeParams.accountId;
         $scope.poolId = $routeParams.poolId;
@@ -9,7 +9,8 @@ angular.module('cloudifyWidgetUiApp')
         $scope.predicate = 'id';
         $scope.reverse = true;
 
-        var cloudNodesRefreshInterval = 360;
+        var pollInterval = 5000;                                // poll every 5 secs
+        var cloudNodesRefreshInterval = 360 * pollInterval;     // poll node mappings every 30 minutes
 
         $scope.model = {
             accountId: $routeParams.accountId,
@@ -24,46 +25,27 @@ angular.module('cloudifyWidgetUiApp')
             threadPoolStatus: []
         };
 
-
-        var refreshInterval = $interval(function () {
-            // TODO create child controllers and separate behaviors so we wouldn't have to call every getter
-            $log.info('refreshing');
-
-//            if (!$rootScope.autoRefresh) {
-//                return;
-//            }
-
-//            $scope.getUsers();
-//            $scope.getPools();
-
-            // TODO: this should really be refactored into a timing service.
-            // See https://ajsblackbelt.wordpress.com/2014/05/13/timing-service/
-
+        TimingSrv.register(PollingConstants.POOL_VIEW, function() {
+            $log.info('Refreshing pool view');
             if (angular.isDefined($scope.model.poolId)) {
-                $scope.getPoolStatus($scope.model.poolId);
                 $scope.getPoolNodes($scope.model.poolId);
                 $scope.getPoolTasks($scope.model.poolId);
                 $scope.getPoolErrors($scope.model.poolId);
                 $scope.getPoolDecisions($scope.model.poolId);
                 $scope.getThreadPoolStatus($scope.model.poolId);
-
-                cloudNodesRefreshInterval--;
-                if (cloudNodesRefreshInterval <= 0) {
-                    // this will only get polled once every 360*5s (30 min).
-                    $scope.getCloudNodes($scope.model.poolId);
-                    cloudNodesRefreshInterval = 360;
-                }
             }
-//            if (angular.isDefined($scope.model.accountId)) {
-//                $scope.getAccountPools($scope.model.accountId);
-//            }
-//            if (angular.isDefined($scope.model.accountId) && angular.isDefined($scope.model.poolId)) {
-//                $scope.getAccountPool($scope.model.accountId, $scope.model.poolId);
-//            }
-        }, 5000);
+        }, pollInterval);
+
+        TimingSrv.register(PollingConstants.POOL_VIEW_NODE_MAPPINGS, function() {
+            $log.info('Refreshing pool view node mappings');
+            if (angular.isDefined($scope.model.poolId)) {
+                $scope.getCloudNodes($scope.model.poolId);
+            }
+        }, cloudNodesRefreshInterval);
 
         $scope.$on('$destroy', function () {
-            $interval.cancel(refreshInterval);
+            TimingSrv.unregister(PollingConstants.POOL_VIEW);
+            TimingSrv.unregister(PollingConstants.POOL_VIEW_NODE_MAPPINGS);
         });
 
         $scope.getPoolStatus = function (poolId) {
