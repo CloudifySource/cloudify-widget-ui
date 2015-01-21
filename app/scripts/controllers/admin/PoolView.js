@@ -27,6 +27,7 @@ angular.module('cloudifyWidgetUiApp')
 
         TimingSrv.register(PollingConstants.POOL_VIEW, function() {
             $log.info('Refreshing pool view');
+            //TODO; think of a better way to poll all these instead of calling each getter.
             if (angular.isDefined($scope.model.poolId)) {
                 $scope.getPoolNodes($scope.model.poolId);
                 $scope.getPoolTasks($scope.model.poolId);
