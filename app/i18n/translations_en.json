@@ -22,6 +22,9 @@
             "hpConsole": "HP Console",
             "embedCode": "Embed Code",
             "copyToEmbed": "Copy the code below to embed the widget on your website."
+        },
+        "login" : {
+            "chooseMethod" : "Choose Login Method"
         }
     }
 
