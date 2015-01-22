@@ -282,7 +282,11 @@ function _loginCallback(req, res) {
             return;
         }
 
-        res.send(200, closePopupResponse.replace('__id__', loginModel._id));
+        if (loginModel.type === 'googleplus') {
+            res.status(200).send({result: loginModel._id});
+        } else {
+            res.send(200, closePopupResponse.replace('__id__', loginModel._id));
+        }
     };
 }
 
