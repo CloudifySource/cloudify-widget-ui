@@ -6,10 +6,9 @@
     "domain": "blu.cfy.org",
     "ram": 1155,
     "cpu": 860,
-    "disk": 3876,
+    "disk": 3891,
     "os": "",
-
-    "image_template_global_id": "ef15c58f-ca88-45b4-9cab-966c0f7f9350",
+    "image_template_global_id": "b7bff072-2fad-4202-b491-a9fec64fc138",
     "image_template_id": "",
     "private_network_only": false,
     "port_speed": 188,
