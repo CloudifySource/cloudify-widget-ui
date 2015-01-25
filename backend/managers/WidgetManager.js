@@ -9,6 +9,7 @@ var services = require('../services');
 var managers = require('../managers');
 var conf = require('../Conf');
 var models = require('../models');
+var executors = require('../executors');
 
 
 /**
