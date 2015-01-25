@@ -3,4 +3,5 @@
  */
 'use strict';
 
-exports.freeWidgetExecutor = require('./FreeWidgetExecutor');
+exports.FreeWidgetExecutor = require('./FreeWidgetExecutor');
+exports.ExecutionModel = require('./ExecutionModel');

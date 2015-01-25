@@ -4,20 +4,24 @@
 'use strict';
 
 var util = require('util');
-var abstractwidgetExecutor = require('./AbstractWidgetExecutor');
+var AbstractWidgetExecutor = require('./AbstractWidgetExecutor');
 var logger = require('log4js').getLogger('FreeWidgetExecutor');
 
-function FreeWidgetExecutor() {
+
+function FreeWidgetExecutor(executionModel) {
     logger.info('ctor');
-    abstractwidgetExecutor.call(this);
+    AbstractWidgetExecutor.call(this, executionModel);
 }
 
-util.inherits(FreeWidgetExecutor, abstractwidgetExecutor);
+util.inherits(FreeWidgetExecutor, AbstractWidgetExecutor);
 
+//-----------  Overrides  ----------------------
 FreeWidgetExecutor.prototype.executionType = 'Free';
 
-FreeWidgetExecutor.prototype.sendEmail = function() {
-    logger.info('FreeWidgetExecutor sending email...');
+AbstractWidgetExecutor.prototype.getExecutionTasks = function () {
+    return [this.getWidget];
 };
+//-----------  Overrides  ----------------------
+
 
 module.exports = FreeWidgetExecutor;
