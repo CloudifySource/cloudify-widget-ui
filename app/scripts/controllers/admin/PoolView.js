@@ -37,12 +37,12 @@ angular.module('cloudifyWidgetUiApp')
             }
         }, pollInterval);
 
-        TimingSrv.register(PollingConstants.POOL_VIEW_NODE_MAPPINGS, function() {
-            $log.info('Refreshing pool view node mappings');
-            if (angular.isDefined($scope.model.poolId)) {
-                $scope.getCloudNodes($scope.model.poolId);
-            }
-        }, cloudNodesRefreshInterval);
+        //TimingSrv.register(PollingConstants.POOL_VIEW_NODE_MAPPINGS, function() {
+        //    $log.info('Refreshing pool view node mappings');
+        //    if (angular.isDefined($scope.model.poolId)) {
+        //        $scope.getCloudNodes($scope.model.poolId);
+        //    }
+        //}, cloudNodesRefreshInterval);
 
         $scope.$on('$destroy', function () {
             TimingSrv.unregister(PollingConstants.POOL_VIEW);
