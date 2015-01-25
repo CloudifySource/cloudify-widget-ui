@@ -10,7 +10,7 @@ angular.module('cloudifyWidgetUiApp')
         $scope.reverse = true;
 
         var pollInterval = 5000;                                // poll every 5 secs
-        var cloudNodesRefreshInterval = 360 * pollInterval;     // poll node mappings every 30 minutes
+        //var cloudNodesRefreshInterval = 360 * pollInterval;     // poll node mappings every 30 minutes
 
         $scope.model = {
             accountId: $routeParams.accountId,
