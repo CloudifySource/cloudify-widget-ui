@@ -57,6 +57,7 @@ angular.module('cloudifyWidgetUiApp')
             GoogleplusLoginService.render($scope.processGoogleplusAuth);
         };
 
+        //TODO: use TimingService once it supports timeout as well.
         $timeout( function(){
             $scope.page.loading = false;
         }, 3000);
