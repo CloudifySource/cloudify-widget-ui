@@ -23,7 +23,8 @@ AbstractWidgetExecutor.prototype.getExecutionTasks = function () {
         tasksDirectory.getWidget,
         tasksDirectory.getPoolKey,
         tasksDirectory.saveExecutionModel,
-        tasksDirectory.updateExecutionModelAddPaths
+        tasksDirectory.updateExecutionModelAddPaths,
+        tasksDirectory.downloadRecipe
     ];
 };
 

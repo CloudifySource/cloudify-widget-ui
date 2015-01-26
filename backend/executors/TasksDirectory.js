@@ -5,6 +5,7 @@
 
 var logger = require('log4js').getLogger('TasksDirectory');
 var managers = require('../managers');
+var services = require('../services');
 var path = require('path');
 var _ = require('lodash');
 var conf = require('../Conf');
@@ -119,6 +120,28 @@ exports.updateExecutionModelAddPaths = function (executionModel, callback) {
         downloadsPath: executionModel.getDownloadsPath(),
         logsPath: executionModel.getLogsPath()
     }, executionModel, callback);
+};
+
+exports.downloadRecipe = function(executionModel, callback) {
+    // TODO : add validation if destination download not already exists otherwise simply call callback.
+    logger.info('downloading recipe from ', executionModel.getWidget().recipeUrl);
+    // download recipe zip
+    var options = {
+        destDir: executionModel.getDownloadsPath(),
+        url: executionModel.getWidget().recipeUrl,
+        extract: true
+    };
+
+    if (!options.url) {
+        executionModel.setShouldInstall(false);
+        callback(null, executionModel);
+
+    } else {
+        executionModel.setShouldInstall(true);
+        services.dl.downloadZipfile(options, function (e) {
+            callback(e, executionModel);
+        });
+    }
 };
 
 //---------------- COMMON TASKS END ------------------------

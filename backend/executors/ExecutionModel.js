@@ -79,6 +79,14 @@ ExecutionModel.prototype.getLogsPath = function () {
     return this.logsPath;
 };
 
+ExecutionModel.prototype.setShouldInstall = function (shouldInstall) {
+    this.shouldInstall = shouldInstall;
+};
+
+ExecutionModel.prototype.getShouldInstall = function () {
+    return this.shouldInstall;
+};
+
 
 
 module.exports = ExecutionModel;
