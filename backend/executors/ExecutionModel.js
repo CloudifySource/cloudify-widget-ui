@@ -11,36 +11,42 @@ function ExecutionModel(widgetId, callback) {
     this.executionCallback = callback;
 }
 
-ExecutionModel.prototype.getWidgetId = function() {
+ExecutionModel.prototype.getWidgetId = function () {
     return this.widgetId;
 };
 
-ExecutionModel.prototype.getWidgetObjectId = function() {
+ExecutionModel.prototype.getWidgetObjectId = function () {
     return this.widgetObjectId;
 };
 
-ExecutionModel.prototype.getExecutionCallback = function() {
+ExecutionModel.prototype.getExecutionCallback = function () {
     return this.executionCallback;
 };
 
-ExecutionModel.prototype.setLoginDetailsId = function(loginDetailsId) {
+ExecutionModel.prototype.setLoginDetailsId = function (loginDetailsId) {
     this.loginDetailsId = loginDetailsId;
 };
 
-ExecutionModel.prototype.getLoginDetailsId = function() {
+ExecutionModel.prototype.getLoginDetailsId = function () {
     return this.loginDetailsId;
 };
 
-
-
-
-
-ExecutionModel.prototype.setTestString = function(testString) {
-    this.testString = testString;
+ExecutionModel.prototype.setWidget = function (widget) {
+    this.widget = widget;
 };
 
-ExecutionModel.prototype.getTestString = function() {
-    return this.testString;
+ExecutionModel.prototype.getWidget = function () {
+    return this.widget;
 };
+
+ExecutionModel.prototype.setPoolKey = function (poolKey) {
+    this.poolKey = poolKey;
+};
+
+ExecutionModel.prototype.getPoolKey = function () {
+    return this.poolKey;
+};
+
+
 
 module.exports = ExecutionModel;

@@ -4,6 +4,7 @@
 'use strict';
 var logger = require('log4js').getLogger('AbstractWidgetExecutor');
 var async = require('async');
+var managers = require('../managers');
 
 function AbstractWidgetExecutor(executionModel) {
     logger.info('ctor');
@@ -30,12 +31,32 @@ AbstractWidgetExecutor.prototype.getExecutionTasks = function () {
 
 AbstractWidgetExecutor.prototype.getWidget = function (executionModel, callback) {
     logger.info('getting widget id ' + executionModel.getWidgetId());
-    executionModel.setTestString('getWidget test string');
-    callback(null, executionModel);
+
+    managers.db.connect('widgets', function (db, collection, done) {
+        collection.findOne({ _id: executionModel.getWidgetObjectId()}, function (err, result) {
+            if (err) {
+                logger.error('unable to find widget', err);
+                callback(err, executionModel);
+                return;
+            }
+
+            if (!result) {
+                logger.error('result is null for widget find');
+                callback(new Error('could not find widget'), executionModel);
+                return;
+            }
+
+            executionModel.setWidget(result);
+            callback(null, executionModel);
+            done();
+        });
+    });
+
+    //callback(null, executionModel);
 };
 
 AbstractWidgetExecutor.prototype.playFinally = function (err, executionModel) {
-    logger.info(executionModel.getTestString());
+
 };
 
 /**
