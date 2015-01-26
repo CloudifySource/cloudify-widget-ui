@@ -29,6 +29,7 @@ AbstractWidgetExecutor.prototype.getExecutionTasks = function () {
     throw new Error('Abstract method not implemented in inheriting class!');
 };
 
+//--------------------- TASKS -----------------------
 AbstractWidgetExecutor.prototype.getWidget = function (executionModel, callback) {
     logger.info('getting widget id ' + executionModel.getWidgetId());
 
@@ -51,9 +52,38 @@ AbstractWidgetExecutor.prototype.getWidget = function (executionModel, callback)
             done();
         });
     });
-
-    //callback(null, executionModel);
 };
+
+AbstractWidgetExecutor.prototype.saveExecutionModel = function (executionModel, callback) {
+    logger.info('saving execution to mongo');
+
+    managers.db.connect('widgetExecutions', function (db, collection, done) {
+        // instantiate the execution model with the widget data, and remove the _id - we want mongodb to generate a unique id
+        var storedExecutionModel = {};
+        storedExecutionModel.widget = executionModel.widget;
+        storedExecutionModel.loginDetailsId = executionModel.loginDetailsId;
+        storedExecutionModel.state = 'RUNNING';
+
+        collection.insert(storedExecutionModel, function (err, docsInserted) {
+            if (err) {
+                logger.error('failed to store widget execution model to DB', err);
+                callback(err, executionModel);
+                return;
+            }
+
+            if (!docsInserted) {
+                logger.error('no widget execution docs inserted to database');
+                callback(new Error('no widget execution docs inserted to database'), executionModel);
+                return;
+            }
+
+            executionModel.setExecutionObjectId(docsInserted[0]._id);
+            callback(null, executionModel);
+        });
+    });
+};
+
+//--------------------- TASKS END -----------------------
 
 AbstractWidgetExecutor.prototype.playFinally = function (err, executionModel) {
 

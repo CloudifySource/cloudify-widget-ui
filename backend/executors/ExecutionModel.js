@@ -47,6 +47,14 @@ ExecutionModel.prototype.getPoolKey = function () {
     return this.poolKey;
 };
 
+ExecutionModel.prototype.setExecutionObjectId = function (executionObjectId) {
+    this.executionObjectId = executionObjectId;
+};
+
+ExecutionModel.prototype.getExecutionObjectId = function () {
+    return this.executionObjectId;
+};
+
 
 
 module.exports = ExecutionModel;

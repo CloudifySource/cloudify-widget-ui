@@ -15,6 +15,7 @@ function FreeWidgetExecutor(executionModel) {
 
 util.inherits(FreeWidgetExecutor, AbstractWidgetExecutor);
 
+//--------------------- TASKS -----------------------
 FreeWidgetExecutor.prototype.getPoolKey = function (executionModel, callback) {
     logger.info('getting pool key');
 
@@ -39,13 +40,16 @@ FreeWidgetExecutor.prototype.getPoolKey = function (executionModel, callback) {
     });
 };
 
+//--------------------- TASKS END -----------------------
+
 //-----------  Overrides  ----------------------
 FreeWidgetExecutor.prototype.executionType = 'Free';
 
 AbstractWidgetExecutor.prototype.getExecutionTasks = function () {
     return [
         this.getWidget,
-        this.getPoolKey
+        this.getPoolKey,
+        this.saveExecutionModel
     ];
 };
 //-----------  Overrides  ----------------------
