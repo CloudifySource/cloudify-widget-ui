@@ -765,29 +765,6 @@ exports.play = function (widgetId, loginDetailsId, playCallback) {
 
     var executor = new executors.FreeWidgetExecutor();
     executor.play(executionModel);
-    //async.waterfall([
-    //
-    //        function initCurryParams(callback) {
-    //            var initialCurryParams = {
-    //                widgetId: widgetId,
-    //                widgetObjectId: managers.db.toObjectId(widgetId),
-    //                loginDetailsId: loginDetailsId,
-    //                playCallback: playCallback
-    //            };
-    //            callback(null, initialCurryParams);
-    //        },
-    //        _getWidget,
-    //        _getPoolKey,
-    //        _createExecutionModel,
-    //        _updateExecutionModelAddPaths,
-    //        _downloadRecipe,
-    //        _occupyMachine,
-    //        _updateExecutionModelAddNodeModel,
-    //        _runInstallCommand
-    //    ],
-    //
-    //    _playFinally
-    //);
 };
 
 
