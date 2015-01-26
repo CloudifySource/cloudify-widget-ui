@@ -115,7 +115,7 @@ exports.updateExecutionModelAddPaths = function (executionModel, callback) {
     executionModel.setDownloadsPath(path.join(conf.downloadsDir, executionModel.getExecutionId()));
     executionModel.setLogsPath(path.join(conf.logsDir, executionModel.getExecutionId()));
 
-    this.updateExecutionModel({
+    exports.updateExecutionModel({
         downloadsPath: executionModel.getDownloadsPath(),
         logsPath: executionModel.getLogsPath()
     }, executionModel, callback);
