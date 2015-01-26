@@ -24,7 +24,10 @@ AbstractWidgetExecutor.prototype.getExecutionTasks = function () {
         tasksDirectory.getPoolKey,
         tasksDirectory.saveExecutionModel,
         tasksDirectory.updateExecutionModelAddPaths,
-        tasksDirectory.downloadRecipe
+        tasksDirectory.downloadRecipe,
+        tasksDirectory.occupyMachine,
+        tasksDirectory.updateExecutionModelAddNodeModel,
+        tasksDirectory.runInstallCommand
     ];
 };
 

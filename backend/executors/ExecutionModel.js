@@ -87,6 +87,14 @@ ExecutionModel.prototype.getShouldInstall = function () {
     return this.shouldInstall;
 };
 
+ExecutionModel.prototype.setNodeModel = function (nodeModel) {
+    this.nodeModel = nodeModel;
+};
+
+ExecutionModel.prototype.getNodeModel= function () {
+    return this.nodeModel;
+};
+
 
 
 module.exports = ExecutionModel;
