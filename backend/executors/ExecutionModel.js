@@ -47,12 +47,36 @@ ExecutionModel.prototype.getPoolKey = function () {
     return this.poolKey;
 };
 
+ExecutionModel.prototype.setExecutionId = function (executionId) {
+    this.executionId = executionId;
+};
+
+ExecutionModel.prototype.getExecutionId = function () {
+    return this.executionId;
+};
+
 ExecutionModel.prototype.setExecutionObjectId = function (executionObjectId) {
     this.executionObjectId = executionObjectId;
 };
 
 ExecutionModel.prototype.getExecutionObjectId = function () {
     return this.executionObjectId;
+};
+
+ExecutionModel.prototype.setDownloadsPath = function (downloadsPath) {
+    this.downloadsPath = downloadsPath;
+};
+
+ExecutionModel.prototype.getDownloadsPath = function () {
+    return this.downloadsPath;
+};
+
+ExecutionModel.prototype.setLogsPath = function (logsPath) {
+    this.logsPath = logsPath;
+};
+
+ExecutionModel.prototype.getLogsPath = function () {
+    return this.logsPath;
 };
 
 

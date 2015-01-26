@@ -5,3 +5,4 @@
 
 exports.FreeWidgetExecutor = require('./FreeWidgetExecutor');
 exports.ExecutionModel = require('./ExecutionModel');
+exports.TasksDirectory = require('./TasksDirectory');

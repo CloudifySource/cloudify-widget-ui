@@ -5,6 +5,10 @@
 var logger = require('log4js').getLogger('AbstractWidgetExecutor');
 var async = require('async');
 var managers = require('../managers');
+var path = require('path');
+var _ = require('lodash');
+var conf = require('../Conf');
+
 
 function AbstractWidgetExecutor(executionModel) {
     logger.info('ctor');
@@ -38,12 +42,14 @@ AbstractWidgetExecutor.prototype.getWidget = function (executionModel, callback)
             if (err) {
                 logger.error('unable to find widget', err);
                 callback(err, executionModel);
+                done();
                 return;
             }
 
             if (!result) {
                 logger.error('result is null for widget find');
                 callback(new Error('could not find widget'), executionModel);
+                done();
                 return;
             }
 
@@ -60,27 +66,82 @@ AbstractWidgetExecutor.prototype.saveExecutionModel = function (executionModel, 
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         // instantiate the execution model with the widget data, and remove the _id - we want mongodb to generate a unique id
         var storedExecutionModel = {};
-        storedExecutionModel.widget = executionModel.widget;
-        storedExecutionModel.loginDetailsId = executionModel.loginDetailsId;
+        storedExecutionModel.widget = executionModel.getWidget();
+        storedExecutionModel.loginDetailsId = executionModel.getLoginDetailsId();
         storedExecutionModel.state = 'RUNNING';
 
         collection.insert(storedExecutionModel, function (err, docsInserted) {
             if (err) {
                 logger.error('failed to store widget execution model to DB', err);
                 callback(err, executionModel);
+                done();
                 return;
             }
 
             if (!docsInserted) {
                 logger.error('no widget execution docs inserted to database');
                 callback(new Error('no widget execution docs inserted to database'), executionModel);
+                done();
                 return;
             }
 
             executionModel.setExecutionObjectId(docsInserted[0]._id);
             callback(null, executionModel);
+            done();
         });
     });
+};
+
+AbstractWidgetExecutor.prototype.updateExecutionModel = function (data, executionModel, callback) {
+    managers.db.connect('widgetExecutions', function (db, collection, done) {
+        collection.findOne(
+            { _id: executionModel.getExecutionObjectId() },
+            function (err, result) {
+                if (err) {
+                    logger.error('failed to retrieve execution model before update', err);
+                    callback(err, executionModel);
+                    done();
+                    return;
+                }
+
+                result = _.merge(result, data);
+
+                collection.update(
+                    { _id: executionModel.getExecutionObjectId() },
+                    result,
+                    function (err, nUpdated) {
+                        if (err) {
+                            logger.error('failed updating widget execution model', err);
+                            callback(err, executionModel);
+                            done();
+                            return;
+                        }
+
+                        if (!nUpdated) {
+                            logger.error('no widget execution docs updated in the database');
+                            callback(new Error('no widget execution docs updated in the database'), executionModel);
+                            done();
+                            return;
+                        }
+
+                        callback(null, executionModel);
+                        done();
+                    });
+            });
+    });
+};
+
+AbstractWidgetExecutor.prototype.updateExecutionModelAddPaths = function (executionModel, callback) {
+    logger.info('updating execution model add paths');
+
+    executionModel.setExecutionId(executionModel.getExecutionObjectId().toHexString());
+    executionModel.setDownloadsPath(path.join(conf.downloadsDir, executionModel.getExecutionId()));
+    executionModel.setLogsPath(path.join(conf.logsDir, executionModel.getExecutionId()));
+
+    this.updateExecutionModel({
+        downloadsPath: executionModel.getDownloadsPath(),
+        logsPath: executionModel.getLogsPath()
+    }, executionModel, callback);
 };
 
 //--------------------- TASKS END -----------------------

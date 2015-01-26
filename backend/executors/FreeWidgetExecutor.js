@@ -49,10 +49,12 @@ AbstractWidgetExecutor.prototype.getExecutionTasks = function () {
     return [
         this.getWidget,
         this.getPoolKey,
-        this.saveExecutionModel
+        this.saveExecutionModel,
+        this.updateExecutionModelAddPaths
     ];
 };
-//-----------  Overrides  ----------------------
+
+//-----------  Overrides END ----------------------
 
 
 module.exports = FreeWidgetExecutor;
