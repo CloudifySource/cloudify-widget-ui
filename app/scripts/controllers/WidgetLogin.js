@@ -45,8 +45,8 @@ angular.module('cloudifyWidgetUiApp')
         $scope.processGoogleplusAuth = function(authResult) {
             if ( !!authResult && !!authResult.code) {
                 $.post('/backend/widgets/' + $routeParams.widgetId + '/login/googleplus/callback', { code: authResult.code})
-                    .done(function(/*data*/) {
-                        window.opener.$windowScope.loginDone('__id__');
+                    .done(function(data) {
+                        window.opener.$windowScope.loginDone(data.result);
                     });
 
             }
