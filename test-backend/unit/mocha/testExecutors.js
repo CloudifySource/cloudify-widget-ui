@@ -11,5 +11,5 @@ var executionModel = new executors.ExecutionModel('53d651d37818c889b6619020', fu
 });
 executionModel.setLoginDetailsId('dddssss');
 
-var freeExecutor = new executors.FreeWidgetExecutor(executionModel);
+var freeExecutor = new executors.FreeWidgetExecutor();
 freeExecutor.play(executionModel);

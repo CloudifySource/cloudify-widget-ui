@@ -8,9 +8,9 @@ var AbstractWidgetExecutor = require('./AbstractWidgetExecutor');
 var tasksDirectory = require('./TasksDirectory');
 var logger = require('log4js').getLogger('FreeWidgetExecutor');
 
-function FreeWidgetExecutor(executionModel) {
+function FreeWidgetExecutor() {
     logger.info('ctor');
-    AbstractWidgetExecutor.call(this, executionModel);
+    AbstractWidgetExecutor.call(this);
 }
 
 util.inherits(FreeWidgetExecutor, AbstractWidgetExecutor);

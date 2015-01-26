@@ -9,7 +9,7 @@ var services = require('../services');
 var managers = require('../managers');
 var conf = require('../Conf');
 var models = require('../models');
-
+var executors = require('../executors');
 
 /**
  *
@@ -760,29 +760,34 @@ exports.getExecutionModelById = function(executionId, callback) {
 
 exports.play = function (widgetId, loginDetailsId, playCallback) {
 
-    async.waterfall([
+    var executionModel = new executors.ExecutionModel(widgetId, playCallback);
+    executionModel.setLoginDetailsId(loginDetailsId);
 
-            function initCurryParams(callback) {
-                var initialCurryParams = {
-                    widgetId: widgetId,
-                    widgetObjectId: managers.db.toObjectId(widgetId),
-                    loginDetailsId: loginDetailsId,
-                    playCallback: playCallback
-                };
-                callback(null, initialCurryParams);
-            },
-            _getWidget,
-            _getPoolKey,
-            _createExecutionModel,
-            _updateExecutionModelAddPaths,
-            _downloadRecipe,
-            _occupyMachine,
-            _updateExecutionModelAddNodeModel,
-            _runInstallCommand
-        ],
-
-        _playFinally
-    );
+    var executor = new executors.FreeWidgetExecutor();
+    executor.play(executionModel);
+    //async.waterfall([
+    //
+    //        function initCurryParams(callback) {
+    //            var initialCurryParams = {
+    //                widgetId: widgetId,
+    //                widgetObjectId: managers.db.toObjectId(widgetId),
+    //                loginDetailsId: loginDetailsId,
+    //                playCallback: playCallback
+    //            };
+    //            callback(null, initialCurryParams);
+    //        },
+    //        _getWidget,
+    //        _getPoolKey,
+    //        _createExecutionModel,
+    //        _updateExecutionModelAddPaths,
+    //        _downloadRecipe,
+    //        _occupyMachine,
+    //        _updateExecutionModelAddNodeModel,
+    //        _runInstallCommand
+    //    ],
+    //
+    //    _playFinally
+    //);
 };
 
 
