@@ -12,7 +12,7 @@ var fs = require('fs');
 var conf = require('../Conf');
 var models = require('../models');
 
-var sendEmailAfterInstall = function(executionModel) {
+var sendEmailAfterInstall = function (executionModel) {
     var widget = executionModel.getWidget();
 
     if (!widget.socialLogin || !widget.socialLogin.handlers || !widget.socialLogin.handlers.mandrill || !widget.socialLogin.handlers.mandrill.enabled) {
@@ -81,12 +81,12 @@ var sendEmailAfterInstall = function(executionModel) {
     });
 };
 
-var updatePropertiesFile = function(fileName, updateLine, callback) {
+var updatePropertiesFile = function (fileName, updateLine, callback) {
     logger.info('---updateLine', updateLine);
     fs.appendFile(fileName, updateLine, callback);
 };
 
-var getRecipePropertiesUpdateLine = function(executionDetails) {
+var getRecipePropertiesUpdateLine = function (executionDetails) {
     var updateLine = '';
 
     if (executionDetails.recipeProperties) {
@@ -104,7 +104,7 @@ var getRecipePropertiesUpdateLine = function(executionDetails) {
     return updateLine;
 };
 
-var getCloudPropertiesUpdateLine = function(executionDetails, executionId) {
+var getCloudPropertiesUpdateLine = function (executionDetails, executionId) {
     var updateLine = '';
 
     if (executionDetails.SOFTLAYER) {
@@ -152,7 +152,7 @@ exports.getWidget = function (executionModel, callback) {
     logger.info('getting widget id ' + executionModel.getWidgetId());
 
     managers.db.connect('widgets', function (db, collection, done) {
-        collection.findOne({ _id: executionModel.getWidgetObjectId()}, function (err, result) {
+        collection.findOne({_id: executionModel.getWidgetObjectId()}, function (err, result) {
             if (err) {
                 logger.error('unable to find widget', err);
                 callback(err, executionModel);
@@ -209,7 +209,7 @@ exports.saveExecutionModel = function (executionModel, callback) {
 exports.updateExecutionModel = function (data, executionModel, callback) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.findOne(
-            { _id: executionModel.getExecutionObjectId() },
+            {_id: executionModel.getExecutionObjectId()},
             function (err, result) {
                 if (err) {
                     logger.error('failed to retrieve execution model before update', err);
@@ -221,7 +221,7 @@ exports.updateExecutionModel = function (data, executionModel, callback) {
                 result = _.merge(result, data);
 
                 collection.update(
-                    { _id: executionModel.getExecutionObjectId() },
+                    {_id: executionModel.getExecutionObjectId()},
                     result,
                     function (err, nUpdated) {
                         if (err) {
@@ -258,7 +258,7 @@ exports.updateExecutionModelAddPaths = function (executionModel, callback) {
     }, executionModel, callback);
 };
 
-exports.downloadRecipe = function(executionModel, callback) {
+exports.downloadRecipe = function (executionModel, callback) {
     // TODO : add validation if destination download not already exists otherwise simply call callback.
     logger.info('downloading recipe from ', executionModel.getWidget().recipeUrl);
     // download recipe zip
@@ -280,7 +280,7 @@ exports.downloadRecipe = function(executionModel, callback) {
     }
 };
 
-exports.downloadCloudProvider = function(executionModel, callback) {
+exports.downloadCloudProvider = function (executionModel, callback) {
     // TODO : add validation if destination download not already exists otherwise simply call callback.
     logger.info('downloading Cloud Provider from ', executionModel.getExecutionDetails().providerUrl);
 
@@ -296,7 +296,7 @@ exports.downloadCloudProvider = function(executionModel, callback) {
 
 };
 
-exports.overrideCloudPropertiesFile = function(executionModel, callback) {
+exports.overrideCloudPropertiesFile = function (executionModel, callback) {
     logger.trace('overriding Cloud Properties File');
 
     var cloudDistFolderName = executionModel.getDownloadsPath() + path.sep + executionModel.getWidget().executionDetails.providerRootPath;
@@ -306,7 +306,7 @@ exports.overrideCloudPropertiesFile = function(executionModel, callback) {
     var executionDetails = executionModel.getExecutionDetails();
     var updateLine = getCloudPropertiesUpdateLine(executionDetails, executionModel.getExecutionId());
 
-    updatePropertiesFile(cloudPropertiesFile, updateLine, function(err) {
+    updatePropertiesFile(cloudPropertiesFile, updateLine, function (err) {
         if (err) {
             logger.info(err);
             callback(err, executionModel);
@@ -318,7 +318,7 @@ exports.overrideCloudPropertiesFile = function(executionModel, callback) {
 
 };
 
-exports.overrideRecipePropertiesFile = function(executionModel, callback) {
+exports.overrideRecipePropertiesFile = function (executionModel, callback) {
     logger.trace('overriding Recipe Properties File');
 
     var widget = executionModel.getWidget();
@@ -329,7 +329,7 @@ exports.overrideRecipePropertiesFile = function(executionModel, callback) {
     var executionDetails = executionModel.getExecutionDetails();
     var updateLine = getRecipePropertiesUpdateLine(executionDetails);
 
-    updatePropertiesFile(recipePropertiesFile, updateLine, function(err) {
+    updatePropertiesFile(recipePropertiesFile, updateLine, function (err) {
         if (err) {
             logger.info(err);
             callback(err, executionModel);
@@ -349,7 +349,7 @@ exports.getPoolKey = function (executionModel, callback) {
     logger.info('getting pool key');
 
     managers.db.connect('users', function (db, collection) {
-        collection.findOne({ '_id': executionModel.getWidget().userId }, function (err, result) {
+        collection.findOne({'_id': executionModel.getWidget().userId}, function (err, result) {
             if (err) {
                 logger.error('unable to find user from widget', err);
                 callback(err, executionModel);
@@ -369,7 +369,7 @@ exports.getPoolKey = function (executionModel, callback) {
     });
 };
 
-exports.occupyMachine = function(executionModel, callback) {
+exports.occupyMachine = function (executionModel, callback) {
     logger.info('occupying machine');
 
     // TODO better defense
@@ -404,7 +404,7 @@ exports.occupyMachine = function(executionModel, callback) {
     });
 };
 
-exports.updateExecutionModelAddNodeModel = function(executionModel, callback) {
+exports.updateExecutionModelAddNodeModel = function (executionModel, callback) {
     logger.info('update Execution Model Add Node Model');
 
     exports.updateExecutionModel({
@@ -412,7 +412,7 @@ exports.updateExecutionModelAddNodeModel = function(executionModel, callback) {
     }, executionModel, callback);
 };
 
-exports.runInstallCommand = function(executionModel, callback) {
+exports.runInstallCommand = function (executionModel, callback) {
     logger.info('running Install Command');
 
     if (!executionModel.getShouldInstall()) {
@@ -471,7 +471,7 @@ exports.runInstallCommand = function(executionModel, callback) {
 
 //---------------- SOLO AWS TASKS ------------------------
 
-exports.updateExecutionModelAddExecutionDetails = function(executionModel, callback) {
+exports.updateExecutionModelAddExecutionDetails = function (executionModel, callback) {
     logger.trace('updateing Execution Model Add Execution Details');
 
     var encryptionKey = executionModel.getExecutionId();
@@ -492,7 +492,7 @@ exports.updateExecutionModelAddExecutionDetails = function(executionModel, callb
 
 };
 
-exports.generateKeyPair = function(executionModel, callback) {
+exports.generateKeyPair = function (executionModel, callback) {
     var executionDetails = executionModel.getExecutionDetails();
     var encryptionKey = executionModel.getExecutionId();
 
@@ -530,7 +530,7 @@ exports.generateKeyPair = function(executionModel, callback) {
     });
 };
 
-exports.modifyImages = function(executionModel, callback){
+exports.modifyImages = function (executionModel, callback) {
     var executionDetails = executionModel.getExecutionDetails();
 
     if (!executionDetails.EC2 || !executionDetails.privateImages || executionDetails.privateImages.length === 0) {
@@ -545,7 +545,7 @@ exports.modifyImages = function(executionModel, callback){
         images: executionDetails.privateImages
     };
 
-    services.ec2Api.modifyImages(data, function(err) {
+    services.ec2Api.modifyImages(data, function (err) {
         if (err) {
             callback(err, executionModel);
         }
@@ -554,7 +554,7 @@ exports.modifyImages = function(executionModel, callback){
     });
 };
 
-exports.runBootstrapAndInstallCommands = function(executionModel, callback) {
+exports.runBootstrapAndInstallCommands = function (executionModel, callback) {
     var widget = executionModel.getWidget();
 
     logger.info('runCliBootstrapCommand, LogsPath:', executionModel.getLogsPath(), 'installCommand:', widget.recipeType.installCommand);

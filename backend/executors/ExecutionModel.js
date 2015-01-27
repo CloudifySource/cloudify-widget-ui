@@ -120,5 +120,4 @@ ExecutionModel.prototype.getRecipeDistFolderName = function () {
 };
 
 
-
 module.exports = ExecutionModel;

@@ -6,8 +6,8 @@
 var executors = require('../../../backend/executors');
 var logger = require('log4js').getLogger('testExecutors.spec');
 
-var executionModel = new executors.ExecutionModel('53d651d37818c889b6619020', function() {
-     logger.info('executionCallback');
+var executionModel = new executors.ExecutionModel('53d651d37818c889b6619020', function () {
+    logger.info('executionCallback');
 });
 executionModel.setLoginDetailsId('dddssss');
 

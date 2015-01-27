@@ -5,10 +5,6 @@
 var logger = require('log4js').getLogger('AbstractWidgetExecutor');
 var async = require('async');
 var managers = require('../managers');
-var path = require('path');
-var _ = require('lodash');
-var conf = require('../Conf');
-
 
 function AbstractWidgetExecutor() {
     logger.info('ctor');
@@ -36,7 +32,7 @@ AbstractWidgetExecutor.prototype.getExecutionTasks = function () {
 AbstractWidgetExecutor.prototype.updateExecution = function (executionObjectId, data) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.update(
-            { _id: executionObjectId },
+            {_id: executionObjectId},
             {
                 $set: data
             },
