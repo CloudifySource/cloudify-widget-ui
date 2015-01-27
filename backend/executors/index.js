@@ -4,5 +4,6 @@
 'use strict';
 
 exports.FreeWidgetExecutor = require('./FreeWidgetExecutor');
+exports.SoloAWSWidgetExecutor = require('./SoloAWSWidgetExecutor');
 exports.ExecutionModel = require('./ExecutionModel');
 exports.TasksDirectory = require('./TasksDirectory');

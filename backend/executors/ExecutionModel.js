@@ -31,6 +31,14 @@ ExecutionModel.prototype.getLoginDetailsId = function () {
     return this.loginDetailsId;
 };
 
+ExecutionModel.prototype.setExecutionDetails = function (executionDetails) {
+    this.executionDetails = executionDetails;
+};
+
+ExecutionModel.prototype.getExecutionDetails = function () {
+    return this.executionDetails;
+};
+
 ExecutionModel.prototype.setWidget = function (widget) {
     this.widget = widget;
 };
@@ -91,8 +99,24 @@ ExecutionModel.prototype.setNodeModel = function (nodeModel) {
     this.nodeModel = nodeModel;
 };
 
-ExecutionModel.prototype.getNodeModel= function () {
+ExecutionModel.prototype.getNodeModel = function () {
     return this.nodeModel;
+};
+
+ExecutionModel.prototype.setCloudDistFolderName = function (cloudDistFolderName) {
+    this.cloudDistFolderName = cloudDistFolderName;
+};
+
+ExecutionModel.prototype.getCloudDistFolderName = function () {
+    return this.cloudDistFolderName;
+};
+
+ExecutionModel.prototype.setRecipeDistFolderName = function (recipeDistFolderName) {
+    this.recipeDistFolderName = recipeDistFolderName;
+};
+
+ExecutionModel.prototype.getRecipeDistFolderName = function () {
+    return this.recipeDistFolderName;
 };
 
 

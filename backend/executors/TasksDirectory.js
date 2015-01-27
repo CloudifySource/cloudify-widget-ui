@@ -8,8 +8,143 @@ var managers = require('../managers');
 var services = require('../services');
 var path = require('path');
 var _ = require('lodash');
+var fs = require('fs');
 var conf = require('../Conf');
 var models = require('../models');
+
+var sendEmailAfterInstall = function(executionModel) {
+    var widget = executionModel.getWidget();
+
+    if (!widget.socialLogin || !widget.socialLogin.handlers || !widget.socialLogin.handlers.mandrill || !widget.socialLogin.handlers.mandrill.enabled) {
+        // noop
+        return;
+    }
+
+    var mandrillConfig = widget.socialLogin.handlers.mandrill;
+    var publicIp = executionModel.getNodeModel().machineSshDetails.publicIp;
+    var link = '<a href="http://"' + publicIp + '> http://' + publicIp + '</a>';
+
+    managers.widgetLogins.getWidgetLoginById(executionModel.getLoginDetailsId(), function (err, result) {
+        if (err) {
+            logger.error('unable to find login details, email send failed', err);
+            return;
+        }
+
+        if (!result) {
+            logger.error('result is null for login details find, email send failed');
+            return;
+        }
+
+        var fullname = result.loginDetails.name + ' ' + result.loginDetails.lastName;
+
+        var data = {
+            'apiKey': mandrillConfig.apiKey,
+            'template_name': mandrillConfig.templateName,
+            'template_content': [
+                {
+                    'name': 'link',
+                    'content': link
+                },
+                {
+                    'name': 'name',
+                    'content': fullname
+                },
+                {
+                    'name': 'randomValue',
+                    'content': executionModel.getNodeModel().randomValue
+                },
+                {
+                    'name': 'publicIp',
+                    'content': publicIp
+                }
+            ],
+            'message': {
+                'to': [
+                    {
+                        'email': result.loginDetails.email,
+                        'name': fullname,
+                        'type': 'to'
+                    }
+                ]
+            },
+            'async': true
+        };
+
+        services.mandrill.sendMandrillTemplate(data,
+            function (err, result) {
+                if (err) {
+                    executionModel.getWidget().socialLogin.handlers.mandrill.status = err;
+                } else {
+                    executionModel.getWidget().socialLogin.handlers.mandrill.status = result;
+                }
+            });
+    });
+};
+
+var updatePropertiesFile = function(fileName, updateLine, callback) {
+    logger.info('---updateLine', updateLine);
+    fs.appendFile(fileName, updateLine, callback);
+};
+
+var getRecipePropertiesUpdateLine = function(executionDetails) {
+    var updateLine = '';
+
+    if (executionDetails.recipeProperties) {
+        for (var i = 0; i < executionDetails.recipeProperties.length; i++) {
+            var prop = executionDetails.recipeProperties[i];
+
+            if (_.isNumber(prop.value)) {
+                updateLine += prop.key + '=' + prop.value + '\n';
+            } else {
+                updateLine += prop.key + '="' + prop.value + '"\n';
+            }
+        }
+    }
+
+    return updateLine;
+};
+
+var getCloudPropertiesUpdateLine = function(executionDetails, executionId) {
+    var updateLine = '';
+
+    if (executionDetails.SOFTLAYER) {
+        var username = executionDetails.SOFTLAYER.params.username;
+        var apiKey = executionDetails.SOFTLAYER.params.apiKey;
+        updateLine =
+            'user=' + username + '\n' +
+            'apiKey="' + apiKey + '"';
+    }
+    else if (executionDetails.HP) {
+        var key = executionDetails.HP.params.key;
+        var secretKey = executionDetails.HP.params.secretKey;
+        var project = executionDetails.HP.params.project;
+        updateLine =
+            'tenant="' + project + '"\n' +
+            'user="' + key + '"\n' +
+            'apiKey="' + secretKey + '"';
+        /*
+         'keyFile="' + newPemFile.getName() + '.pem"';
+         'keyPair="' + newPemFile.getName() + '"';
+         'securityGroup="' + cloudConf.securityGroup + '"';
+         */
+    } else if (executionDetails.EC2) {
+        var ec2user = executionDetails.EC2.params.apiKey;
+        var ec2apiKey = executionDetails.EC2.params.secretKey;
+        var ec2keyPair = executionDetails.EC2.params.keyPair.KeyName;
+
+        updateLine =
+            '\n\nuser="' + ec2user + '"\n' +
+            'apiKey="' + ec2apiKey + '"\n' +
+            'keyPair="' + ec2keyPair + '"\n' +
+            'keyFile="keyFile.pem"\n' +
+            'machineNamePrefix="cloudify-agent-widget-' + executionId + '"\n' +
+            'managementGroup="cloudify-manager-widget-' + executionId + '"\n';
+    }
+
+    updateLine += getRecipePropertiesUpdateLine(executionDetails);
+
+    return updateLine;
+};
 
 //---------------- COMMON TASKS ------------------------
 
@@ -145,73 +280,65 @@ exports.downloadRecipe = function(executionModel, callback) {
     }
 };
 
-exports.sendEmailAfterInstall = function(executionModel) {
-    var widget = executionModel.getWidget();
+exports.downloadCloudProvider = function(executionModel, callback) {
+    // TODO : add validation if destination download not already exists otherwise simply call callback.
+    logger.info('downloading Cloud Provider from ', executionModel.getExecutionDetails().providerUrl);
 
-    if (!widget.socialLogin || !widget.socialLogin.handlers || !widget.socialLogin.handlers.mandrill || !widget.socialLogin.handlers.mandrill.enabled) {
-        // noop
-        return;
-    }
+    var options = {
+        destDir: executionModel.getDownloadsPath(),
+        url: executionModel.getExecutionDetails().providerUrl,
+        extract: true
+    };
 
-    var mandrillConfig = widget.socialLogin.handlers.mandrill;
-    var publicIp = executionModel.getNodeModel().machineSshDetails.publicIp;
-    var link = '<a href="http://"' + publicIp + '> http://' + publicIp + '</a>';
-
-    managers.widgetLogins.getWidgetLoginById(executionModel.getLoginDetailsId(), function (err, result) {
-        if (err) {
-            logger.error('unable to find login details, email send failed', err);
-            return;
-        }
-
-        if (!result) {
-            logger.error('result is null for login details find, email send failed');
-            return;
-        }
-
-        var fullname = result.loginDetails.name + ' ' + result.loginDetails.lastName;
-
-        var data = {
-            'apiKey': mandrillConfig.apiKey,
-            'template_name': mandrillConfig.templateName,
-            'template_content': [
-                {
-                    'name': 'link',
-                    'content': link
-                },
-                {
-                    'name': 'name',
-                    'content': fullname
-                },
-                {
-                    'name': 'randomValue',
-                    'content': executionModel.getNodeModel().randomValue
-                },
-                {
-                    'name': 'publicIp',
-                    'content': publicIp
-                }
-            ],
-            'message': {
-                'to': [
-                    {
-                        'email': result.loginDetails.email,
-                        'name': fullname,
-                        'type': 'to'
-                    }
-                ]
-            },
-            'async': true
-        };
-
-        services.mandrill.sendMandrillTemplate(data,
-            function (err, result) {
-                if (err) {
-                    executionModel.getWidget().socialLogin.handlers.mandrill.status = err;
-                } else {
-                    executionModel.getWidget().socialLogin.handlers.mandrill.status = result;
-                }
-            });
+    services.dl.downloadZipfile(options, function (e) {
+        callback(e, executionModel);
     });
+
+};
+
+exports.overrideCloudPropertiesFile = function(executionModel, callback) {
+    logger.trace('overriding Cloud Properties File');
+
+    var cloudDistFolderName = executionModel.getDownloadsPath() + path.sep + executionModel.getWidget().executionDetails.providerRootPath;
+    executionModel.setCloudDistFolderName(cloudDistFolderName);
+    var cloudName = executionModel.getWidget().executionDetails.providerName;
+    var cloudPropertiesFile = cloudDistFolderName + path.sep + cloudName + '-cloud.properties';
+    var executionDetails = executionModel.getExecutionDetails();
+    var updateLine = getCloudPropertiesUpdateLine(executionDetails, executionModel.getExecutionId());
+
+    updatePropertiesFile(cloudPropertiesFile, updateLine, function(err) {
+        if (err) {
+            logger.info(err);
+            callback(err, executionModel);
+        }
+
+        logger.info('Cloud Properties File was updated:', cloudPropertiesFile);
+        callback(null, executionModel);
+    });
+
+};
+
+exports.overrideRecipePropertiesFile = function(executionModel, callback) {
+    logger.trace('overriding Recipe Properties File');
+
+    var widget = executionModel.getWidget();
+    var recipeDistFolderName = executionModel.getDownloadsPath() + path.sep + widget.recipeRootPath;
+    executionModel.setRecipeDistFolderName(recipeDistFolderName);
+    // filename - assuming that the file format is 'recipeName'-'recipeType'.properties i.e. mongod-service.properties
+    var recipePropertiesFile = recipeDistFolderName + path.sep + widget.recipeName + '-' + widget.recipeType + '.properties';
+    var executionDetails = executionModel.getExecutionDetails();
+    var updateLine = getRecipePropertiesUpdateLine(executionDetails);
+
+    updatePropertiesFile(recipePropertiesFile, updateLine, function(err) {
+        if (err) {
+            logger.info(err);
+            callback(err, executionModel);
+        }
+
+        logger.info('Recipe Properties File was updated:', recipePropertiesFile);
+        callback(null, executionModel);
+    });
+
 };
 
 //---------------- COMMON TASKS END ------------------------
@@ -294,7 +421,7 @@ exports.runInstallCommand = function(executionModel, callback) {
         services.logs.writeStatus(JSON.stringify(status, null, 4) + '\n', executionModel.getExecutionId());
         services.logs.appendOutput('Install finished successfully.\n', executionModel.getExecutionId());
 
-        exports.sendEmailAfterInstall(executionModel);
+        sendEmailAfterInstall(executionModel);
 
         callback(null, executionModel);
         return;
@@ -332,7 +459,7 @@ exports.runInstallCommand = function(executionModel, callback) {
             return;
         }
 
-        exports.sendEmailAfterInstall(executionModel);
+        sendEmailAfterInstall(executionModel);
         // TODO change execution status
     });
 
@@ -342,8 +469,123 @@ exports.runInstallCommand = function(executionModel, callback) {
 //---------------- FREE TASKS END ------------------------
 
 
-//---------------- SOLO TASKS ------------------------
+//---------------- SOLO AWS TASKS ------------------------
 
+exports.updateExecutionModelAddExecutionDetails = function(executionModel, callback) {
+    logger.trace('updateing Execution Model Add Execution Details');
 
-//---------------- SOLO TASKS END ------------------------
+    var encryptionKey = executionModel.getExecutionId();
+    var details = executionModel.getExecutionDetails();
+
+    if (!details.EC2 || !details.EC2.params || !details.EC2.params.apiKey || !details.EC2.params.secretKey) {
+        callback(new Error('Cloud provider apiKey and secretKey are mandatory fields!'), executionModel);
+    }
+
+    exports.updateExecutionModel({
+        cloudProvider: {
+            EC2: {
+                apiKey: services.crypto.encrypt(encryptionKey, details.EC2.params.apiKey),
+                secretKey: services.crypto.encrypt(encryptionKey, details.EC2.params.secretKey)
+            }
+        }
+    }, executionModel, callback);
+
+};
+
+exports.generateKeyPair = function(executionModel, callback) {
+    var executionDetails = executionModel.getExecutionDetails();
+    var encryptionKey = executionModel.getExecutionId();
+
+    if (!executionDetails.EC2) {
+        callback(null, executionModel);
+    }
+
+    services.ec2Api.createKeyPair(executionDetails.EC2.params.apiKey, executionDetails.EC2.params.secretKey, 'us-east-1', 'Cloudify-Widget-' + executionModel.getExecutionId(), function (err, data) {
+        if (err) {
+            callback(err, executionModel);
+        }
+
+        //create pem file
+        var keyPairPemFile = executionModel.getDownloadsPath() + path.sep + executionModel.getWidget().executionDetails.providerRootPath + path.sep + 'upload/keyFile.pem';
+        fs.appendFile(keyPairPemFile, data.KeyMaterial, function (err) {
+            if (err) {
+                callback(err, executionModel);
+            }
+
+            fs.chmodSync(keyPairPemFile, '600');
+
+            executionModel.getExecutionDetails().EC2.params.keyPair = data;
+
+            exports.updateExecutionModel({
+                cloudProvider: {
+                    EC2: {
+                        keyPairName: services.crypto.encrypt(encryptionKey, data.KeyName),
+                        keyPairSecret: services.crypto.encrypt(encryptionKey, data.KeyMaterial),
+                        keyPairFile: keyPairPemFile
+                    }
+                }
+            }, executionModel, callback);
+        });
+
+    });
+};
+
+exports.modifyImages = function(executionModel, callback){
+    var executionDetails = executionModel.getExecutionDetails();
+
+    if (!executionDetails.EC2 || !executionDetails.privateImages || executionDetails.privateImages.length === 0) {
+        // not EC2 or no private images, nothing to do.
+        callback(null, executionModel);
+    }
+
+    var data = {
+        action: 'add',
+        apiKey: executionDetails.EC2.params.apiKey,
+        secretKey: executionDetails.EC2.params.secretKey,
+        images: executionDetails.privateImages
+    };
+
+    services.ec2Api.modifyImages(data, function(err) {
+        if (err) {
+            callback(err, executionModel);
+        }
+
+        callback(null, executionModel);
+    });
+};
+
+exports.runBootstrapAndInstallCommands = function(executionModel, callback) {
+    var widget = executionModel.getWidget();
+
+    logger.info('runCliBootstrapCommand, LogsPath:', executionModel.getLogsPath(), 'installCommand:', widget.recipeType.installCommand);
+    logger.info('runCliBootstrapCommand, DownloadsPath:', executionModel.getDownloadsPath(), 'recipeRootPath:', widget.recipeRootPath);
+
+    var installPath = path.resolve(path.join(executionModel.getDownloadsPath(), widget.recipeRootPath));
+    var installTimeout = widget.installTimeout;
+
+    logger.info('installTimeout:', installTimeout);
+    logger.info('runCliBootstrapCommand, JOIN:', installPath);
+    //logger.info('-installPath after handlingseparators:', installPath);
+
+    var command = {
+        arguments: [
+            'bootstrap-cloud',
+            executionModel.getCloudDistFolderName(),
+            ';',
+            'install-service -disableSelfHealing -timeout',
+            installTimeout,
+            installPath
+        ],
+        logsDir: executionModel.getLogsPath(),
+        executionId: executionModel.getExecutionObjectId().toHexString()
+    };
+
+    logger.info('-command', command);
+
+    services.cloudifyCli.executeCommand(command);
+
+    callback(null, executionModel);
+};
+
+//---------------- SOLO AWS TASKS END ------------------------
 

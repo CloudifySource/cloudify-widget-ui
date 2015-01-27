@@ -759,7 +759,6 @@ exports.getExecutionModelById = function(executionId, callback) {
 };
 
 exports.play = function (widgetId, loginDetailsId, playCallback) {
-
     var executionModel = new executors.ExecutionModel(widgetId, playCallback);
     executionModel.setLoginDetailsId(loginDetailsId);
 
@@ -772,32 +771,11 @@ exports.playSolo = function (widgetId, executionDetails, playCallback) {
 
     logger.trace('-playRemote !!!!!!');
 
-    async.waterfall([
+    var executionModel = new executors.ExecutionModel(widgetId, playCallback);
+    executionModel.setExecutionDetails(executionDetails);
 
-            function initCurryParams(callback) {
-                var initialCurryParams = {
-                    widgetId: widgetId,
-                    widgetObjectId: managers.db.toObjectId(widgetId),
-                    executionDetails: executionDetails,
-                    playCallback: playCallback
-                };
-                callback(null, initialCurryParams);
-            },
-            _getWidget,
-            _createExecutionModel,
-            _updateExecutionModelAddPaths,
-            _updateExecutionModelAddExecutionDetails,
-            _downloadRecipe,
-            _downloadCloudProvider,
-            _generateKeyPair,
-            _modifyImages,
-            _overrideCloudPropertiesFile,
-            _overrideRecipePropertiesFile,
-            _runBootstrapAndInstallCommands
-        ],
-
-        _playFinally
-    );
+    var executor = new executors.SoloAWSWidgetExecutor();
+    executor.play(executionModel);
 };
 
 exports.stop = function (widgetId, executionId, isSoloMode, stopCallback) {

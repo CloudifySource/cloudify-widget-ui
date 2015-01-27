@@ -18,7 +18,7 @@ util.inherits(FreeWidgetExecutor, AbstractWidgetExecutor);
 //-----------  Overrides  ----------------------
 FreeWidgetExecutor.prototype.executionType = 'Free';
 
-AbstractWidgetExecutor.prototype.getExecutionTasks = function () {
+FreeWidgetExecutor.prototype.getExecutionTasks = function () {
     return [
         tasksDirectory.getWidget,
         tasksDirectory.getPoolKey,
