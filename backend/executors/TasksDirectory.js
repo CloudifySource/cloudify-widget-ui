@@ -170,6 +170,7 @@ exports.getWidget = function (executionModel, callback) {
             executionModel.setWidget(result);
             callback(null, executionModel);
             done();
+            return;
         });
     });
 };
@@ -202,6 +203,7 @@ exports.saveExecutionModel = function (executionModel, callback) {
             executionModel.setExecutionObjectId(docsInserted[0]._id);
             callback(null, executionModel);
             done();
+            return;
         });
     });
 };
@@ -240,6 +242,7 @@ exports.updateExecutionModel = function (data, executionModel, callback) {
 
                         callback(null, executionModel);
                         done();
+                        return;
                     });
             });
     });
@@ -271,11 +274,13 @@ exports.downloadRecipe = function (executionModel, callback) {
     if (!options.url) {
         executionModel.setShouldInstall(false);
         callback(null, executionModel);
+        return;
 
     } else {
         executionModel.setShouldInstall(true);
         services.dl.downloadZipfile(options, function (e) {
             callback(e, executionModel);
+            return;
         });
     }
 };
@@ -292,12 +297,13 @@ exports.downloadCloudProvider = function (executionModel, callback) {
 
     services.dl.downloadZipfile(options, function (e) {
         callback(e, executionModel);
+        return;
     });
 
 };
 
 exports.overrideCloudPropertiesFile = function (executionModel, callback) {
-    logger.trace('overriding Cloud Properties File');
+    logger.info('overriding Cloud Properties File');
 
     var cloudDistFolderName = executionModel.getDownloadsPath() + path.sep + executionModel.getWidget().executionDetails.providerRootPath;
     executionModel.setCloudDistFolderName(cloudDistFolderName);
@@ -310,10 +316,12 @@ exports.overrideCloudPropertiesFile = function (executionModel, callback) {
         if (err) {
             logger.info(err);
             callback(err, executionModel);
+            return;
         }
 
         logger.info('Cloud Properties File was updated:', cloudPropertiesFile);
         callback(null, executionModel);
+        return;
     });
 
 };
@@ -333,10 +341,12 @@ exports.overrideRecipePropertiesFile = function (executionModel, callback) {
         if (err) {
             logger.info(err);
             callback(err, executionModel);
+            return;
         }
 
         logger.info('Recipe Properties File was updated:', recipePropertiesFile);
         callback(null, executionModel);
+        return;
     });
 
 };
@@ -365,6 +375,7 @@ exports.getPoolKey = function (executionModel, callback) {
             logger.info('found poolKey', result.poolKey);
             executionModel.setPoolKey(result.poolKey);
             callback(null, executionModel);
+            return;
         });
     });
 };
@@ -396,11 +407,13 @@ exports.occupyMachine = function (executionModel, callback) {
                 resultObj = JSON.parse(result);
             } catch (e) {
                 callback(e, executionModel);
+                return;
             }
         }
 
         executionModel.setNodeModel(resultObj);
         callback(null, executionModel);
+        return;
     });
 };
 
@@ -464,6 +477,7 @@ exports.runInstallCommand = function (executionModel, callback) {
     });
 
     callback(null, executionModel);
+    return;
 };
 
 //---------------- FREE TASKS END ------------------------
@@ -472,13 +486,14 @@ exports.runInstallCommand = function (executionModel, callback) {
 //---------------- SOLO AWS TASKS ------------------------
 
 exports.updateExecutionModelAddExecutionDetails = function (executionModel, callback) {
-    logger.trace('updateing Execution Model Add Execution Details');
+    logger.trace('updating Execution Model Add Execution Details');
 
     var encryptionKey = executionModel.getExecutionId();
     var details = executionModel.getExecutionDetails();
 
     if (!details.EC2 || !details.EC2.params || !details.EC2.params.apiKey || !details.EC2.params.secretKey) {
         callback(new Error('Cloud provider apiKey and secretKey are mandatory fields!'), executionModel);
+        return;
     }
 
     exports.updateExecutionModel({
@@ -493,16 +508,20 @@ exports.updateExecutionModelAddExecutionDetails = function (executionModel, call
 };
 
 exports.generateKeyPair = function (executionModel, callback) {
+    logger.trace('Generating Key Pair');
+
     var executionDetails = executionModel.getExecutionDetails();
     var encryptionKey = executionModel.getExecutionId();
 
     if (!executionDetails.EC2) {
         callback(null, executionModel);
+        return;
     }
 
     services.ec2Api.createKeyPair(executionDetails.EC2.params.apiKey, executionDetails.EC2.params.secretKey, 'us-east-1', 'Cloudify-Widget-' + executionModel.getExecutionId(), function (err, data) {
         if (err) {
             callback(err, executionModel);
+            return;
         }
 
         //create pem file
@@ -510,6 +529,7 @@ exports.generateKeyPair = function (executionModel, callback) {
         fs.appendFile(keyPairPemFile, data.KeyMaterial, function (err) {
             if (err) {
                 callback(err, executionModel);
+                return;
             }
 
             fs.chmodSync(keyPairPemFile, '600');
@@ -531,11 +551,14 @@ exports.generateKeyPair = function (executionModel, callback) {
 };
 
 exports.modifyImages = function (executionModel, callback) {
+    logger.trace('Modifying images');
+
     var executionDetails = executionModel.getExecutionDetails();
 
     if (!executionDetails.EC2 || !executionDetails.privateImages || executionDetails.privateImages.length === 0) {
         // not EC2 or no private images, nothing to do.
         callback(null, executionModel);
+        return;
     }
 
     var data = {
@@ -548,9 +571,11 @@ exports.modifyImages = function (executionModel, callback) {
     services.ec2Api.modifyImages(data, function (err) {
         if (err) {
             callback(err, executionModel);
+            return;
         }
 
         callback(null, executionModel);
+        return;
     });
 };
 
@@ -585,6 +610,7 @@ exports.runBootstrapAndInstallCommands = function (executionModel, callback) {
     services.cloudifyCli.executeCommand(command);
 
     callback(null, executionModel);
+    return;
 };
 
 //---------------- SOLO AWS TASKS END ------------------------
