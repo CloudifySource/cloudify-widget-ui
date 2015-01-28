@@ -32,8 +32,8 @@ var executionDetails = {
     privateImages: [],
     EC2: {
         params: {
-            apiKey: 'AKIAIBTYJKCAU66HBQ5Q',
-            secretKey: '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'
+            apiKey: '__key__',
+            secretKey: '__password__'
         }
     }
 };
