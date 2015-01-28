@@ -8,7 +8,6 @@ var managers = require('../managers');
 
 function AbstractWidgetExecutor() {
     logger.info('ctor');
-    //this.executionModel = executionModel;
 }
 
 AbstractWidgetExecutor.prototype.executionModel;

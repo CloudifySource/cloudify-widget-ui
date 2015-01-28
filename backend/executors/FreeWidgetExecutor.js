@@ -9,13 +9,13 @@ var tasksDirectory = require('./TasksDirectory');
 var logger = require('log4js').getLogger('FreeWidgetExecutor');
 
 function FreeWidgetExecutor() {
-    logger.info('ctor');
     AbstractWidgetExecutor.call(this);
 }
 
 util.inherits(FreeWidgetExecutor, AbstractWidgetExecutor);
 
 //-----------  Overrides  ----------------------
+
 FreeWidgetExecutor.prototype.executionType = 'Free';
 
 FreeWidgetExecutor.prototype.getExecutionTasks = function () {

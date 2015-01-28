@@ -5,5 +5,6 @@
 
 exports.FreeWidgetExecutor = require('./FreeWidgetExecutor');
 exports.SoloAWSWidgetExecutor = require('./SoloAWSWidgetExecutor');
+exports.SoloSoftlayerWidgetExecutor = require('./SoloSoftlayerWidgetExecutor');
 exports.ExecutionModel = require('./ExecutionModel');
 exports.TasksDirectory = require('./TasksDirectory');

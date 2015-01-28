@@ -1,5 +1,5 @@
 /**
- * Created by sefi on 26/01/15.
+ * Created by sefi on 28/01/15.
  */
 'use strict';
 
@@ -8,17 +8,17 @@ var AbstractWidgetExecutor = require('./AbstractWidgetExecutor');
 var tasksDirectory = require('./TasksDirectory');
 var logger = require('log4js').getLogger('SoloSoftlayerWidgetExecutor');
 
-function SoloAWSWidgetExecutor() {
+function SoloSoftlayerWidgetExecutor() {
     AbstractWidgetExecutor.call(this);
 }
 
-util.inherits(SoloAWSWidgetExecutor, AbstractWidgetExecutor);
+util.inherits(SoloSoftlayerWidgetExecutor, AbstractWidgetExecutor);
 
 //-----------  Overrides  ----------------------
 
-SoloAWSWidgetExecutor.prototype.executionType = 'Solo AWS';
+SoloSoftlayerWidgetExecutor.prototype.executionType = 'Solo Softlayer';
 
-SoloAWSWidgetExecutor.prototype.getExecutionTasks = function () {
+SoloSoftlayerWidgetExecutor.prototype.getExecutionTasks = function () {
     return [
         tasksDirectory.getWidget,
         tasksDirectory.saveExecutionModel,
@@ -37,4 +37,4 @@ SoloAWSWidgetExecutor.prototype.getExecutionTasks = function () {
 //-----------  Overrides END ----------------------
 
 
-module.exports = SoloAWSWidgetExecutor;
+module.exports = SoloSoftlayerWidgetExecutor;
