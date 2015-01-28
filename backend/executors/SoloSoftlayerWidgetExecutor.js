@@ -6,7 +6,6 @@
 var util = require('util');
 var AbstractWidgetExecutor = require('./AbstractWidgetExecutor');
 var tasksDirectory = require('./TasksDirectory');
-var logger = require('log4js').getLogger('SoloSoftlayerWidgetExecutor');
 
 function SoloSoftlayerWidgetExecutor() {
     AbstractWidgetExecutor.call(this);
