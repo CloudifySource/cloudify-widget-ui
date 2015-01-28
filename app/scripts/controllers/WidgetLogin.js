@@ -4,6 +4,7 @@ angular.module('cloudifyWidgetUiApp')
     .controller('WidgetLoginCtrl', function ($scope, $routeParams, GoogleplusLoginService,  WidgetsService, LoginTypesService, $log, $timeout ) {
 
         $log.info('loading');
+        $scope.page = { loading: true };
         WidgetsService.getPublicWidget($routeParams.widgetId).then(function (result) {
             $scope.widget = result.data;
             $timeout( $scope.renderSignIn, 1000);
@@ -22,6 +23,14 @@ angular.module('cloudifyWidgetUiApp')
         };
 
 
+        $scope.getIcon = function( login ){
+            if ( login.id === 'custom'){
+                return 'fa-sign-in';
+            }
+            if ( login.id === 'google'){
+                return 'fa-google';
+            }
+        };
 
         $scope.hasGoogleplus = function(){
             if ( !!$scope.widget && !!$scope.widget.socialLogin && !!$scope.widget.socialLogin.data ) {
@@ -47,4 +56,9 @@ angular.module('cloudifyWidgetUiApp')
             $log.info('rendering signin');
             GoogleplusLoginService.render($scope.processGoogleplusAuth);
         };
+
+        //TODO: use TimingService once it supports timeout as well.
+        $timeout( function(){
+            $scope.page.loading = false;
+        }, 3000);
     });

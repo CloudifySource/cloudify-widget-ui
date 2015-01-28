@@ -1,5 +1,9 @@
 {
     "name": "new-widget",
+    "backend" : {
+        "port" : 9001,
+        "host" : "localhost"
+    },
     "cloudifyCloudsDir": "cloudify-folder/clouds",
     "cloudifyExecutable": "cloudify-folder/bin/cloudify.sh",
     "logsDir": "/var/log/cloudify-widget/logs",

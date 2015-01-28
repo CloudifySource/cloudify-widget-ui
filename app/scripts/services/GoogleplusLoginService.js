@@ -8,9 +8,10 @@
  * Service in the cloudifyWidgetUiApp.
  */
 angular.module('cloudifyWidgetUiApp')
-    .service('GoogleplusLoginService', function () {
+    .service('GoogleplusLoginService', function ( $log ) {
         // AngularJS will instantiate a singleton by calling "new" on this function
         this.render = function (onSignin) {
+            $log.info('rendering');
             gapi.signin.render('googleplus', {
                 'callback': onSignin,
                 'clientid': conf.googleplus.clientId,
@@ -23,5 +24,6 @@ angular.module('cloudifyWidgetUiApp')
                 'cookiepolicy': 'single_host_origin'//,
                 //'accesstype': 'offline'
             });
+            $log.info('finished rendering');
         };
     });

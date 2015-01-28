@@ -1,6 +1,7 @@
 'use strict';
 exports.db = require('./DbManager');
 exports.users = require('./UsersManager');
+exports.localWorkFlowWidgetManager = require('./LocalWorkFlowWidgetManager');
 
 exports.poolClient = require('./PoolRestClient');
 exports.widget = require('./WidgetManager');
