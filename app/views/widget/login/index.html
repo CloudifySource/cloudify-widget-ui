@@ -1,11 +1,34 @@
-<h4>Please select authentication service</h4>
 
-<div>
-    <div ng-repeat="login in loginTypes(widget.socialLogin.data)" class="thumb">
+<div id="widget-login" >
 
-        <a ng-show="login.id !== 'googleplus'" ng-href="/backend/widgets/{{widget._id}}/login/{{login.id}}">
-            <div class="social-login-icon login-{{login.id}}"></div>
-        </a>
+    <div ng-show="!page.loading" class="wrapper">
+        <legend class="bs-callout-info h4"><label>{{'widget.login.chooseMethod'|i18n}}</label> </legend>
+
+
+        <div class="bg-info logins-menu">
+            <div  class="btn login-item thumb" ng-repeat="login in loginTypes(widget.socialLogin.data)" ng-show="login.id !== 'googleplus'">
+
+                <a  class="login-item-link" ng-href="/backend/widgets/{{widget._id}}/login/{{login.id}}">
+                    <i class="fa {{getIcon(login)}} fa-2x {{login.id}} login-logo"></i>
+
+                </a>
+                <div class="login-label">{{login.id}}</div>
+            </div>
+
+            <div class="btn login-item" ng-show="hasGoogleplus()">
+                <a   >
+                <div id="googleplus" ></div>
+                </a>
+                <div class="googleplus-login-label">Google+</div>
+            </div>
+        </div>
     </div>
-    <div id="googleplus" ng-show="hasGoogleplus()"></div>
+
+    <div ng-show="!!page.loading">
+        <div  class="login-loading-label" ><i class="fa fa-circle-o-notch fa-5x fa-spin"></i> <h1>Loading... </h1></div>
+
+    </div>
+
 </div>
+
+

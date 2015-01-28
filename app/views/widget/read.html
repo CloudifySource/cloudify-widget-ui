@@ -9,8 +9,9 @@
     <!-- TODO FIXME figure out how to put inner frame without it being empty -->
     <div ng-controller="WidgetsDefaultCtrl">
         <hr />
-        <button ng-click="play()">post play</button>
-        <button ng-click="stop()">post stop</button>
+
+        <button class="btn" ng-click="play()"> <i class="fa fa-play"> post play</i></button>
+        <button class="btn" ng-click="stop()"> <i class="fa fa-stop"> post stop</i></button>
         <br />
         <div widget-embed widget="widget" theme="theme"></div>
     </div>

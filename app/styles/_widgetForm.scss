@@ -1,28 +1,75 @@
 #widgetForm {
-  .loginTypeButton{
-    &.selected{
-      font-weight: bolder;
-    }
-  }
-
-  .row {
-    padding: 8px;
-
-    span {
-      padding-top: 5px;
+    .loginTypeButton {
+        &.selected {
+            font-weight: bolder;
+        }
     }
 
-    sup {
-      padding-top: 10px;
-      margin-bottom: -10px;
+    .row {
+        padding: 8px;
+
+        span {
+            padding-top: 5px;
+        }
+
+        sup {
+            padding-top: 10px;
+            margin-bottom: -10px;
+        }
+
+        input[type="checkbox"] {
+            margin: 8px 0 0 -15px;
+        }
+
+        textarea {
+            margin-left: 10px;
+        }
     }
 
-    input[type="checkbox"] {
-      margin: 8px 0 0 -15px;
+    .social{
+        .alert.alert-info{
+            margin-top:10px;
+        }
+        .try-now{
+            text-align:center;
+            button{
+                font-size:20px;
+                margin:0;
+                padding:0;
+            }
+        }
     }
 
-    textarea {
-      margin-left: 10px;
+    .social-login-title{
+        font-weight: bold;
+        text-decoration: underline;
     }
-  }
+
+    .supported-logins{
+        & > div {
+            padding-top: 10px;
+        }
+        & > div:not(:last-child) {
+            padding-bottom: 10px;
+            border-bottom: 2px dashed white;
+        }
+
+    }
+
+
+
+
+    .add-support{
+        position:absolute;
+        right:-500px;
+        top:100px;
+
+        width:300px;
+        text-align:center;
+        margin:10px auto;
+
+        button{
+            width:100%;
+        }
+    }
 }

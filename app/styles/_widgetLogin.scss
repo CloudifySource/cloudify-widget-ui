@@ -1,0 +1,37 @@
+#widget-login {
+    width: 400px;
+    margin: 40px auto 0;
+    padding: 0;
+
+    .logins-menu {
+        text-align: center;
+        .login-item-link {
+            background: white;
+            border: 1px solid #D9D9D9;
+            border-radius: 2px;
+            font-size: 30px;
+            width: 47px;
+            height: 44px;
+            margin-top: 0;
+            box-shadow: 0 1px 0 #CDE0EA;
+
+            display: inline-block;
+            i {
+                font-size: 30px;
+            }
+        }
+        .login-label {
+            text-transform: capitalize;
+            margin-top: 10px;
+            text-align: left;
+        }
+
+    }
+
+    .login-loading-label {
+
+        font-stretch: expanded;
+        text-align: center;
+
+    }
+}

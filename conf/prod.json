@@ -51,6 +51,9 @@
         "newDir": "/var/opt/cloudify-widget/cli-service/new",
         "executingDir": "/var/opt/cloudify-widget/cli-service/executing"
     },
+    "googleplus" : {
+        "clientId" : "__clientId__"
+    },
     "public": {
         "googleplus": {
             "clientId": "google_user_account_id"

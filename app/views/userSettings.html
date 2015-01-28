@@ -1,30 +1,61 @@
 <div layout class="admin-my-user">
 
+    <form ng-submit="submitForm()">
 
-    <div>
-        {{page.message}}
-    </div>
+        <div class="col-lg-4 col-sm-offset-4">
+            <label><h1>Information</h1></label>
+        </div>
 
-    <h1>Information</h1>
-    <div>
-        My pool key is <code>{{myUser.poolKey}}</code>
-    </div>
+        <div class="form-group">
+            <div class="col-lg-4 col-sm-offset-4">
+                <div>
+                    <label>
+                        {{page.message}}
+                    </label>
+                </div>
 
-    <div admin class="pool-key-settings">
-        <h1> Change Pool Key </h1>
-        <input ng-model="myUser.poolKey"/><br/>
-        <button ng-click="setPoolKey(myUser.poolKey)">Update Pool Key</button><br/>
-        <button ng-click="testPoolKey()">Test Pool Key</button><br/>
-        <button ng-click="resetChanges()">Reset Changes</button>
-    </div>
+                <div>
+                    <label>
+                        My pool key is <code>{{myUser.poolKey}}</code>
+                    </label>
+                </div>
 
-    <div class="change-password">
-        <h1>Change Password</h1>
-        Old Password: <input ng-model="page.changePassword.oldPassword"/><br/>
-        New Password: <input ng-model="page.changePassword.newPassword"/> <br/>
-        New Password Again:<input ng-model="page.changePassword.newPasswordAgain"/><br/>
-        <button ng-click="changePassword()">Change Password</button>
-    </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-sm-offset-4">
+            <div class="input-append">
+                <input class="span2" ng-model="myUser.poolKey" type="text" placeholder="Change Pool Key">
+                <button class="btn" ng-click="setPoolKey(myUser.poolKey)">Update Pool Key</button>
+                <button class="btn" ng-click="testPoolKey()">Test Pool Key</button>
+                <button class="btn" ng-click="resetChanges()">Reset Changes</button>
+            </div>
 
+        </div>
+        <input type="submit" style="visibility: hidden;"/>
+    </form>
+
+    <form ng-submit="submitForm()">
+        <label class="col-lg-4 col-sm-offset-4">Change password</label>
+
+        <div class="form-group">
+            <div class="col-lg-4 col-sm-offset-4">
+                <input type="password" class="form-control" ng-model="page.changePassword.oldPassword"
+                       placeholder="Old Password">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-lg-4 col-sm-offset-4">
+                <input type="password" class="form-control" ng-model="page.changePassword.newPassword"
+                       placeholder="New Password">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-lg-4 col-sm-offset-4">
+                <input type="password" class="form-control" ng-model="page.changePassword.newPasswordAgain"
+                       placeholder="New Password">
+            </div>
+        </div>
+        <input type="submit" style="visibility: hidden;" ng-click="changePassword()"/>
+    </form>
 
 </div>

@@ -141,7 +141,7 @@ domain.run(function () {
 
     // jsonp like response for public configuration.
     app.get('/backend/conf', function(req, res){
-        var confName = req.param.name || 'conf';
+        var confName = req.param('name') || 'conf';
         res.send('var ' + confName + ' = ' + JSON.stringify(conf.public) );
     });
 
@@ -184,4 +184,9 @@ domain.run(function () {
     });
 
 
+});
+
+
+process.on('uncaughtException', function( err ){
+    logger.error('uncaught exception happened!!!', err);
 });

@@ -18,4 +18,14 @@ angular.module('cloudifyWidgetUiApp')
         APPROVAL: [
             'MANUAL_APPROVAL', 'AUTO_APPROVAL'
         ]
+    })
+    .value('PollingConstants', {
+        POOL_VIEW: 'poolViewAggregatePolling',
+        POOL_VIEW_STATUS: 'poolStatusPolling',
+        POOL_VIEW_NODES: 'poolNodesPolling',
+        POOL_VIEW_TASKS: 'poolTasksPolling',
+        POOL_VIEW_ERRORS: 'poolErrorsPoling',
+        POOL_VIEW_DECISIONS: 'poolDecisionsPolling',
+        POOL_VIEW_THREADPOOL: 'poolThreadpoolStatusPolling',
+        POOL_VIEW_NODE_MAPPINGS: 'poolNodeMappingsPolling'
     });

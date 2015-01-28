@@ -4,230 +4,189 @@
 @import "./widgetThemeDefault";
 @import "./login";
 @import "./widgetForm";
+@import "./loggedInLayout";
+@import "./widgetLogin";
+
+$fa-font-path: "/bower_components/font-awesome/fonts";
+@import "font-awesome/scss/font-awesome";
 
 // ---------- bootstrap overrides------------------
 .row {
-  margin-left: 15px;
-  margin-right: 15px;
-  padding: 2px;
+    margin-left: 15px;
+    margin-right: 15px;
+    padding: 2px;
 }
-
 
 // ------------------------------------------------
 
 
-// hide multiple layouts layers for "logged-in-layout" - means that if I have 2 pages one within another with the layout, the other layout will be hidden.
-#logged-in-layout {
-  .logged-in-layout .require-login {
-    display: none !important;
-
-  }
-  .require-login {
-    display: none;
-  }
-
-  .header {
-    background-color: #181818;
-  }
-
-  .hello {
-    color: white;
-    float: left;
-    margin: 12px 12px 12px 24px;
-  }
-
-  &.logged-in {
-    display: default;
-    width: 100%;
-
-    .require-login {
-      display: block;
-
-    }
-    .logged-out {
-      display: none;
-    }
-
-  }
-
-  .auto-refresh {
-    float: right;
-  }
-
-}
-
 .hidden {
-  display: none;
+    display: none;
 }
 
 .pool-nodes {
-  .sortable {
-    cursor: pointer;
+    .sortable {
+        cursor: pointer;
 
-  }
+    }
 }
 
 .pool-form {
-  margin-top: 20px;
+    margin-top: 20px;
 
-  &.ng-invalid.ng-dirty {
-    input.minmax {
-      background: rgba(255, 0, 0, 0.4);
+    &.ng-invalid.ng-dirty {
+        input.minmax {
+            background: rgba(255, 0, 0, 0.4);
+        }
     }
-  }
 }
 
-.nav {
 
-  li {
-    display: inline-block;
-  }
-
-}
 
 #accountPools, #dashboard {
-  .actions {
-    padding: 15px;
-    height: 55px;
+    .actions {
+        padding: 15px;
+        height: 55px;
 
-  }
+    }
 
 }
 
+
 #accountPoolDetails {
-  .jumbotron {
-    padding: 24px 30px 24px 30px;
-    border-radius: 10px;
-    margin-top: 10px;
-  }
+    .jumbotron {
+        padding: 24px 30px 24px 30px;
+        border-radius: 10px;
+        margin-top: 10px;
+    }
 }
 
 #accountPoolEdit, #accountPoolCreate {
-  input {
-    padding-right: 0px;
-  }
-
-  .row {
-    &.actions {
-      margin-left: 30px;
-      margin-top: 10px;
-
-      button:disabled {
-        opacity: 0.5;
-      }
+    input {
+        padding-right: 0px;
     }
-  }
+
+    .row {
+        &.actions {
+            margin-left: 30px;
+            margin-top: 10px;
+
+            button:disabled {
+                opacity: 0.5;
+            }
+        }
+    }
 }
 
 #documentation .navigation .nav {
-  background: #32637C;
-  color: white;
-  font-weight: bold;
-  margin-left: -20px;
-  width: 1200px;
+    background: #32637C;
+    color: white;
+    font-weight: bold;
+    margin-left: -20px;
+    width: 1200px;
 }
 
 #documentation .navigation .nav li {
-  padding: 20px;
-  cursor: pointer;
+    padding: 20px;
+    cursor: pointer;
 }
 
 #documentation .navigation .nav li:hover, #documentation .navigation .nav li.active {
-  color: black;
-  background: #d9edf7;
+    color: black;
+    background: #d9edf7;
 }
 
 #documentation #main {
-  position: relative;
-  padding: 0px 20px 200px 20px;
-  background: #d9edf7;
-  font-family: helvetica, arial, freesans, clean, sans-serif;
-  width: 1200px;
-  margin: -20px 0 0 300px;
-  z-index: 0;
-  font-size: 15px;
-  line-height: 17px;
+    position: relative;
+    padding: 0px 20px 200px 20px;
+    background: #d9edf7;
+    font-family: helvetica, arial, freesans, clean, sans-serif;
+    width: 1200px;
+    margin: -20px 0 0 300px;
+    z-index: 0;
+    font-size: 15px;
+    line-height: 17px;
 }
 
 #documentation #main .section {
-  position: relative;
-  padding-bottom: 10px;
-  padding-top: 10px;
+    position: relative;
+    padding-bottom: 10px;
+    padding-top: 10px;
 }
 
 #documentation #main .section::after {
-  content: "";
-  display: table;
-  clear: both;
+    content: "";
+    display: table;
+    clear: both;
 }
 
 #documentation #main .section .snippet {
-  top: 0;
-  vertical-align: top;
-  right: 0;
+    top: 0;
+    vertical-align: top;
+    right: 0;
 }
 
 #documentation a {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 #documentation pre {
-  margin-top: 20px;
+    margin-top: 20px;
 }
 
 #documentation .plunkr-link {
-  cursor: pointer;
-  padding-top: 20px;
-  display: block;
-  margin: 0 auto;
-  -moz-box-shadow: inset 0px 1px 0px 0px #fce2c1;
-  -webkit-box-shadow: inset 0px 1px 0px 0px #fce2c1;
-  box-shadow: inset 0px 1px 0px 0px #fce2c1;
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ffc477), color-stop(1, #fb9e25));
-  background: -moz-linear-gradient(center top, #ffc477 5%, #fb9e25 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffc477', endColorstr='#fb9e25');
-  background-color: #ffc477;
-  -webkit-border-top-left-radius: 20px;
-  -moz-border-radius-topleft: 20px;
-  border-top-left-radius: 20px;
-  -webkit-border-top-right-radius: 20px;
-  -moz-border-radius-topright: 20px;
-  border-top-right-radius: 20px;
-  -webkit-border-bottom-right-radius: 20px;
-  -moz-border-radius-bottomright: 20px;
-  border-bottom-right-radius: 20px;
-  -webkit-border-bottom-left-radius: 20px;
-  -moz-border-radius-bottomleft: 20px;
-  border-bottom-left-radius: 20px;
-  text-indent: 0;
-  border: 1px solid #eeb44f;
-  color: #ffffff;
-  font-family: Arial;
-  font-size: 25px;
-  font-weight: bold;
-  font-style: normal;
-  height: 95px;
-  line-height: 50px;
-  width: 500px;
-  text-decoration: none;
-  text-align: center;
-  text-shadow: 1px 1px 0px #cc9f52;
-  /* This button was generated using CSSButtonGenerator.com */
+    cursor: pointer;
+    padding-top: 20px;
+    display: block;
+    margin: 0 auto;
+    -moz-box-shadow: inset 0px 1px 0px 0px #fce2c1;
+    -webkit-box-shadow: inset 0px 1px 0px 0px #fce2c1;
+    box-shadow: inset 0px 1px 0px 0px #fce2c1;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ffc477), color-stop(1, #fb9e25));
+    background: -moz-linear-gradient(center top, #ffc477 5%, #fb9e25 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffc477', endColorstr='#fb9e25');
+    background-color: #ffc477;
+    -webkit-border-top-left-radius: 20px;
+    -moz-border-radius-topleft: 20px;
+    border-top-left-radius: 20px;
+    -webkit-border-top-right-radius: 20px;
+    -moz-border-radius-topright: 20px;
+    border-top-right-radius: 20px;
+    -webkit-border-bottom-right-radius: 20px;
+    -moz-border-radius-bottomright: 20px;
+    border-bottom-right-radius: 20px;
+    -webkit-border-bottom-left-radius: 20px;
+    -moz-border-radius-bottomleft: 20px;
+    border-bottom-left-radius: 20px;
+    text-indent: 0;
+    border: 1px solid #eeb44f;
+    color: #ffffff;
+    font-family: Arial;
+    font-size: 25px;
+    font-weight: bold;
+    font-style: normal;
+    height: 95px;
+    line-height: 50px;
+    width: 500px;
+    text-decoration: none;
+    text-align: center;
+    text-shadow: 1px 1px 0px #cc9f52;
+    /* This button was generated using CSSButtonGenerator.com */
 }
 
 #documentation .plunkr-link:hover {
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0.05, #fb9e25), color-stop(1, #ffc477));
-  background: -moz-linear-gradient(center top, #fb9e25 5%, #ffc477 100%);
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fb9e25', endColorstr='#ffc477');
-  background-color: #fb9e25;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.05, #fb9e25), color-stop(1, #ffc477));
+    background: -moz-linear-gradient(center top, #fb9e25 5%, #ffc477 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fb9e25', endColorstr='#ffc477');
+    background-color: #fb9e25;
 }
 
 #documentation .plunkr-link:active {
-  position: relative;
-  top: 1px;
+    position: relative;
+    top: 1px;
 }
 
-[pool-error] pre{
-  font-size:10px;
-  width:800px;
+[pool-error] pre {
+    font-size: 10px;
+    width: 800px;
 }
