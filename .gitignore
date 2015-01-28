@@ -13,4 +13,10 @@ cloudify-folder
 coverage
 test-results.xml
 backend-coverage
+backend/cfy-config-softlayer-old
+
+**/softlayer_widget/
 backend-instrument
+local-storage
+me.json
+

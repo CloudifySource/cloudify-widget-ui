@@ -1,4 +1,29 @@
 'use strict';
+
+/**
+ * @module DbManager
+ * @description
+ *
+ *
+ * use this manager
+ *
+ * <pre>
+ *     var dbManager = require('...path...');
+ *     dbManager.connect('collectionName', function(db, collection){
+ *
+ *           .. use collection as defined in node-mongo documentation
+ *           https://github.com/mongodb/node-mongodb-native
+ *           http://mongodb.github.io/node-mongodb-native/markdown-docs/queries.html
+ *
+ *           no need to disconnect, or such. just do what you need with the collection.
+ *
+ *     });
+ *</pre>
+ *
+ *
+ * @type {exports}
+ */
+
 //var logger = require('log4js').getLogger('DbManager');
 var conf = require('../Conf');
 var ObjectID = require('mongodb').ObjectID;
@@ -28,7 +53,9 @@ function getConnection(callback) {
 exports.connect = function (collectionName, callback) {
     logger.trace('connecting', collectionName);
     getConnection(function (err, db) {
+        logger.trace('got connection');
         if (err) {
+            logger.trace('got error:', err );
             throw err;
         }
 

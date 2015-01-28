@@ -22,6 +22,15 @@ module.exports = function (grunt) {
         dist: 'dist'
     };
 
+
+    if ( !grunt.file.exists('./conf/dev/me.json')){
+        grunt.file.write('./conf/dev/me.json',JSON.stringify({}));
+    }else{
+        grunt.log.ok('me.json exists');
+    }
+    var widgetUiConf = require('./backend/Conf');
+
+
     try {
         yeomanConfig.app = require('./bower.json').appPath || yeomanConfig.app;
     } catch (e) {
@@ -88,8 +97,8 @@ module.exports = function (grunt) {
             proxies: [
                 {
                     context: '/backend',
-                    host: '127.0.0.1',
-                    port: 9001,
+                    host: widgetUiConf.backend.host,
+                    port: widgetUiConf.backend.port,
                     https: false,
                     changeOrigin: false,
                     xforward: false
@@ -623,6 +632,7 @@ module.exports = function (grunt) {
     ]);
 
     grunt.registerTask('test', function (testBackend) {
+        //var done = this.async();
         var tasks = [];
         if (testBackend === undefined || testBackend === '' || testBackend === 'all' || testBackend === 'frontend') { // default
             tasks = [
@@ -636,10 +646,23 @@ module.exports = function (grunt) {
         }
 
         if (testBackend === undefined || testBackend === '' || testBackend === 'all' || testBackend === 'backend') {
+            tasks.push('mocha_istanbul');
             // guy - we always use code coverage in grunt.. when debug from the IDE so no need for no instrumented mode in grunt.
-            tasks = tasks.concat(['clean:instrumentBackend','clean:coverageBackend', 'instrument', 'copy:backendCoverageTests', 'jasmine_node:unitInstrument', 'storeCoverage', 'makeReport', 'clean:instrumentBackend']);
+            tasks = tasks.concat([
+                'clean:instrumentBackend',
+                'clean:coverageBackend',
+                'instrument',
+                'copy:backendCoverageTests',
+                'jasmine_node:unitInstrument',
+                'storeCoverage',
+                'makeReport',
+                //'clean:instrumentBackend' // sopped working for some reason - need to investigate
+
+            ]);
         }
         grunt.task.run(tasks);
+
+
     });
 
     grunt.registerTask('testSingle', [
