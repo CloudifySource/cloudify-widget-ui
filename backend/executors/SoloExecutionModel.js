@@ -3,11 +3,14 @@
  */
 'use strict';
 //var dbService = require('../services/DbService');
+var util = require('util');
 var ExecutionModel = require('./ExecutionModel');
 
 function SoloExecutionModel(widgetId, callback) {
     ExecutionModel.call(this, widgetId, callback);
 }
+
+util.inherits(SoloExecutionModel, ExecutionModel);
 
 SoloExecutionModel.prototype.setExecutionDetails = function (executionDetails) {
     this.executionDetails = executionDetails;

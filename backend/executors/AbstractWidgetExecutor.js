@@ -28,7 +28,7 @@ AbstractWidgetExecutor.prototype.getExecutionTasks = function () {
     throw new Error('Abstract method not implemented in inheriting class!');
 };
 
-AbstractWidgetExecutor.prototype.updateExecution = function (executionObjectId, data) {
+var updateExecution = function (executionObjectId, data) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.update(
             {_id: executionObjectId},
@@ -53,8 +53,8 @@ AbstractWidgetExecutor.prototype.updateExecution = function (executionObjectId, 
 
 AbstractWidgetExecutor.prototype.playFinally = function (err, executionModel) {
     if (err) {
-        logger.info('failed to play widget with id [%s]', executionModel.getWidgetId());
-        this.updateExecution(executionModel.getExecutionObjectId(), {
+        logger.info('failed to play widget with id [%s]', executionModel.getWidgetId(), err.message);
+        updateExecution(executionModel.getExecutionObjectId(), {
             state: 'STOPPED',
             error: err.message
         });

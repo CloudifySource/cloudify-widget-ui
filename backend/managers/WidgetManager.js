@@ -190,24 +190,39 @@ exports.getExecutionModelById = function(executionId, callback) {
     });
 };
 
+var getExecutorInstance = function(type) {
+    var executor;
+
+    switch(type) {
+        case 'free':
+            executor = new executors.FreeWidgetExecutor();
+            break;
+        case 'ec2':
+            executor = new executors.SoloAWSWidgetExecutor();
+            break;
+        case 'softlayer':
+            executor = new executors.SoloSoftlayerWidgetExecutor();
+            break;
+    }
+
+    return executor;
+};
+
 exports.play = function (widgetId, loginDetailsId, playCallback) {
     var executionModel = new executors.ExecutionModel(widgetId, playCallback);
     executionModel.setLoginDetailsId(loginDetailsId);
 
-    var executor = new executors.FreeWidgetExecutor();
-    executor.play(executionModel);
+    getExecutorInstance('free').play(executionModel);
 };
 
 
 exports.playSolo = function (widgetId, executionDetails, playCallback) {
-
     logger.trace('-playRemote !!!!!!');
 
     var executionModel = new executors.SoloExecutionModel(widgetId, playCallback);
     executionModel.setExecutionDetails(executionDetails);
 
-    var executor = new executors.SoloAWSWidgetExecutor();
-    executor.play(executionModel);
+    getExecutorInstance(executionDetails.providerName).play(executionModel);
 };
 
 exports.stop = function (widgetId, executionId, isSoloMode, stopCallback) {

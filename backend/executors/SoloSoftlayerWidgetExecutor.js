@@ -4,7 +4,6 @@
 'use strict';
 
 var util = require('util');
-var path = require('path');
 var AbstractWidgetExecutor = require('./AbstractWidgetExecutor');
 var tasksDirectory = require('./TasksDirectory');
 
@@ -14,21 +13,13 @@ function SoloSoftlayerWidgetExecutor() {
 
 util.inherits(SoloSoftlayerWidgetExecutor, AbstractWidgetExecutor);
 
-var soloSoftlayerInit = function (executionModel, callback) {
-    var executionDetails = executionModel.getExecutionDetails();
-    executionDetails = _.merge({'configPrototype': path.resolve(__dirname, '..', 'cfy-config-softlayer')}, executionDetails);
-    executionModel.setExecutionDetails(executionDetails);
-
-    callback(null, executionModel);
-};
-
 //-----------  Overrides  ----------------------
 
 SoloSoftlayerWidgetExecutor.prototype.executionType = 'Solo Softlayer';
 
 SoloSoftlayerWidgetExecutor.prototype.getExecutionTasks = function () {
     return [
-        soloSoftlayerInit,
+        tasksDirectory.soloSoftlayer.soloSoftlayerInit,
         tasksDirectory.common.getWidget,
         tasksDirectory.common.saveExecutionModel,
         tasksDirectory.soloSoftlayer.setupDirectory,

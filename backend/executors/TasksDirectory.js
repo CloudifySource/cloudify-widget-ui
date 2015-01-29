@@ -629,6 +629,15 @@ var listenOutput = function (executionModel, childProcess) {
 };
 
 exports.soloSoftlayer = {};
+
+exports.soloSoftlayer.soloSoftlayerInit = function (executionModel, callback) {
+    var executionDetails = executionModel.getExecutionDetails();
+    executionDetails = _.merge({'configPrototype': path.resolve(__dirname, '..', 'cfy-config-softlayer')}, executionDetails);
+    executionModel.setExecutionDetails(executionDetails);
+
+    callback(null, executionModel);
+};
+
 exports.soloSoftlayer.setupDirectory = function (executionModel, callback) {
 
     callback = callback || _.noop;
@@ -684,7 +693,7 @@ exports.soloSoftlayer.setupSoftlayerCli = function (executionModel, callback) {
     exec('pip install softlayer', function (err, stdout) {
         if (err) {
             logger.error('error while installing softlayer CLI : ' + err);
-            callback(new Error('failed to install softlayer CLI'), executionModel);
+            callback(new Error('failed to install softlayer CLI:\n' + stdout), executionModel);
             return;
         }
 
