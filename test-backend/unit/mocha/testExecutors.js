@@ -51,8 +51,8 @@ var logger = require('log4js').getLogger('testExecutors.spec');
 var executionDetails = {
     softlayer: {
         params: {
-            username: 'cwuser',
-            apiKey: '5bef5579f38c5c519f89f0e382a48701297ed7a96d4949b73a71c0dc0deb008d'
+            username: '__user__',
+            apiKey: '__password__'
         }
     }
 };
