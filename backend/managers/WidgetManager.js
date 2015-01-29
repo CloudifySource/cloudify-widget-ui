@@ -10,7 +10,7 @@ var executors = require('../executors');
 function _getWidget(curryParams, curryCallback) {
     logger.trace('-play- getWidget');
     managers.db.connect('widgets', function (db, collection, done) {
-        collection.findOne({ _id: curryParams.widgetObjectId }, function (err, result) {
+        collection.findOne({_id: curryParams.widgetObjectId}, function (err, result) {
             if (!!err) {
                 logger.error('unable to find widget', err);
                 curryCallback(err, curryParams);
@@ -35,7 +35,7 @@ function _getWidget(curryParams, curryCallback) {
 function _getPoolKey(curryParams, curryCallback) {
     logger.info('getting user from widget');
     managers.db.connect('users', function (db, collection) {
-        collection.findOne({ '_id': curryParams.widget.userId }, function (err, result) {
+        collection.findOne({'_id': curryParams.widget.userId}, function (err, result) {
             if (!!err) {
                 logger.error('unable to find user from widget', err);
                 curryCallback(err, curryParams);
@@ -58,7 +58,7 @@ function _getPoolKey(curryParams, curryCallback) {
 function _updateExecutionModel(data, curryParams, curryCallback) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.findOne(
-            { _id: curryParams.executionObjectId },
+            {_id: curryParams.executionObjectId},
             function (err, result) {
                 if (err) {
                     logger.error('failed to retrieve execution model before update', err);
@@ -70,7 +70,7 @@ function _updateExecutionModel(data, curryParams, curryCallback) {
                 result = _.merge(result, data);
 
                 collection.update(
-                    { _id: curryParams.executionObjectId },
+                    {_id: curryParams.executionObjectId},
                     result,
                     function (err, nUpdated) {
                         if (err) {
@@ -95,7 +95,7 @@ function _updateExecutionModel(data, curryParams, curryCallback) {
 function updateExecution(executionObjectId, data) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.update(
-            { _id: executionObjectId },
+            {_id: executionObjectId},
             {
                 $set: data
             },
@@ -117,7 +117,7 @@ function updateExecution(executionObjectId, data) {
 
 function _getExecutionModel(curryParams, curryCallback) {
 
-    exports.getExecutionModelById(curryParams.executionId, function(err, result) {
+    exports.getExecutionModelById(curryParams.executionId, function (err, result) {
         if (!!err) {
             curryCallback(err, curryParams);
             return;
@@ -171,7 +171,7 @@ function _stopFinally(err, curryParams) {
     curryParams.stopCallback(null, {});
 }
 
-exports.getExecutionModelById = function(executionId, callback) {
+exports.getExecutionModelById = function (executionId, callback) {
     managers.db.connect('widgetExecutions', function (db, collection) {
         collection.findOne({_id: managers.db.toObjectId(executionId)}, function (err, result) {
 
@@ -190,19 +190,19 @@ exports.getExecutionModelById = function(executionId, callback) {
     });
 };
 
-var getExecutorInstance = function(type) {
+var getExecutorInstance = function (type) {
     var executor;
 
-    switch(type) {
-        case 'free':
-            executor = new executors.FreeWidgetExecutor();
-            break;
-        case 'ec2':
-            executor = new executors.SoloAWSWidgetExecutor();
-            break;
-        case 'softlayer':
-            executor = new executors.SoloSoftlayerWidgetExecutor();
-            break;
+    switch (type) {
+    case 'free':
+        executor = new executors.FreeWidgetExecutor();
+        break;
+    case 'ec2':
+        executor = new executors.SoloAWSWidgetExecutor();
+        break;
+    case 'softlayer':
+        executor = new executors.SoloSoftlayerWidgetExecutor();
+        break;
     }
 
     return executor;
@@ -262,7 +262,7 @@ function getPublicExecutionDetails(execution) {
 
     if (execution.nodeModel) {
         retVal.nodeModel = _.merge(_.pick(execution.nodeModel, ['id']),
-            {'publicIp': execution.nodeModel.machineSshDetails.publicIp },
+            {'publicIp': execution.nodeModel.machineSshDetails.publicIp},
             {'expires': execution.nodeModel.expires},
             {'state': execution.state});
     } else {
@@ -334,7 +334,7 @@ exports.getOutput = function (executionId, callback) {
 exports.findById = function (widgetId, callback) {
     logger.info(widgetId);
     managers.db.connect('widgets', function (db, collection, done) {
-        collection.findOne({ _id: managers.db.toObjectId(widgetId) }, function (err, result) {
+        collection.findOne({_id: managers.db.toObjectId(widgetId)}, function (err, result) {
             if (!!err) {
                 logger.error('unable to find widget', err);
                 done();
