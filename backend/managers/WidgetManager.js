@@ -203,7 +203,7 @@ exports.playSolo = function (widgetId, executionDetails, playCallback) {
 
     logger.trace('-playRemote !!!!!!');
 
-    var executionModel = new executors.ExecutionModel(widgetId, playCallback);
+    var executionModel = new executors.SoloExecutionModel(widgetId, playCallback);
     executionModel.setExecutionDetails(executionDetails);
 
     var executor = new executors.SoloAWSWidgetExecutor();

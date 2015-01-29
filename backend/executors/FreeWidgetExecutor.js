@@ -19,14 +19,14 @@ FreeWidgetExecutor.prototype.executionType = 'Free';
 
 FreeWidgetExecutor.prototype.getExecutionTasks = function () {
     return [
-        tasksDirectory.getWidget,
-        tasksDirectory.getPoolKey,
-        tasksDirectory.saveExecutionModel,
-        tasksDirectory.updateExecutionModelAddPaths,
-        tasksDirectory.downloadRecipe,
-        tasksDirectory.occupyMachine,
-        tasksDirectory.updateExecutionModelAddNodeModel,
-        tasksDirectory.runInstallCommand
+        tasksDirectory.common.getWidget,
+        tasksDirectory.free.getPoolKey,
+        tasksDirectory.common.saveExecutionModel,
+        tasksDirectory.common.updateExecutionModelAddPaths,
+        tasksDirectory.common.downloadRecipe,
+        tasksDirectory.free.occupyMachine,
+        tasksDirectory.free.updateExecutionModelAddNodeModel,
+        tasksDirectory.free.runInstallCommand
     ];
 };
 

@@ -63,7 +63,7 @@ AbstractWidgetExecutor.prototype.playFinally = function (err, executionModel) {
     }
 
     logger.info('finished widget execution!');
-    executionModel.getExecutionCallback()(null, executionModel.getExecutionObjectId().toHexString());
+    executionModel.getExecutionCallback()(null, executionModel.getExecutionId());
 };
 
 /**

@@ -19,17 +19,17 @@ SoloAWSWidgetExecutor.prototype.executionType = 'Solo AWS';
 
 SoloAWSWidgetExecutor.prototype.getExecutionTasks = function () {
     return [
-        tasksDirectory.getWidget,
-        tasksDirectory.saveExecutionModel,
-        tasksDirectory.updateExecutionModelAddPaths,
-        tasksDirectory.updateExecutionModelAddExecutionDetails,
-        tasksDirectory.downloadRecipe,
-        tasksDirectory.downloadCloudProvider,
-        tasksDirectory.generateKeyPair,
-        tasksDirectory.modifyImages,
-        tasksDirectory.overrideCloudPropertiesFile,
-        tasksDirectory.overrideRecipePropertiesFile,
-        tasksDirectory.runBootstrapAndInstallCommands
+        tasksDirectory.common.getWidget,
+        tasksDirectory.common.saveExecutionModel,
+        tasksDirectory.common.updateExecutionModelAddPaths,
+        tasksDirectory.soloAws.updateExecutionModelAddExecutionDetails,
+        tasksDirectory.common.downloadRecipe,
+        tasksDirectory.common.downloadCloudProvider,
+        tasksDirectory.soloAws.generateKeyPair,
+        tasksDirectory.soloAws.modifyImages,
+        tasksDirectory.common.overrideCloudPropertiesFile,
+        tasksDirectory.common.overrideRecipePropertiesFile,
+        tasksDirectory.soloAws.runBootstrapAndInstallCommands
     ];
 };
 

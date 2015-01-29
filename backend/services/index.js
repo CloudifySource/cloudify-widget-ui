@@ -10,3 +10,4 @@ exports.mandrill = require('./MandrillService');
 exports.crypto = require('./CryptoService');
 exports.ec2Api = require('./clouds/ec2');
 exports.errorResponse = require('./ErrorResponseService');
+exports.GsReadLine = require('./GsReadLine');

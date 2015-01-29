@@ -4,6 +4,7 @@
 'use strict';
 
 var util = require('util');
+var path = require('path');
 var AbstractWidgetExecutor = require('./AbstractWidgetExecutor');
 var tasksDirectory = require('./TasksDirectory');
 
@@ -13,23 +14,31 @@ function SoloSoftlayerWidgetExecutor() {
 
 util.inherits(SoloSoftlayerWidgetExecutor, AbstractWidgetExecutor);
 
+var soloSoftlayerInit = function (executionModel, callback) {
+    var executionDetails = executionModel.getExecutionDetails();
+    executionDetails = _.merge({'configPrototype': path.resolve(__dirname, '..', 'cfy-config-softlayer')}, executionDetails);
+    executionModel.setExecutionDetails(executionDetails);
+
+    callback(null, executionModel);
+};
+
 //-----------  Overrides  ----------------------
 
 SoloSoftlayerWidgetExecutor.prototype.executionType = 'Solo Softlayer';
 
 SoloSoftlayerWidgetExecutor.prototype.getExecutionTasks = function () {
     return [
-        tasksDirectory.getWidget,
-        tasksDirectory.saveExecutionModel,
-        tasksDirectory.updateExecutionModelAddPaths,
-        tasksDirectory.updateExecutionModelAddExecutionDetails,
-        tasksDirectory.downloadRecipe,
-        tasksDirectory.downloadCloudProvider,
-        tasksDirectory.generateKeyPair,
-        tasksDirectory.modifyImages,
-        tasksDirectory.overrideCloudPropertiesFile,
-        tasksDirectory.overrideRecipePropertiesFile,
-        tasksDirectory.runBootstrapAndInstallCommands
+        soloSoftlayerInit,
+        tasksDirectory.common.getWidget,
+        tasksDirectory.common.saveExecutionModel,
+        tasksDirectory.soloSoftlayer.setupDirectory,
+        tasksDirectory.soloSoftlayer.setupEnvironmentVariables,
+        tasksDirectory.soloSoftlayer.setupSoftlayerCli,
+        tasksDirectory.soloSoftlayer.setupSoftlayerSsh,
+        tasksDirectory.soloSoftlayer.editInputsFile,
+        tasksDirectory.soloSoftlayer.runInitCommand,
+        tasksDirectory.soloSoftlayer.runInstallWorkflowCommand,
+        tasksDirectory.soloSoftlayer.clean
     ];
 };
 

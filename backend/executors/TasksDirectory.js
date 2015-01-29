@@ -9,6 +9,9 @@ var services = require('../services');
 var path = require('path');
 var _ = require('lodash');
 var fs = require('fs');
+var fse = require('fs-extra');
+var exec = require('child_process').exec;
+var util = require('util');
 var conf = require('../Conf');
 var models = require('../models');
 
@@ -147,8 +150,8 @@ var getCloudPropertiesUpdateLine = function (executionDetails, executionId) {
 };
 
 //---------------- COMMON TASKS ------------------------
-
-exports.getWidget = function (executionModel, callback) {
+exports.common = {};
+exports.common.getWidget = function (executionModel, callback) {
     logger.info('getting widget id ' + executionModel.getWidgetId());
 
     managers.db.connect('widgets', function (db, collection, done) {
@@ -170,12 +173,11 @@ exports.getWidget = function (executionModel, callback) {
             executionModel.setWidget(result);
             callback(null, executionModel);
             done();
-            return;
         });
     });
 };
 
-exports.saveExecutionModel = function (executionModel, callback) {
+exports.common.saveExecutionModel = function (executionModel, callback) {
     logger.info('saving execution to mongo');
 
     managers.db.connect('widgetExecutions', function (db, collection, done) {
@@ -201,14 +203,14 @@ exports.saveExecutionModel = function (executionModel, callback) {
             }
 
             executionModel.setExecutionObjectId(docsInserted[0]._id);
+            executionModel.setExecutionId(executionModel.getExecutionObjectId().toHexString());
             callback(null, executionModel);
             done();
-            return;
         });
     });
 };
 
-exports.updateExecutionModel = function (data, executionModel, callback) {
+exports.common.updateExecutionModel = function (data, executionModel, callback) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.findOne(
             {_id: executionModel.getExecutionObjectId()},
@@ -242,16 +244,14 @@ exports.updateExecutionModel = function (data, executionModel, callback) {
 
                         callback(null, executionModel);
                         done();
-                        return;
                     });
             });
     });
 };
 
-exports.updateExecutionModelAddPaths = function (executionModel, callback) {
+exports.common.updateExecutionModelAddPaths = function (executionModel, callback) {
     logger.info('updating execution model add paths');
 
-    executionModel.setExecutionId(executionModel.getExecutionObjectId().toHexString());
     executionModel.setDownloadsPath(path.join(conf.downloadsDir, executionModel.getExecutionId()));
     executionModel.setLogsPath(path.join(conf.logsDir, executionModel.getExecutionId()));
 
@@ -261,7 +261,7 @@ exports.updateExecutionModelAddPaths = function (executionModel, callback) {
     }, executionModel, callback);
 };
 
-exports.downloadRecipe = function (executionModel, callback) {
+exports.common.downloadRecipe = function (executionModel, callback) {
     // TODO : add validation if destination download not already exists otherwise simply call callback.
     logger.info('downloading recipe from ', executionModel.getWidget().recipeUrl);
     // download recipe zip
@@ -274,18 +274,16 @@ exports.downloadRecipe = function (executionModel, callback) {
     if (!options.url) {
         executionModel.setShouldInstall(false);
         callback(null, executionModel);
-        return;
 
     } else {
         executionModel.setShouldInstall(true);
         services.dl.downloadZipfile(options, function (e) {
             callback(e, executionModel);
-            return;
         });
     }
 };
 
-exports.downloadCloudProvider = function (executionModel, callback) {
+exports.common.downloadCloudProvider = function (executionModel, callback) {
     // TODO : add validation if destination download not already exists otherwise simply call callback.
     logger.info('downloading Cloud Provider from ', executionModel.getExecutionDetails().providerUrl);
 
@@ -297,12 +295,11 @@ exports.downloadCloudProvider = function (executionModel, callback) {
 
     services.dl.downloadZipfile(options, function (e) {
         callback(e, executionModel);
-        return;
     });
 
 };
 
-exports.overrideCloudPropertiesFile = function (executionModel, callback) {
+exports.common.overrideCloudPropertiesFile = function (executionModel, callback) {
     logger.info('overriding Cloud Properties File');
 
     var cloudDistFolderName = executionModel.getDownloadsPath() + path.sep + executionModel.getWidget().executionDetails.providerRootPath;
@@ -321,12 +318,11 @@ exports.overrideCloudPropertiesFile = function (executionModel, callback) {
 
         logger.info('Cloud Properties File was updated:', cloudPropertiesFile);
         callback(null, executionModel);
-        return;
     });
 
 };
 
-exports.overrideRecipePropertiesFile = function (executionModel, callback) {
+exports.common.overrideRecipePropertiesFile = function (executionModel, callback) {
     logger.trace('overriding Recipe Properties File');
 
     var widget = executionModel.getWidget();
@@ -346,7 +342,6 @@ exports.overrideRecipePropertiesFile = function (executionModel, callback) {
 
         logger.info('Recipe Properties File was updated:', recipePropertiesFile);
         callback(null, executionModel);
-        return;
     });
 
 };
@@ -355,7 +350,8 @@ exports.overrideRecipePropertiesFile = function (executionModel, callback) {
 
 //---------------- FREE TASKS ------------------------
 
-exports.getPoolKey = function (executionModel, callback) {
+exports.free = {};
+exports.free.getPoolKey = function (executionModel, callback) {
     logger.info('getting pool key');
 
     managers.db.connect('users', function (db, collection) {
@@ -375,12 +371,11 @@ exports.getPoolKey = function (executionModel, callback) {
             logger.info('found poolKey', result.poolKey);
             executionModel.setPoolKey(result.poolKey);
             callback(null, executionModel);
-            return;
         });
     });
 };
 
-exports.occupyMachine = function (executionModel, callback) {
+exports.free.occupyMachine = function (executionModel, callback) {
     logger.info('occupying machine');
 
     // TODO better defense
@@ -413,11 +408,10 @@ exports.occupyMachine = function (executionModel, callback) {
 
         executionModel.setNodeModel(resultObj);
         callback(null, executionModel);
-        return;
     });
 };
 
-exports.updateExecutionModelAddNodeModel = function (executionModel, callback) {
+exports.free.updateExecutionModelAddNodeModel = function (executionModel, callback) {
     logger.info('update Execution Model Add Node Model');
 
     exports.updateExecutionModel({
@@ -425,7 +419,7 @@ exports.updateExecutionModelAddNodeModel = function (executionModel, callback) {
     }, executionModel, callback);
 };
 
-exports.runInstallCommand = function (executionModel, callback) {
+exports.free.runInstallCommand = function (executionModel, callback) {
     logger.info('running Install Command');
 
     if (!executionModel.getShouldInstall()) {
@@ -462,7 +456,7 @@ exports.runInstallCommand = function (executionModel, callback) {
             installPath
         ],
         logsDir: executionModel.getLogsPath(),
-        executionId: executionModel.getExecutionObjectId().toHexString()
+        executionId: executionModel.getExecutionId()
     };
 
     // we want to remove the execution model when the execution is over
@@ -477,7 +471,6 @@ exports.runInstallCommand = function (executionModel, callback) {
     });
 
     callback(null, executionModel);
-    return;
 };
 
 //---------------- FREE TASKS END ------------------------
@@ -485,7 +478,8 @@ exports.runInstallCommand = function (executionModel, callback) {
 
 //---------------- SOLO AWS TASKS ------------------------
 
-exports.updateExecutionModelAddExecutionDetails = function (executionModel, callback) {
+exports.soloAws = {};
+exports.soloAws.updateExecutionModelAddExecutionDetails = function (executionModel, callback) {
     logger.trace('updating Execution Model Add Execution Details');
 
     var encryptionKey = executionModel.getExecutionId();
@@ -507,7 +501,7 @@ exports.updateExecutionModelAddExecutionDetails = function (executionModel, call
 
 };
 
-exports.generateKeyPair = function (executionModel, callback) {
+exports.soloAws.generateKeyPair = function (executionModel, callback) {
     logger.trace('Generating Key Pair');
 
     var executionDetails = executionModel.getExecutionDetails();
@@ -550,7 +544,7 @@ exports.generateKeyPair = function (executionModel, callback) {
     });
 };
 
-exports.modifyImages = function (executionModel, callback) {
+exports.soloAws.modifyImages = function (executionModel, callback) {
     logger.trace('Modifying images');
 
     var executionDetails = executionModel.getExecutionDetails();
@@ -575,11 +569,10 @@ exports.modifyImages = function (executionModel, callback) {
         }
 
         callback(null, executionModel);
-        return;
     });
 };
 
-exports.runBootstrapAndInstallCommands = function (executionModel, callback) {
+exports.soloAws.runBootstrapAndInstallCommands = function (executionModel, callback) {
     var widget = executionModel.getWidget();
 
     logger.info('runCliBootstrapCommand, LogsPath:', executionModel.getLogsPath(), 'installCommand:', widget.recipeType.installCommand);
@@ -602,7 +595,7 @@ exports.runBootstrapAndInstallCommands = function (executionModel, callback) {
             installPath
         ],
         logsDir: executionModel.getLogsPath(),
-        executionId: executionModel.getExecutionObjectId().toHexString()
+        executionId: executionModel.getExecutionId()
     };
 
     logger.info('-command', command);
@@ -610,8 +603,248 @@ exports.runBootstrapAndInstallCommands = function (executionModel, callback) {
     services.cloudifyCli.executeCommand(command);
 
     callback(null, executionModel);
-    return;
 };
 
 //---------------- SOLO AWS TASKS END ------------------------
+
+//---------------- SOLO Softlayer TASKS ------------------------
+
+var listenOutput = function (executionModel, childProcess) {
+    managers.db.connect('widgetExecutions', function (db, collection) {
+        function handleLines(type) {
+            return function (lines) {
+                lines = _.map(lines, function (line) {
+                    logger.trace(type + ' :: [' + line + ']');
+                    return {'type': type, 'line': line};
+                });
+                collection.update({_id: executionModel.getExecutionObjectId()}, {$push: {'output': {$each: lines}}}, function () {
+                });
+            };
+        }
+
+        new services.GsReadline(childProcess.stdout).on('lines', handleLines('info'));
+        new services.GsReadline(childProcess.stderr).on('lines', handleLines('error'));
+    });
+
+};
+
+exports.soloSoftlayer = {};
+exports.soloSoftlayer.setupDirectory = function (executionModel, callback) {
+
+    callback = callback || _.noop;
+
+    logger.debug('copying config files to temp folder');
+    var tmpDirName = path.resolve(__dirname, '..', 'cp_' + executionModel.getExecutionId());
+    executionModel.setDownloadsPath(tmpDirName);
+
+    fse.copy(executionModel.getExecutionDetails().configPrototype, tmpDirName, function (err) {
+        if (err) {
+            logger.error('failed at copying config files to temp folder', err);
+            callback(err, executionModel);
+            return;
+        }
+
+        // fill in paths to be reused
+        var commands = {
+            initCommand: util.format('cfy local init -p %s/blu_sl_blueprint.yaml --install-plugins -i %s/blu_sl.json', tmpDirName, tmpDirName),
+            installWfCommand: 'cfy local execute -w install'
+        };
+        executionModel.setCommands(commands);
+        logger.debug('configuration update. now it is \n', JSON.stringify(executionModel.getCommands(), {}, 4));
+
+        callback(null, executionModel);
+    });
+};
+
+exports.soloSoftlayer.setupEnvironmentVariables = function(executionModel, callback) {
+    var executionDetails = executionModel.getExecutionDetails();
+    process.env.SL_USERNAME = executionDetails.softlayer.params.username;
+    exec('echo $SL_USERNAME', {env: process.env}, function (err, stdout) {
+        if (err) {
+            logger.error('could not set environment variable: SL_USERNAME');
+            callback(err, executionModel);
+            return;
+        }
+        logger.debug('this is the USERNAME: ', stdout);
+
+        process.env.SL_API_KEY = executionDetails.softlayer.params.apiKey;
+        exec('echo $SL_API_KEY', {env: process.env}, function (err, stdout) {
+            if (err) {
+                logger.error('could not set environment variable: SL_API_KEY');
+                callback(err, executionModel);
+                return;
+            }
+            logger.debug('this is the API_KEY: ', stdout);
+            callback(null, executionModel);
+        });
+    });
+};
+
+exports.soloSoftlayer.setupSoftlayerCli = function (executionModel, callback) {
+    exec('pip install softlayer', function (err, stdout) {
+        if (err) {
+            logger.error('error while installing softlayer CLI : ' + err);
+            callback(new Error('failed to install softlayer CLI'), executionModel);
+            return;
+        }
+
+        logger.debug('stdout: ' + stdout);
+        callback(null, executionModel);
+    });
+};
+
+exports.soloSoftlayer.setupSoftlayerSsh = function (executionModel, callback) {
+    logger.debug('running setup for softlayer ssh');
+
+    // TODO: liron - maybe an inner async waterfall instead of all this execs hierarchy?
+    var executionId = executionModel.getExecutionId();
+    logger.debug('your random key: ' + executionId);
+
+    logger.debug('creating keypairs ...');
+    exec('ssh-keygen -t rsa -N "" -f ' + executionId, function (err, output) {
+        if (err) {
+            logger.error('failed creating ssh keys: ' + err);
+            callback(new Error('failed creating ssh keys'), executionModel);
+            return;
+        }
+
+        logger.debug('success! ' + output);
+
+        exec('sl sshkey add -f ' + process.cwd() + '/' + executionId + '.pub' + ' ' + executionId, function (err, output) {
+            if (err) {
+                logger.error('failed adding ssh key to softlayer: ' + err);
+                callback(new Error('failed adding ssh key to softlayer'), executionModel);
+                return;
+            }
+            logger.debug('success! ' + output);
+
+            exec('sl sshkey list', function (err, output) {
+                if (err) {
+                    logger.error('failed running sshkey list on softlayer cli', err);
+                    callback(err, executionModel);
+                    return;
+                }
+
+                if (!output) {
+                    logger.error('expected output from sl sshkey list command but got nothing');
+                    callback(new Error('missing output from sshkey list command'), executionModel);
+                    return;
+                }
+
+                logger.trace('got sshkey list output', output);
+
+                var line = _.find(output.split('\n'), function (line) {
+                    return line.indexOf(executionId) >= 0;
+                });
+
+                if (!line) {
+                    logger.error('expected to find a line with ', +executionId + ' but could not find one. all I got was, ', output);
+                    callback(new Error('could not find line with id' + executionId + '. unable to get key id'), executionModel);
+                    return;
+                }
+
+                logger.debug('line ' + line);
+                var keyId = line.split(' ', 1);
+
+                if (keyId.length === 0) {
+                    logger.info('keyId is an empty array - length is: ' + keyId);
+                    callback(new Error('could not find the keyId on keyId[0]'), executionModel);
+                    return;
+                }
+
+                logger.info('got the keyId: ' + keyId);
+                var idAsNumber = Number(keyId);
+                logger.info('got the idAsNumber: ' + idAsNumber);
+
+                executionModel.setSshKey(idAsNumber);
+
+                callback(null, executionModel);
+            });
+        });
+    });
+};
+
+/*jshint camelcase: false */
+exports.soloSoftlayer.editInputsFile = function (executionModel, callback) {
+    logger.debug('editing blu_sljson .. ');
+
+    var executionId = executionModel.getExecutionId();
+    var executionDetails = executionModel.getExecutionDetails();
+    var inputsFile = path.join(executionModel.getDownloadsPath(), 'blu_sl.json');
+    logger.debug('inputsFile path is : ', inputsFile);
+
+    var softlayerInputs = require(inputsFile);
+    logger.debug('softlayerInputs: ', softlayerInputs);
+
+    softlayerInputs.username = executionDetails.softlayer.params.username;
+    softlayerInputs.api_key = executionDetails.softlayer.params.apiKey;
+
+    softlayerInputs.ssh_keys = executionModel.getSshKey();
+    logger.debug('ssh_keys ', executionModel.getSshKey());
+    softlayerInputs.ssh_key_filename = process.cwd() + '/' + executionId;
+
+    logger.debug('softlayerInputs after setting inputs: ', softlayerInputs);
+    logger.debug('writing to input file .. ', 'blu_sl ' + softlayerInputs);
+    fse.writeJSONFile(inputsFile, softlayerInputs, function(err) {
+        if (err) {
+            logger.error(err);
+            callback(err, executionModel);
+            return;
+        }
+
+        logger.info('softlayerInputs file successfully updated');
+        callback(null, executionModel);
+    });
+};
+
+exports.soloSoftlayer.runInitCommand = function (executionModel, callback) {
+    var initCommand = executionModel.getCommands().initCommand;
+
+    logger.debug('initializing..  ' + initCommand);
+    listenOutput(executionModel, exec(initCommand, function(err) {
+        if (err) {
+            logger.error(err);
+            callback(err, executionModel);
+            return;
+        }
+
+        callback(null, executionModel);
+    }));
+
+
+};
+
+exports.soloSoftlayer.runInstallWorkflowCommand = function (executionModel, callback) {
+    var installWfCommand = executionModel.getCommands().installWfCommand;
+
+    logger.debug('installing workflow: ' + installWfCommand);
+
+    // this.listenOutput(exec(conf.installWfCommand, noOutputCallback(callback) ));
+    exec(installWfCommand, function (err, output) {
+        logger.trace('cfy install ef command output: ' + output);
+
+        if (err) {
+            logger.error('failed running install workflow command');
+            callback(new Error('failed running install workflow command'), executionModel);
+            return;
+        }
+
+        callback(null, executionModel);
+    });
+};
+
+exports.soloSoftlayer.clean = function (executionModel, callback) {
+    logger.debug('removing the library');
+    fse.remove(executionModel.getDownloadsPath(), function(err) {
+        if (err) {
+            logger.error(err);
+            callback(err, executionModel);
+            return;
+        }
+
+        callback(null, executionModel);
+    });
+};
+
+//---------------- SOLO Softlayer TASKS END ------------------------
 
