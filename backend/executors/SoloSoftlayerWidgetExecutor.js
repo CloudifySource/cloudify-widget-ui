@@ -37,8 +37,7 @@ SoloSoftlayerWidgetExecutor.prototype.getExecutionTasks = function () {
         tasksDirectory.soloSoftlayer.setupSoftlayerSsh,
         tasksDirectory.soloSoftlayer.editInputsFile,
         tasksDirectory.soloSoftlayer.runInitCommand,
-        tasksDirectory.soloSoftlayer.runInstallWorkflowCommand,
-        tasksDirectory.soloSoftlayer.clean
+        tasksDirectory.soloSoftlayer.runInstallWorkflowCommand
     ];
 };
 

@@ -6,11 +6,11 @@
 var executors = require('../../../backend/executors');
 var logger = require('log4js').getLogger('testExecutors.spec');
 
-var executionModel = new executors.ExecutionModel('53d651d37818c889b6619020', function () {
-    logger.info('executionCallback');
-});
-
 // Free test
+//var executionModel = new executors.ExecutionModel('53d651d37818c889b6619020', function () {
+//    logger.info('executionCallback');
+//});
+
 //executionModel.setLoginDetailsId('dddssss');
 //
 //var executor = new executors.FreeWidgetExecutor();
@@ -18,27 +18,50 @@ var executionModel = new executors.ExecutionModel('53d651d37818c889b6619020', fu
 
 
 // Solo AWS test
+//var executionDetails = {
+//    isSoloMode: true,
+//    providerUrl: 'https://www.dropbox.com/s/f44ngahig9k077w/ec2.tar.gz?dl=1',
+//    appName: 'default',
+//    serviceName: 'mongod',
+//    providerRootPath: 'ec2',
+//    providerName: 'ec2',
+//    privateAmiId: 'ami-3cb92054',
+//    privateAmiRegion: 'us-east-1',
+//    privateImageId: 'ami-7aa83112',
+//    privateImageRegion: 'us-east-1',
+//    privateImages: [],
+//    EC2: {
+//        params: {
+//            apiKey: '__key__',
+//            secretKey: '__password__'
+//        }
+//    }
+//};
+//
+//var executionModel = new executors.SoloExecutionModel('53d651d37818c889b6619020', function () {
+//    logger.info('executionCallback');
+//});
+//
+//executionModel.setExecutionDetails(executionDetails);
+//
+//var executor = new executors.SoloAWSWidgetExecutor();
+//executor.play(executionModel);
+
+// Solo softlayer test
 var executionDetails = {
-    isSoloMode: true,
-    providerUrl: 'https://www.dropbox.com/s/f44ngahig9k077w/ec2.tar.gz?dl=1',
-    appName: 'default',
-    serviceName: 'mongod',
-    providerRootPath: 'ec2',
-    providerName: 'ec2',
-    privateAmiId: 'ami-3cb92054',
-    privateAmiRegion: 'us-east-1',
-    privateImageId: 'ami-7aa83112',
-    privateImageRegion: 'us-east-1',
-    privateImages: [],
-    EC2: {
+    softlayer: {
         params: {
-            apiKey: '__key__',
-            secretKey: '__password__'
+            username: 'cwuser',
+            apiKey: '5bef5579f38c5c519f89f0e382a48701297ed7a96d4949b73a71c0dc0deb008d'
         }
     }
 };
 
+var executionModel = new executors.SoloExecutionModel('53d651d37818c889b6619020', function () {
+    logger.info('executionCallback');
+});
 executionModel.setExecutionDetails(executionDetails);
 
-var executor = new executors.SoloAWSWidgetExecutor();
+var executor = new executors.SoloSoftlayerWidgetExecutor();
 executor.play(executionModel);
+

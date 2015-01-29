@@ -833,18 +833,5 @@ exports.soloSoftlayer.runInstallWorkflowCommand = function (executionModel, call
     });
 };
 
-exports.soloSoftlayer.clean = function (executionModel, callback) {
-    logger.debug('removing the library');
-    fse.remove(executionModel.getDownloadsPath(), function(err) {
-        if (err) {
-            logger.error(err);
-            callback(err, executionModel);
-            return;
-        }
-
-        callback(null, executionModel);
-    });
-};
-
 //---------------- SOLO Softlayer TASKS END ------------------------
 
