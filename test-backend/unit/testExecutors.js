@@ -43,6 +43,34 @@ var testConf = require('./conf/dev/me-test-conf.json');
 //var executor = new executors.SoloAWSWidgetExecutor();
 //executor.play(executionModel);
 
+
+/**
+ *
+ * To make this work:
+ 1. execute the install.sh script to setup the virtualenv
+ 2. in IntelliJ terminal exec
+ 2.a. source softlayer_widget/bin/activate
+ 2.b. node testExecutors.js
+
+ You also need test-backend/unit/conf/dev/me-test-conf.json to include:
+ {
+    "softlayer": {
+        "params": {
+            "username": "user",
+            "apiKey": "key"
+        }
+    },
+    "EC2": {
+        "params": {
+            "apiKey": "key",
+            "secretKey": "secret"
+        }
+    }
+ }
+ *
+ * @type {{isSoloMode: boolean, providerUrl: string, appName: string, serviceName: string, providerRootPath: string, providerName: string, privateAmiId: string, privateAmiRegion: string, privateImageId: string, privateImageRegion: string, privateImages: Array, softlayer: *}}
+ */
+
 // Solo softlayer test
 var executionDetails = {
     isSoloMode: true,
