@@ -22,6 +22,7 @@ SoloSoftlayerWidgetExecutor.prototype.getExecutionTasks = function () {
         tasksDirectory.soloSoftlayer.soloSoftlayerInit,
         tasksDirectory.common.getWidget,
         tasksDirectory.common.saveExecutionModel,
+        //tasksDirectory.soloSoftlayer.setupVirtualenv,
         tasksDirectory.soloSoftlayer.setupDirectory,
         tasksDirectory.soloSoftlayer.setupEnvironmentVariables,
         tasksDirectory.soloSoftlayer.setupSoftlayerCli,

@@ -14,6 +14,7 @@ coverage
 test-results.xml
 backend-coverage
 backend/cfy-config-softlayer-old
+backend/cfy-config-softlayer
 
 **/softlayer_widget/
 backend-instrument
