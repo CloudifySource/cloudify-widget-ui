@@ -11,6 +11,7 @@ var services = require('../services');
 var path = require('path');
 var _ = require('lodash');
 var fs = require('fs');
+var conf = require('../Conf');
 
 function AbstractWidgetExecutor() {
     logger.info('ctor');

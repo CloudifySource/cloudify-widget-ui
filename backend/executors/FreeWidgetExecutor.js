@@ -8,7 +8,6 @@ var logger = require('log4js').getLogger('FreeWidgetExecutor');
 var managers = require('../managers');
 var services = require('../services');
 var path = require('path');
-var _ = require('lodash');
 var util = require('util');
 var models = require('../models');
 

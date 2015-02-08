@@ -7,7 +7,6 @@ var AbstractWidgetExecutor = require('./AbstractWidgetExecutor');
 var logger = require('log4js').getLogger('TasksDirectory');
 var services = require('../services');
 var path = require('path');
-var _ = require('lodash');
 var fs = require('fs');
 var util = require('util');
 
