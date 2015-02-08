@@ -8,4 +8,3 @@ exports.SoloAWSWidgetExecutor = require('./SoloAWSWidgetExecutor');
 exports.SoloSoftlayerWidgetExecutor = require('./SoloSoftlayerWidgetExecutor');
 exports.ExecutionModel = require('./ExecutionModel');
 exports.SoloExecutionModel = require('./SoloExecutionModel');
-exports.TasksDirectory = require('./TasksDirectory');
