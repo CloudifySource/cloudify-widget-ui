@@ -16,6 +16,11 @@ function AbstractWidgetExecutor() {
     logger.info('ctor');
 }
 
+/**
+ * The execution model.
+ * Executor uses the execution model to store the state of the execution. Some of the data in the execution model
+ * is stored in the DB.
+ */
 AbstractWidgetExecutor.prototype.executionModel;
 
 /**
@@ -27,18 +32,29 @@ AbstractWidgetExecutor.prototype.executionType;
 
 /**
  * <b>Abstract. Should be overridden by extending classes.</b>
+ * It returns an array of references to task functions.
+ * tasks functions accept executionModel and callback as arguments.
  *
- * @returns {Array} The waterfall tasks
+ * @returns {Array} The waterfall tasks array
  */
 AbstractWidgetExecutor.prototype.getExecutionTasks = function () {
     throw new Error('Abstract method not implemented in inheriting class!');
 };
 
+/**
+ * Returns a string that is the value that needs to be added to the cloud properties file.
+ * The default implementation is to return an empty string ('').
+ * Extending executors can override this with specific implementations.
+ *
+ * @param executionDetails  The executionDetails
+ * @param executionId   The executionId
+ * @returns {string}    The updateLine to be used.
+ */
 AbstractWidgetExecutor.prototype.getCloudPropertiesUpdateLineInner = function (executionDetails, executionId) {
     return '';
 };
 
-var updateExecution = function (executionObjectId, data) {
+function updateExecution (executionObjectId, data) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.update(
             {_id: executionObjectId},
@@ -59,8 +75,15 @@ var updateExecution = function (executionObjectId, data) {
                 done();
             });
     });
-};
+}
 
+/**
+ * After all the execution tasks have completed their execution, this method is run to clean up and
+ * call the provided callback.
+ *
+ * @param err
+ * @param executionModel
+ */
 AbstractWidgetExecutor.prototype.playFinally = function (err, executionModel) {
     if (err) {
         logger.info('failed to play widget with id [%s]', executionModel.getWidgetId(), err.message);
@@ -78,6 +101,7 @@ AbstractWidgetExecutor.prototype.playFinally = function (err, executionModel) {
 
 /**
  * The template function for the execution.
+ * This is the method that kicks the execution code. It initializes and executes the waterfall code.
  *
  * @param executionModel
  */
@@ -99,6 +123,14 @@ AbstractWidgetExecutor.prototype.play = function (executionModel) {
 };
 
 //-----------  Common tasks  ----------------------
+
+/**
+ * A util function that facilitates sending an email using mandrill when the execution is complete.
+ * The email recipient is derived from the social login performed prior to the execution. If such a social login is not
+ * present, no email will be sent.
+ *
+ * @param executionModel
+ */
 AbstractWidgetExecutor.prototype.sendEmailAfterInstall = function(executionModel) {
     var widget = executionModel.getWidget();
 
@@ -168,6 +200,12 @@ AbstractWidgetExecutor.prototype.sendEmailAfterInstall = function(executionModel
     });
 };
 
+/**
+ * Returns the update string to be used for updating the recipe properties file.
+ *
+ * @param executionDetails
+ * @returns {string}
+ */
 AbstractWidgetExecutor.prototype.getRecipePropertiesUpdateLine = function (executionDetails) {
     var updateLine = '';
 
@@ -186,6 +224,14 @@ AbstractWidgetExecutor.prototype.getRecipePropertiesUpdateLine = function (execu
     return updateLine;
 };
 
+/**
+ * Returns an update string to be used for updating the cloud properties file.
+ * It calls getCloudPropertiesUpdateLineInner internally as well as getRecipePropertiesUpdateLine.
+ *
+ * @param executionDetails
+ * @param executionId
+ * @returns {string}
+ */
 AbstractWidgetExecutor.prototype.getCloudPropertiesUpdateLine = function (executionDetails, executionId) {
     var updateLine = this.getCloudPropertiesUpdateLineInner(executionDetails, executionId);
     updateLine += this.getRecipePropertiesUpdateLine(executionDetails);
@@ -193,11 +239,24 @@ AbstractWidgetExecutor.prototype.getCloudPropertiesUpdateLine = function (execut
     return updateLine;
 };
 
+/**
+ * Update the provided properties file with the provided update line.
+ *
+ * @param fileName  The file to be updated
+ * @param updateLine    The update string to append to the file
+ * @param callback
+ */
 AbstractWidgetExecutor.prototype.updatePropertiesFile = function (fileName, updateLine, callback) {
     logger.info('---updateLine', updateLine);
     fs.appendFile(fileName, updateLine, callback);
 };
 
+/**
+ * Retrieve the widget object from DB based on the widgetId provided in the executionModel
+ *
+ * @param executionModel    The execution model
+ * @param callback
+ */
 AbstractWidgetExecutor.prototype.getWidget = function (executionModel, callback) {
     logger.info('getting widget id ' + executionModel.getWidgetId());
 
@@ -224,6 +283,12 @@ AbstractWidgetExecutor.prototype.getWidget = function (executionModel, callback)
     });
 };
 
+/**
+ * Store the execution model in the DB. This creates a new document in widgetExecutions in the DB.
+ *
+ * @param executionModel
+ * @param callback
+ */
 AbstractWidgetExecutor.prototype.saveExecutionModel = function (executionModel, callback) {
     logger.info('saving execution to mongo');
 
@@ -257,6 +322,13 @@ AbstractWidgetExecutor.prototype.saveExecutionModel = function (executionModel, 
     });
 };
 
+/**
+ * Update the execution model stored in the DB.
+ *
+ * @param data  The update object
+ * @param executionModel
+ * @param callback
+ */
 AbstractWidgetExecutor.prototype.updateExecutionModel = function (data, executionModel, callback) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.findOne(
@@ -296,6 +368,13 @@ AbstractWidgetExecutor.prototype.updateExecutionModel = function (data, executio
     });
 };
 
+/**
+ * Add downloads and logs paths to the execution model stored in DB.
+ * Calls updateExecutionModel internally.
+ *
+ * @param executionModel
+ * @param callback
+ */
 AbstractWidgetExecutor.prototype.updateExecutionModelAddPaths = function (executionModel, callback) {
     logger.info('updating execution model add paths');
 
@@ -308,6 +387,13 @@ AbstractWidgetExecutor.prototype.updateExecutionModelAddPaths = function (execut
     }, executionModel, callback);
 };
 
+/**
+ * Download recipe according to the recipeUrl defined for the widget.
+ * If non is defined, nothing will be downloaded.
+ *
+ * @param executionModel
+ * @param callback
+ */
 AbstractWidgetExecutor.prototype.downloadRecipe = function (executionModel, callback) {
     // TODO : add validation if destination download not already exists otherwise simply call callback.
     logger.info('downloading recipe from ', executionModel.getWidget().recipeUrl);
@@ -330,6 +416,12 @@ AbstractWidgetExecutor.prototype.downloadRecipe = function (executionModel, call
     }
 };
 
+/**
+ * Download cloud provider according to the providerUrl defined for the widget.
+ *
+ * @param executionModel
+ * @param callback
+ */
 AbstractWidgetExecutor.prototype.downloadCloudProvider = function (executionModel, callback) {
     // TODO : add validation if destination download not already exists otherwise simply call callback.
     logger.info('downloading Cloud Provider from ', executionModel.getExecutionDetails().providerUrl);
@@ -346,6 +438,12 @@ AbstractWidgetExecutor.prototype.downloadCloudProvider = function (executionMode
 
 };
 
+/**
+ * update recipe properties file based on getRecipePropertiesUpdateLine.
+ *
+ * @param executionModel
+ * @param callback
+ */
 AbstractWidgetExecutor.prototype.overrideRecipePropertiesFile = function (executionModel, callback) {
     logger.trace('overriding Recipe Properties File');
 

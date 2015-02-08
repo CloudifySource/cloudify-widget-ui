@@ -21,6 +21,12 @@ function SoloSoftlayerWidgetExecutor() {
 util.inherits(SoloSoftlayerWidgetExecutor, AbstractWidgetExecutor);
 
 //-----------  Private tasks  ----------------------
+/**
+ * Push process stdout and stderr outputs to DB.
+ *
+ * @param executionModel
+ * @param childProcess
+ */
 function listenOutput (executionModel, childProcess) {
     managers.db.connect('widgetExecutions', function (db, collection) {
         function handleLines(type) {
@@ -40,12 +46,25 @@ function listenOutput (executionModel, childProcess) {
 
 }
 
+/**
+ * noop callback
+ *
+ * @param executionModel
+ * @param callback
+ * @returns {Function}
+ */
 function noOutputCallback(executionModel, callback) {
     return function (err) {
         callback(err, executionModel);
     };
 }
 
+/**
+ * Initialize waterfall for softlayer solo
+ *
+ * @param executionModel
+ * @param callback
+ */
 SoloSoftlayerWidgetExecutor.prototype.soloSoftlayerInit = function (executionModel, callback) {
     var executionDetails = executionModel.getExecutionDetails();
     executionDetails = _.merge({'configPrototype': path.resolve(__dirname, '..', 'cfy-config-softlayer')}, executionDetails);
@@ -54,29 +73,29 @@ SoloSoftlayerWidgetExecutor.prototype.soloSoftlayerInit = function (executionMod
     callback(null, executionModel);
 };
 
-SoloSoftlayerWidgetExecutor.prototype.setupVirtualenv = function (executionModel, callback) {
-    fs.exists('softlayer_widget/bin/activate', function (exists) {
-        if (!exists) {
-            logger.error('must have virtualenv configured');
-            callback(new Error('Must have virtualenv configured.'), executionModel);
-            return;
-        }
-
-        logger.debug('[setupVirtualenv] virtual env already setup.');
-
-        exec('bash -c "source softlayer_widget/bin/activate"', function (err, stdout) {
-            if (err) {
-                logger.error('could not setup virtualenv', err);
-                callback(err, executionModel);
-                return;
-            }
-
-            logger.debug('setup virtualenv success: ', stdout);
-            callback(null, executionModel);
-        });
-    });
-
-};
+//SoloSoftlayerWidgetExecutor.prototype.setupVirtualenv = function (executionModel, callback) {
+//    fs.exists('softlayer_widget/bin/activate', function (exists) {
+//        if (!exists) {
+//            logger.error('must have virtualenv configured');
+//            callback(new Error('Must have virtualenv configured.'), executionModel);
+//            return;
+//        }
+//
+//        logger.debug('[setupVirtualenv] virtual env already setup.');
+//
+//        exec('bash -c "source softlayer_widget/bin/activate"', function (err, stdout) {
+//            if (err) {
+//                logger.error('could not setup virtualenv', err);
+//                callback(err, executionModel);
+//                return;
+//            }
+//
+//            logger.debug('setup virtualenv success: ', stdout);
+//            callback(null, executionModel);
+//        });
+//    });
+//
+//};
 
 SoloSoftlayerWidgetExecutor.prototype.setupDirectory = function (executionModel, callback) {
 
@@ -145,7 +164,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerCli = function (executionMod
 SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionModel, callback) {
     logger.debug('[setupSoftlayerSsh] running setup for softlayer ssh');
 
-    // TODO: liron - maybe an inner async waterfall instead of all this execs hierarchy?
+    // TODO: use an inner async waterfall instead of all this execs hell
     var executionId = executionModel.getExecutionId();
     logger.debug('[setupSoftlayerSsh] your random key: ' + executionId);
 

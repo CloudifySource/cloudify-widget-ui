@@ -18,6 +18,14 @@ function SoloAWSWidgetExecutor() {
 util.inherits(SoloAWSWidgetExecutor, AbstractWidgetExecutor);
 
 //-----------  Private tasks  ----------------------
+/**
+ * Update execution model in DB - add execution details
+ * sensitive info is encrypted prior to the update.
+ * i.e. apiKey, secretKey etc.
+ *
+ * @param executionModel
+ * @param callback
+ */
 SoloAWSWidgetExecutor.prototype.updateExecutionModelAddExecutionDetails = function (executionModel, callback) {
     logger.trace('updating Execution Model Add Execution Details');
 
@@ -40,6 +48,12 @@ SoloAWSWidgetExecutor.prototype.updateExecutionModelAddExecutionDetails = functi
 
 };
 
+/**
+ * Generate EC2 keyPair and store it encrypted in DB.
+ *
+ * @param executionModel
+ * @param callback
+ */
 SoloAWSWidgetExecutor.prototype.generateKeyPair = function (executionModel, callback) {
     logger.trace('Generating Key Pair');
 
@@ -83,6 +97,12 @@ SoloAWSWidgetExecutor.prototype.generateKeyPair = function (executionModel, call
     });
 };
 
+/**
+ * Update EC2 private images - add exceptions for the apiKey so that they will be usable.
+ *
+ * @param executionModel
+ * @param callback
+ */
 SoloAWSWidgetExecutor.prototype.modifyImages = function (executionModel, callback) {
     logger.trace('Modifying images');
 
@@ -111,6 +131,12 @@ SoloAWSWidgetExecutor.prototype.modifyImages = function (executionModel, callbac
     });
 };
 
+/**
+ * Execute bootstrap and install commands on the Cloudify CLI
+ *
+ * @param executionModel
+ * @param callback
+ */
 SoloAWSWidgetExecutor.prototype.runBootstrapAndInstallCommands = function (executionModel, callback) {
     var widget = executionModel.getWidget();
 
@@ -144,6 +170,12 @@ SoloAWSWidgetExecutor.prototype.runBootstrapAndInstallCommands = function (execu
     callback(null, executionModel);
 };
 
+/**
+ * see getCloudPropertiesUpdateLineInner(executionDetails, executionId).
+ *
+ * @param executionModel
+ * @param callback
+ */
 SoloAWSWidgetExecutor.prototype.overrideCloudPropertiesFile = function (executionModel, callback) {
     logger.info('overriding Cloud Properties File');
 

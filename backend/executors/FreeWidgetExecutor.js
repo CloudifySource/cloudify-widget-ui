@@ -19,6 +19,12 @@ function FreeWidgetExecutor() {
 util.inherits(FreeWidgetExecutor, AbstractWidgetExecutor);
 
 //-----------  Private tasks  ----------------------
+/**
+ * Retrieve the pool key from DB based on the userId provided in the executionModel
+ *
+ * @param executionModel
+ * @param callback
+ */
 FreeWidgetExecutor.prototype.getPoolKey = function (executionModel, callback) {
     logger.info('getting pool key');
 
@@ -43,6 +49,12 @@ FreeWidgetExecutor.prototype.getPoolKey = function (executionModel, callback) {
     });
 };
 
+/**
+ * Mark the machine as occupied.
+ *
+ * @param executionModel
+ * @param callback
+ */
 FreeWidgetExecutor.prototype.occupyMachine = function (executionModel, callback) {
     logger.info('occupying machine');
 
@@ -79,6 +91,12 @@ FreeWidgetExecutor.prototype.occupyMachine = function (executionModel, callback)
     });
 };
 
+/**
+ * update execution model in DB - add node model
+ *
+ * @param executionModel
+ * @param callback
+ */
 FreeWidgetExecutor.prototype.updateExecutionModelAddNodeModel = function (executionModel, callback) {
     logger.info('update Execution Model Add Node Model');
 
@@ -87,6 +105,12 @@ FreeWidgetExecutor.prototype.updateExecutionModelAddNodeModel = function (execut
     }, executionModel, callback);
 };
 
+/**
+ * Execute the install command on the Cloudify CLI
+ *
+ * @param executionModel
+ * @param callback
+ */
 FreeWidgetExecutor.prototype.runInstallCommand = function (executionModel, callback) {
     logger.info('running Install Command');
 
