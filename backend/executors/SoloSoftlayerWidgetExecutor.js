@@ -10,7 +10,7 @@ var managers = require('../managers');
 var services = require('../services');
 //var fs = require('fs');
 var fse = require('fs-extra');
-var exec = require('child_process').exec;
+var childProcess = require('child_process');
 var _ = require('lodash');
 var async = require('async');
 var AbstractWidgetExecutor = require('./AbstractWidgetExecutor');
@@ -20,6 +20,35 @@ function SoloSoftlayerWidgetExecutor() {
 }
 
 util.inherits(SoloSoftlayerWidgetExecutor, AbstractWidgetExecutor);
+
+function spawn(env, cmd/*, args, callback*/) {
+    var args, callback;
+
+    if(typeof arguments[2] === 'function') {
+        args = {};
+        callback = arguments[2];
+    } else {
+        args = arguments[2];
+        callback = arguments[3];
+    }
+
+    var exec = childProcess.spawn('bash', ['-c', 'source ' + path.resolve(env) + '/bin/activate; ' + cmd], args || {});
+
+    exec.stdout.on('data', function (data) {
+        logger.trace('stdout: ' + data);
+    });
+
+    exec.stderr.on('data', function (data) {
+        logger.trace('stderr: ' + data);
+    });
+
+    exec.on('close', function (code) {
+        callback(code !== 0 ? true : null);
+        exec.stdin.end();
+    });
+
+    return exec;
+}
 
 //-----------  Private tasks  ----------------------
 /**
@@ -128,7 +157,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupDirectory = function (executionModel,
 SoloSoftlayerWidgetExecutor.prototype.setupEnvironmentVariables = function (executionModel, callback) {
     var executionDetails = executionModel.getExecutionDetails();
     process.env.SL_USERNAME = executionDetails.softlayer.params.username;
-    exec('echo $SL_USERNAME', {env: process.env}, function (err, stdout) {
+    childProcess.exec('echo $SL_USERNAME', {env: process.env}, function (err, stdout) {
         if (err) {
             logger.error('[setupEnvironmentVariables] could not set environment variable: SL_USERNAME');
             callback(err, executionModel);
@@ -137,7 +166,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupEnvironmentVariables = function (exec
         logger.debug('[setupEnvironmentVariables] this is the USERNAME: ', stdout);
 
         process.env.SL_API_KEY = executionDetails.softlayer.params.apiKey;
-        exec('echo $SL_API_KEY', {env: process.env}, function (err, stdout) {
+        childProcess.exec('echo $SL_API_KEY', {env: process.env}, function (err, stdout) {
             if (err) {
                 logger.error('[setupEnvironmentVariables] could not set environment variable: SL_API_KEY');
                 callback(err, executionModel);
@@ -150,7 +179,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupEnvironmentVariables = function (exec
 };
 
 SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerCli = function (executionModel, callback) {
-    exec('sudo pip install softlayer', function (err, stdout) {
+    childProcess.exec('sudo pip install softlayer', function (err, stdout) {
         if (err) {
             logger.error('[setupSoftlayerCli] error while installing softlayer CLI : ' + err);
             callback(new Error('failed to install softlayer CLI:\n' + stdout), executionModel);
@@ -170,7 +199,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionMod
     // inner waterfall tasks:
     function createKeyPairs (innerCallback) {
         logger.debug('[setupSoftlayerSsh] Trying to create keypairs ...');
-        exec('ssh-keygen -t rsa -N "" -f ' + executionId, function (err, output) {
+        childProcess.exec('ssh-keygen -t rsa -N "" -f ' + executionId, function (err, output) {
             if (err) {
                 logger.error('[setupSoftlayerSsh] failed creating ssh keys: ' + err);
                 innerCallback(new Error('failed creating ssh keys'));
@@ -184,7 +213,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionMod
 
     function addSshKey (innerCallback) {
         logger.debug('[setupSoftlayerSsh] Trying to add SSH key to Softlayer...');
-        exec('sl sshkey add -f ' + process.cwd() + '/' + executionId + '.pub' + ' ' + executionId, function (err, output) {
+        childProcess.exec('sl sshkey add -f ' + process.cwd() + '/' + executionId + '.pub' + ' ' + executionId, function (err, output) {
             if (err) {
                 logger.error('[setupSoftlayerSsh] failed adding ssh key to softlayer: ' + err);
                 innerCallback(new Error('failed adding ssh key to softlayer'));
@@ -198,7 +227,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionMod
 
     function updateExecutionModel (innerCallback) {
         logger.debug('[setupSoftlayerSsh] Verifying...');
-        exec('sl sshkey list', function (err, output) {
+        childProcess.exec('sl sshkey list', function (err, output) {
             if (err) {
                 logger.error('[setupSoftlayerSsh] failed running sshkey list on softlayer cli', err);
                 innerCallback(err);
@@ -297,14 +326,14 @@ SoloSoftlayerWidgetExecutor.prototype.runInitCommand = function (executionModel,
     var initCommand = executionModel.getCommands().initCommand;
 
     logger.debug('[runInitCommand] initializing..  ' + initCommand);
-    exec('echo $SL_USERNAME', {env: process.env}, function (err, stdout) {
+    childProcess.exec('echo $SL_USERNAME', {env: process.env}, function (err, stdout) {
         if (err) {
             logger.error('[runInitCommand] could not set environment variable: SL_USERNAME');
             callback(err, executionModel);
             return;
         }
         logger.debug('[runInitCommand] this is the USERNAME: ', stdout);
-        listenOutput(executionModel, exec(initCommand, noOutputCallback(executionModel, callback)));
+        listenOutput(executionModel, childProcess.exec(initCommand, noOutputCallback(executionModel, callback)));
     });
 };
 
@@ -313,8 +342,8 @@ SoloSoftlayerWidgetExecutor.prototype.runInstallWorkflowCommand = function (exec
 
     logger.debug('[runInstallWorkflowCommand] installing workflow: ' + installWfCommand);
 
-    // this.listenOutput(exec(conf.installWfCommand, noOutputCallback(callback) ));
-    exec(installWfCommand, function (err, output) {
+    // this.listenOutput(childProcess.exec(conf.installWfCommand, noOutputCallback(callback) ));
+    childProcess.exec(installWfCommand, function (err, output) {
         logger.trace('[runInstallWorkflowCommand] cfy install ef command output: ' + output);
 
         if (err) {
