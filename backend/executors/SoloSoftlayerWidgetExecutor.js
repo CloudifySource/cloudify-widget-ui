@@ -12,6 +12,7 @@ var services = require('../services');
 var fse = require('fs-extra');
 var exec = require('child_process').exec;
 var _ = require('lodash');
+var async = require('async');
 var AbstractWidgetExecutor = require('./AbstractWidgetExecutor');
 
 function SoloSoftlayerWidgetExecutor() {
@@ -163,73 +164,100 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerCli = function (executionMod
 
 SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionModel, callback) {
     logger.debug('[setupSoftlayerSsh] running setup for softlayer ssh');
-
-    // TODO: use an inner async waterfall instead of all this execs hell
     var executionId = executionModel.getExecutionId();
     logger.debug('[setupSoftlayerSsh] your random key: ' + executionId);
 
-    logger.debug('[setupSoftlayerSsh] creating keypairs ...');
-    exec('ssh-keygen -t rsa -N "" -f ' + executionId, function (err, output) {
-        if (err) {
-            logger.error('[setupSoftlayerSsh] failed creating ssh keys: ' + err);
-            callback(new Error('failed creating ssh keys'), executionModel);
-            return;
-        }
+    // inner waterfall tasks:
+    function createKeyPairs (innerCallback) {
+        logger.debug('[setupSoftlayerSsh] Trying to create keypairs ...');
+        exec('ssh-keygen -t rsa -N "" -f ' + executionId, function (err, output) {
+            if (err) {
+                logger.error('[setupSoftlayerSsh] failed creating ssh keys: ' + err);
+                innerCallback(new Error('failed creating ssh keys'));
+                return;
+            }
 
-        logger.debug('[setupSoftlayerSsh] success! ' + output);
+            logger.debug('[setupSoftlayerSsh] success! ' + output);
+            innerCallback();
+        });
+    }
 
+    function addSshKey (innerCallback) {
+        logger.debug('[setupSoftlayerSsh] Trying to add SSH key to Softlayer...');
         exec('sl sshkey add -f ' + process.cwd() + '/' + executionId + '.pub' + ' ' + executionId, function (err, output) {
             if (err) {
                 logger.error('[setupSoftlayerSsh] failed adding ssh key to softlayer: ' + err);
-                callback(new Error('failed adding ssh key to softlayer'), executionModel);
+                innerCallback(new Error('failed adding ssh key to softlayer'));
                 return;
             }
+
             logger.debug('[setupSoftlayerSsh] success! ' + output);
-
-            exec('sl sshkey list', function (err, output) {
-                if (err) {
-                    logger.error('[setupSoftlayerSsh] failed running sshkey list on softlayer cli', err);
-                    callback(err, executionModel);
-                    return;
-                }
-
-                if (!output) {
-                    logger.error('[setupSoftlayerSsh] expected output from sl sshkey list command but got nothing');
-                    callback(new Error('missing output from sshkey list command'), executionModel);
-                    return;
-                }
-
-                logger.trace('[setupSoftlayerSsh] got sshkey list output', output);
-
-                var line = _.find(output.split('\n'), function (line) {
-                    return line.indexOf(executionId) >= 0;
-                });
-
-                if (!line) {
-                    logger.error('[setupSoftlayerSsh] expected to find a line with ', +executionId + ' but could not find one. all I got was, ', output);
-                    callback(new Error('could not find line with id' + executionId + '. unable to get key id'), executionModel);
-                    return;
-                }
-
-                logger.debug('[setupSoftlayerSsh] line ' + line);
-                var keyId = line.split(' ', 1);
-
-                if (keyId.length === 0) {
-                    logger.info('[setupSoftlayerSsh] keyId is an empty array - length is: ' + keyId);
-                    callback(new Error('could not find the keyId on keyId[0]'), executionModel);
-                    return;
-                }
-
-                logger.info('[setupSoftlayerSsh] got the keyId: ' + keyId);
-                var idAsNumber = Number(keyId);
-                logger.info('[setupSoftlayerSsh] got the idAsNumber: ' + idAsNumber);
-
-                executionModel.setSshKey(idAsNumber);
-
-                callback(null, executionModel);
-            });
+            innerCallback();
         });
-    });
+    }
+
+    function updateExecutionModel (innerCallback) {
+        logger.debug('[setupSoftlayerSsh] Verifying...');
+        exec('sl sshkey list', function (err, output) {
+            if (err) {
+                logger.error('[setupSoftlayerSsh] failed running sshkey list on softlayer cli', err);
+                innerCallback(err);
+                return;
+            }
+
+            if (!output) {
+                logger.error('[setupSoftlayerSsh] expected output from sl sshkey list command but got nothing');
+                innerCallback(new Error('missing output from sshkey list command'));
+                return;
+            }
+
+            logger.trace('[setupSoftlayerSsh] got sshkey list output', output);
+
+            var line = _.find(output.split('\n'), function (line) {
+                return line.indexOf(executionId) >= 0;
+            });
+
+            if (!line) {
+                logger.error('[setupSoftlayerSsh] expected to find a line with ', +executionId + ' but could not find one. all I got was, ', output);
+                innerCallback(new Error('could not find line with id' + executionId + '. unable to get key id'));
+                return;
+            }
+
+            logger.debug('[setupSoftlayerSsh] line ' + line);
+            var keyId = line.split(' ', 1);
+
+            if (keyId.length === 0) {
+                logger.info('[setupSoftlayerSsh] keyId is an empty array - length is: ' + keyId);
+                innerCallback(new Error('could not find the keyId on keyId[0]'));
+                return;
+            }
+
+            logger.info('[setupSoftlayerSsh] got the keyId: ' + keyId);
+            var idAsNumber = Number(keyId);
+            logger.info('[setupSoftlayerSsh] got the idAsNumber: ' + idAsNumber);
+
+            executionModel.setSshKey(idAsNumber);
+
+            innerCallback();
+        });
+    }
+
+    function innerFinally (err) {
+        if (err) {
+            callback(err, executionModel);
+            return;
+        }
+
+        callback(null, executionModel);
+    }
+
+    var tasks = [
+        createKeyPairs,
+        addSshKey,
+        updateExecutionModel
+    ];
+
+    async.waterfall(tasks, innerFinally);
 };
 
 /*jshint camelcase: false */
