@@ -382,7 +382,7 @@ AbstractWidgetExecutor.prototype.updateExecutionModelAddPaths = function (execut
     executionModel.setDownloadsPath(path.join(conf.downloadsDir, executionModel.getExecutionId()));
     executionModel.setLogsPath(path.join(conf.logsDir, executionModel.getExecutionId()));
 
-    this.updateExecutionModel({
+    AbstractWidgetExecutor.prototype.updateExecutionModel({
         downloadsPath: executionModel.getDownloadsPath(),
         logsPath: executionModel.getLogsPath()
     }, executionModel, callback);

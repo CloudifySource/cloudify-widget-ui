@@ -99,7 +99,7 @@ FreeWidgetExecutor.prototype.occupyMachine = function (executionModel, callback)
 FreeWidgetExecutor.prototype.updateExecutionModelAddNodeModel = function (executionModel, callback) {
     logger.info('update Execution Model Add Node Model');
 
-    this.updateExecutionModel({
+    FreeWidgetExecutor.prototype.updateExecutionModel({
         nodeModel: executionModel.getNodeModel()
     }, executionModel, callback);
 };
@@ -119,7 +119,7 @@ FreeWidgetExecutor.prototype.runInstallCommand = function (executionModel, callb
         services.logs.writeStatus(JSON.stringify(status, null, 4) + '\n', executionModel.getExecutionId());
         services.logs.appendOutput('Install finished successfully.\n', executionModel.getExecutionId());
 
-        this.sendEmailAfterInstall(executionModel);
+        FreeWidgetExecutor.prototype.sendEmailAfterInstall(executionModel);
 
         callback(null, executionModel);
         return;
@@ -157,7 +157,7 @@ FreeWidgetExecutor.prototype.runInstallCommand = function (executionModel, callb
             return;
         }
 
-        this.sendEmailAfterInstall(executionModel);
+        FreeWidgetExecutor.prototype.sendEmailAfterInstall(executionModel);
         // TODO change execution status
     });
 

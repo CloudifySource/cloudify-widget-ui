@@ -36,7 +36,7 @@ SoloAWSWidgetExecutor.prototype.updateExecutionModelAddExecutionDetails = functi
         return;
     }
 
-    this.updateExecutionModel({
+    SoloAWSWidgetExecutor.prototype.updateExecutionModel({
         cloudProvider: {
             EC2: {
                 apiKey: services.crypto.encrypt(encryptionKey, details.EC2.params.apiKey),
@@ -82,7 +82,7 @@ SoloAWSWidgetExecutor.prototype.generateKeyPair = function (executionModel, call
 
             executionModel.getExecutionDetails().EC2.params.keyPair = data;
 
-            this.updateExecutionModel({
+            SoloAWSWidgetExecutor.prototype.updateExecutionModel({
                 cloudProvider: {
                     EC2: {
                         keyPairName: services.crypto.encrypt(encryptionKey, data.KeyName),
