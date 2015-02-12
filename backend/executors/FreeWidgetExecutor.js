@@ -99,7 +99,7 @@ FreeWidgetExecutor.prototype.occupyMachine = function (executionModel, callback)
 FreeWidgetExecutor.prototype.updateExecutionModelAddNodeModel = function (executionModel, callback) {
     logger.info('update Execution Model Add Node Model');
 
-    FreeWidgetExecutor.prototype.updateExecutionModel({
+    this.updateExecutionModel({
         nodeModel: executionModel.getNodeModel()
     }, executionModel, callback);
 };
@@ -112,6 +112,7 @@ FreeWidgetExecutor.prototype.updateExecutionModelAddNodeModel = function (execut
  */
 FreeWidgetExecutor.prototype.runInstallCommand = function (executionModel, callback) {
     logger.info('running Install Command');
+    var that = this;
 
     if (!executionModel.getShouldInstall()) {
         var status = {'code': 0};
@@ -119,7 +120,7 @@ FreeWidgetExecutor.prototype.runInstallCommand = function (executionModel, callb
         services.logs.writeStatus(JSON.stringify(status, null, 4) + '\n', executionModel.getExecutionId());
         services.logs.appendOutput('Install finished successfully.\n', executionModel.getExecutionId());
 
-        FreeWidgetExecutor.prototype.sendEmailAfterInstall(executionModel);
+        that.sendEmailAfterInstall(executionModel);
 
         callback(null, executionModel);
         return;
@@ -157,7 +158,7 @@ FreeWidgetExecutor.prototype.runInstallCommand = function (executionModel, callb
             return;
         }
 
-        FreeWidgetExecutor.prototype.sendEmailAfterInstall(executionModel);
+        that.sendEmailAfterInstall(executionModel);
         // TODO change execution status
     });
 
@@ -173,14 +174,14 @@ FreeWidgetExecutor.prototype.executionType = 'Free';
 
 FreeWidgetExecutor.prototype.getExecutionTasks = function () {
     return [
-        this.getWidget,
-        this.getPoolKey,
-        this.saveExecutionModel,
-        this.updateExecutionModelAddPaths,
-        this.downloadRecipe,
-        this.occupyMachine,
-        this.updateExecutionModelAddNodeModel,
-        this.runInstallCommand
+        this.getWidget.bind(this),
+        this.getPoolKey.bind(this),
+        this.saveExecutionModel.bind(this),
+        this.updateExecutionModelAddPaths.bind(this),
+        this.downloadRecipe.bind(this),
+        this.occupyMachine.bind(this),
+        this.updateExecutionModelAddNodeModel.bind(this),
+        this.runInstallCommand.bind(this)
     ];
 };
 

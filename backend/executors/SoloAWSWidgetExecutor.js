@@ -36,7 +36,7 @@ SoloAWSWidgetExecutor.prototype.updateExecutionModelAddExecutionDetails = functi
         return;
     }
 
-    SoloAWSWidgetExecutor.prototype.updateExecutionModel({
+    this.updateExecutionModel({
         cloudProvider: {
             EC2: {
                 apiKey: services.crypto.encrypt(encryptionKey, details.EC2.params.apiKey),
@@ -58,6 +58,7 @@ SoloAWSWidgetExecutor.prototype.generateKeyPair = function (executionModel, call
 
     var executionDetails = executionModel.getExecutionDetails();
     var encryptionKey = executionModel.getExecutionId();
+    var that = this;
 
     if (!executionDetails.EC2) {
         callback(null, executionModel);
@@ -82,7 +83,7 @@ SoloAWSWidgetExecutor.prototype.generateKeyPair = function (executionModel, call
 
             executionModel.getExecutionDetails().EC2.params.keyPair = data;
 
-            SoloAWSWidgetExecutor.prototype.updateExecutionModel({
+            that.updateExecutionModel({
                 cloudProvider: {
                     EC2: {
                         keyPairName: services.crypto.encrypt(encryptionKey, data.KeyName),
@@ -183,9 +184,9 @@ SoloAWSWidgetExecutor.prototype.overrideCloudPropertiesFile = function (executio
     var cloudName = executionModel.getWidget().executionDetails.providerName;
     var cloudPropertiesFile = cloudDistFolderName + path.sep + cloudName + '-cloud.properties';
     var executionDetails = executionModel.getExecutionDetails();
-    var updateLine = SoloAWSWidgetExecutor.prototype.getCloudPropertiesUpdateLine(executionDetails, executionModel.getExecutionId());
+    var updateLine = this.getCloudPropertiesUpdateLine(executionDetails, executionModel.getExecutionId());
 
-    SoloAWSWidgetExecutor.prototype.updatePropertiesFile(cloudPropertiesFile, updateLine, function (err) {
+    this.updatePropertiesFile(cloudPropertiesFile, updateLine, function (err) {
         if (err) {
             logger.info(err);
             callback(err, executionModel);
@@ -221,17 +222,17 @@ SoloAWSWidgetExecutor.prototype.executionType = 'Solo AWS';
 
 SoloAWSWidgetExecutor.prototype.getExecutionTasks = function () {
     return [
-        this.getWidget,
-        this.saveExecutionModel,
-        this.updateExecutionModelAddPaths,
-        this.updateExecutionModelAddExecutionDetails,
-        this.downloadRecipe,
-        this.downloadCloudProvider,
-        this.generateKeyPair,
-        this.modifyImages,
-        this.overrideCloudPropertiesFile,
-        this.overrideRecipePropertiesFile,
-        this.runBootstrapAndInstallCommands
+        this.getWidget.bind(this),
+        this.saveExecutionModel.bind(this),
+        this.updateExecutionModelAddPaths.bind(this),
+        this.updateExecutionModelAddExecutionDetails.bind(this),
+        this.downloadRecipe.bind(this),
+        this.downloadCloudProvider.bind(this),
+        this.generateKeyPair.bind(this),
+        this.modifyImages.bind(this),
+        this.overrideCloudPropertiesFile.bind(this),
+        this.overrideRecipePropertiesFile.bind(this),
+        this.runBootstrapAndInstallCommands.bind(this)
     ];
 };
 

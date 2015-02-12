@@ -374,17 +374,17 @@ SoloSoftlayerWidgetExecutor.prototype.executionType = 'Solo Softlayer';
 
 SoloSoftlayerWidgetExecutor.prototype.getExecutionTasks = function () {
     return [
-        this.soloSoftlayerInit,
-        this.getWidget,
-        this.saveExecutionModel,
+        this.soloSoftlayerInit.bind(this),
+        this.getWidget.bind(this),
+        this.saveExecutionModel.bind(this),
         //this.setupVirtualenv,
-        this.setupDirectory,
-        this.setupEnvironmentVariables,
-        this.setupSoftlayerCli,
-        this.setupSoftlayerSsh,
-        this.editInputsFile,
-        this.runInitCommand,
-        this.runInstallWorkflowCommand
+        this.setupDirectory.bind(this),
+        this.setupEnvironmentVariables.bind(this),
+        this.setupSoftlayerCli.bind(this),
+        this.setupSoftlayerSsh.bind(this),
+        this.editInputsFile.bind(this),
+        this.runInitCommand.bind(this),
+        this.runInstallWorkflowCommand.bind(this)
     ];
 };
 

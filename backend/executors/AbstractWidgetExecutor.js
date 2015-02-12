@@ -382,7 +382,7 @@ AbstractWidgetExecutor.prototype.updateExecutionModelAddPaths = function (execut
     executionModel.setDownloadsPath(path.join(conf.downloadsDir, executionModel.getExecutionId()));
     executionModel.setLogsPath(path.join(conf.logsDir, executionModel.getExecutionId()));
 
-    AbstractWidgetExecutor.prototype.updateExecutionModel({
+    this.updateExecutionModel({
         downloadsPath: executionModel.getDownloadsPath(),
         logsPath: executionModel.getLogsPath()
     }, executionModel, callback);
@@ -454,9 +454,9 @@ AbstractWidgetExecutor.prototype.overrideRecipePropertiesFile = function (execut
     // filename - assuming that the file format is 'recipeName'-'recipeType'.properties i.e. mongod-service.properties
     var recipePropertiesFile = recipeDistFolderName + path.sep + widget.recipeName + '-' + widget.recipeType + '.properties';
     var executionDetails = executionModel.getExecutionDetails();
-    var updateLine = AbstractWidgetExecutor.prototype.getRecipePropertiesUpdateLine(executionDetails);
+    var updateLine = this.getRecipePropertiesUpdateLine(executionDetails);
 
-    AbstractWidgetExecutor.prototype.updatePropertiesFile(recipePropertiesFile, updateLine, function (err) {
+    this.updatePropertiesFile(recipePropertiesFile, updateLine, function (err) {
         if (err) {
             logger.info(err);
             callback(err, executionModel);
