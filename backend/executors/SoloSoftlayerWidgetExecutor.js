@@ -167,7 +167,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupDirectory = function (executionModel,
 SoloSoftlayerWidgetExecutor.prototype.setupEnvironmentVariables = function (executionModel, callback) {
     var executionDetails = executionModel.getExecutionDetails();
     process.env.SL_USERNAME = executionDetails.softlayer.params.username;
-    childProcess.exec('echo $SL_USERNAME', {env: process.env}, function (err, stdout) {
+    spawn(env, 'echo $SL_USERNAME', {env: process.env}, function (err, stdout) {
         if (err) {
             logger.error('[setupEnvironmentVariables] could not set environment variable: SL_USERNAME');
             callback(err, executionModel);
@@ -176,7 +176,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupEnvironmentVariables = function (exec
         logger.debug('[setupEnvironmentVariables] this is the USERNAME: ', stdout);
 
         process.env.SL_API_KEY = executionDetails.softlayer.params.apiKey;
-        childProcess.exec('echo $SL_API_KEY', {env: process.env}, function (err, stdout) {
+        spawn(env, 'echo $SL_API_KEY', {env: process.env}, function (err, stdout) {
             if (err) {
                 logger.error('[setupEnvironmentVariables] could not set environment variable: SL_API_KEY');
                 callback(err, executionModel);
@@ -189,7 +189,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupEnvironmentVariables = function (exec
 };
 
 SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerCli = function (executionModel, callback) {
-    childProcess.exec('sudo pip install softlayer', function (err, stdout) {
+    spawn(env, 'sudo pip install softlayer', function (err, stdout) {
         if (err) {
             logger.error('[setupSoftlayerCli] error while installing softlayer CLI : ' + err);
             callback(new Error('failed to install softlayer CLI:\n' + stdout), executionModel);
@@ -209,7 +209,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionMod
     // inner waterfall tasks:
     function createKeyPairs (innerCallback) {
         logger.debug('[setupSoftlayerSsh] Trying to create keypairs ...');
-        childProcess.exec('ssh-keygen -t rsa -N "" -f ' + executionId, function (err, output) {
+        spawn(env, 'ssh-keygen -t rsa -N "" -f ' + executionId, function (err, output) {
             if (err) {
                 logger.error('[setupSoftlayerSsh] failed creating ssh keys: ' + err);
                 innerCallback(new Error('failed creating ssh keys'));
@@ -223,7 +223,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionMod
 
     function addSshKey (innerCallback) {
         logger.debug('[setupSoftlayerSsh] Trying to add SSH key to Softlayer...');
-        childProcess.exec('sl sshkey add -f ' + process.cwd() + '/' + executionId + '.pub' + ' ' + executionId, function (err, output) {
+        spawn(env, 'sl sshkey add -f ' + process.cwd() + '/' + executionId + '.pub' + ' ' + executionId, function (err, output) {
             if (err) {
                 logger.error('[setupSoftlayerSsh] failed adding ssh key to softlayer: ' + err + output);
                 innerCallback(new Error('failed adding ssh key to softlayer'));
@@ -237,7 +237,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionMod
 
     function updateExecutionModel (innerCallback) {
         logger.debug('[setupSoftlayerSsh] Verifying...');
-        childProcess.exec('sl sshkey list', function (err, output) {
+        spawn(env, 'sl sshkey list', function (err, output) {
             if (err) {
                 logger.error('[setupSoftlayerSsh] failed running sshkey list on softlayer cli', err);
                 innerCallback(err);
@@ -336,7 +336,7 @@ SoloSoftlayerWidgetExecutor.prototype.runInitCommand = function (executionModel,
     var initCommand = executionModel.getCommands().initCommand;
 
     logger.debug('[runInitCommand] initializing..  ' + initCommand);
-    childProcess.exec('echo $SL_USERNAME', {env: process.env}, function (err, stdout) {
+    spawn(env, 'echo $SL_USERNAME', {env: process.env}, function (err, stdout) {
         if (err) {
             logger.error('[runInitCommand] could not set environment variable: SL_USERNAME');
             callback(err, executionModel);
