@@ -21,8 +21,10 @@ function SoloSoftlayerWidgetExecutor() {
 
 util.inherits(SoloSoftlayerWidgetExecutor, AbstractWidgetExecutor);
 
+var env = 'softlayer_widget';
+
 function spawn(env, cmd/*, args, callback*/) {
-    var args, callback;
+    var args, callback, stderr, stdout;
 
     if(typeof arguments[2] === 'function') {
         args = {};
@@ -35,15 +37,23 @@ function spawn(env, cmd/*, args, callback*/) {
     var exec = childProcess.spawn('bash', ['-c', 'source ' + path.resolve(env) + '/bin/activate; ' + cmd], args || {});
 
     exec.stdout.on('data', function (data) {
-        logger.trace('stdout: ' + data);
+        //logger.trace('stdout: ' + data);
+        if (!stdout) {
+            stdout = '';
+        }
+        stdout += data;
     });
 
     exec.stderr.on('data', function (data) {
-        logger.trace('stderr: ' + data);
+        //logger.trace('stderr: ' + data);
+        if (!stderr) {
+            stderr = '';
+        }
+        stderr += data;
     });
 
-    exec.on('close', function (code) {
-        callback(code !== 0 ? true : null);
+    exec.on('close', function (/*code*/) {
+        callback(stderr, stdout);
         exec.stdin.end();
     });
 
@@ -215,7 +225,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionMod
         logger.debug('[setupSoftlayerSsh] Trying to add SSH key to Softlayer...');
         childProcess.exec('sl sshkey add -f ' + process.cwd() + '/' + executionId + '.pub' + ' ' + executionId, function (err, output) {
             if (err) {
-                logger.error('[setupSoftlayerSsh] failed adding ssh key to softlayer: ' + err);
+                logger.error('[setupSoftlayerSsh] failed adding ssh key to softlayer: ' + err + output);
                 innerCallback(new Error('failed adding ssh key to softlayer'));
                 return;
             }
@@ -333,7 +343,7 @@ SoloSoftlayerWidgetExecutor.prototype.runInitCommand = function (executionModel,
             return;
         }
         logger.debug('[runInitCommand] this is the USERNAME: ', stdout);
-        listenOutput(executionModel, childProcess.exec(initCommand, noOutputCallback(executionModel, callback)));
+        listenOutput(executionModel, spawn(env, initCommand, noOutputCallback(executionModel, callback)));
     });
 };
 
@@ -343,7 +353,7 @@ SoloSoftlayerWidgetExecutor.prototype.runInstallWorkflowCommand = function (exec
     logger.debug('[runInstallWorkflowCommand] installing workflow: ' + installWfCommand);
 
     // this.listenOutput(childProcess.exec(conf.installWfCommand, noOutputCallback(callback) ));
-    childProcess.exec(installWfCommand, function (err, output) {
+    spawn(env, installWfCommand, function (err, output) {
         logger.trace('[runInstallWorkflowCommand] cfy install ef command output: ' + output);
 
         if (err) {
