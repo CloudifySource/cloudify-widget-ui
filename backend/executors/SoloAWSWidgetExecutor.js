@@ -183,9 +183,9 @@ SoloAWSWidgetExecutor.prototype.overrideCloudPropertiesFile = function (executio
     var cloudName = executionModel.getWidget().executionDetails.providerName;
     var cloudPropertiesFile = cloudDistFolderName + path.sep + cloudName + '-cloud.properties';
     var executionDetails = executionModel.getExecutionDetails();
-    var updateLine = this.getCloudPropertiesUpdateLine(executionDetails, executionModel.getExecutionId());
+    var updateLine = SoloAWSWidgetExecutor.prototype.getCloudPropertiesUpdateLine(executionDetails, executionModel.getExecutionId());
 
-    this.updatePropertiesFile(cloudPropertiesFile, updateLine, function (err) {
+    SoloAWSWidgetExecutor.prototype.updatePropertiesFile(cloudPropertiesFile, updateLine, function (err) {
         if (err) {
             logger.info(err);
             callback(err, executionModel);

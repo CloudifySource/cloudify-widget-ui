@@ -198,6 +198,7 @@ var getExecutorInstance = function (type) {
         executor = new executors.FreeWidgetExecutor();
         break;
     case 'ec2':
+    case 'aws':
         executor = new executors.SoloAWSWidgetExecutor();
         break;
     case 'softlayer':

@@ -454,9 +454,9 @@ AbstractWidgetExecutor.prototype.overrideRecipePropertiesFile = function (execut
     // filename - assuming that the file format is 'recipeName'-'recipeType'.properties i.e. mongod-service.properties
     var recipePropertiesFile = recipeDistFolderName + path.sep + widget.recipeName + '-' + widget.recipeType + '.properties';
     var executionDetails = executionModel.getExecutionDetails();
-    var updateLine = this.getRecipePropertiesUpdateLine(executionDetails);
+    var updateLine = AbstractWidgetExecutor.prototype.getRecipePropertiesUpdateLine(executionDetails);
 
-    this.updatePropertiesFile(recipePropertiesFile, updateLine, function (err) {
+    AbstractWidgetExecutor.prototype.updatePropertiesFile(recipePropertiesFile, updateLine, function (err) {
         if (err) {
             logger.info(err);
             callback(err, executionModel);
