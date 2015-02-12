@@ -113,34 +113,7 @@ SoloSoftlayerWidgetExecutor.prototype.soloSoftlayerInit = function (executionMod
     callback(null, executionModel);
 };
 
-//SoloSoftlayerWidgetExecutor.prototype.setupVirtualenv = function (executionModel, callback) {
-//    fs.exists('softlayer_widget/bin/activate', function (exists) {
-//        if (!exists) {
-//            logger.error('must have virtualenv configured');
-//            callback(new Error('Must have virtualenv configured.'), executionModel);
-//            return;
-//        }
-//
-//        logger.debug('[setupVirtualenv] virtual env already setup.');
-//
-//        exec('bash -c "source softlayer_widget/bin/activate"', function (err, stdout) {
-//            if (err) {
-//                logger.error('could not setup virtualenv', err);
-//                callback(err, executionModel);
-//                return;
-//            }
-//
-//            logger.debug('setup virtualenv success: ', stdout);
-//            callback(null, executionModel);
-//        });
-//    });
-//
-//};
-
 SoloSoftlayerWidgetExecutor.prototype.setupDirectory = function (executionModel, callback) {
-
-    //callback = callback || _.noop;
-
     logger.debug('[setupDirectory] copying config files to temp folder');
     var tmpDirName = path.resolve(__dirname, '..', 'cp_' + executionModel.getExecutionId());
     executionModel.setDownloadsPath(tmpDirName);
@@ -377,7 +350,6 @@ SoloSoftlayerWidgetExecutor.prototype.getExecutionTasks = function () {
         this.soloSoftlayerInit.bind(this),
         this.getWidget.bind(this),
         this.saveExecutionModel.bind(this),
-        //this.setupVirtualenv,
         this.setupDirectory.bind(this),
         this.setupEnvironmentVariables.bind(this),
         this.setupSoftlayerCli.bind(this),
