@@ -5,22 +5,23 @@
 
 
 var logger = require('log4js').getLogger('LocalWorkFlowWidgetManager');
+var testConf = require('./conf/dev/me-test-conf.json');
 //var fs = require('fs-extra');
 //var util = require('util');
 var DbManager = require('../../backend/managers/DbManager');
 
 var executionDetails;
 
-function beforeTest( callback ){
+function beforeTest(callback) {
 
-    DbManager.connect('example', function(db, collection){
-        collection.findOne({'_id' : DbManager.id('54a56ffd5c25df5a38f1ad28')}, function( err, document){
-         //   logger.info('found something', arguments);
-            if ( !!err ){
+    DbManager.connect('example', function (db, collection) {
+        collection.findOne({'_id': DbManager.id('54a56ffd5c25df5a38f1ad28')}, function (err, document) {
+            //   logger.info('found something', arguments);
+            if (!!err) {
                 throw new Error('no such thing!');
             }
 
-            if ( !document ){
+            if (!document) {
                 throw new Error('no such doc!');
             }
             executionDetails = document;
@@ -32,16 +33,16 @@ function beforeTest( callback ){
 
 //describe('Backend: managers', function () {
 
-function runTest(){
+function runTest() {
     var widgetMgmt = require('../../backend/managers/LocalWorkFlowWidgetManager.js');
 
     var opts = {
         softlayerDetails: {
-            username: '',
-            apiKey: ''
+            username: testConf.softlayer.params.username,
+            apiKey: testConf.softlayer.params.apiKey
         },
 
-        executionDetails: { _id:'myid123'}
+        executionDetails: {_id: 'myid123'}
 
     };
 
@@ -56,21 +57,21 @@ function runTest(){
 
 beforeTest(runTest);
 //runTest();
-    //it('should sum', function(){
-    //    expect(1+1).toBe(2);
-    //});
-    //
-    //it('should finish execution', function () {
-    //    waitsFor(function(){
-    //        return finished;
-    //    });
-    //
-    //    runs(function(){
-    //        expect(finished).toBe(true);
-    //    })
-    //
-    //
-    //});
+//it('should sum', function(){
+//    expect(1+1).toBe(2);
+//});
+//
+//it('should finish execution', function () {
+//    waitsFor(function(){
+//        return finished;
+//    });
+//
+//    runs(function(){
+//        expect(finished).toBe(true);
+//    })
+//
+//
+//});
 
 //});
 
