@@ -286,6 +286,11 @@ SoloSoftlayerWidgetExecutor.prototype.editInputsFile = function (executionModel,
 
     softlayerInputs.username = executionDetails.softlayer.params.username;
     softlayerInputs.api_key = executionDetails.softlayer.params.apiKey;
+    softlayerInputs.db2expressRandomValue = executionDetails.recipeProperties.filter(function(item) {
+        if (item.key === 'db2expressRandomValue') {
+            return item;
+        }
+    })[0].value;
 
     softlayerInputs.ssh_keys = executionModel.getSshKey();
     logger.debug('[editInputsFile] ssh_keys ', executionModel.getSshKey());
