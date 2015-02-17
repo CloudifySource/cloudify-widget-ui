@@ -55,6 +55,10 @@ AbstractWidgetExecutor.prototype.getCloudPropertiesUpdateLineInner = function (e
     return '';
 };
 
+AbstractWidgetExecutor.prototype.getSendMailTemplateExtraContent = function (executionModel) {
+    return [];
+};
+
 function updateExecution (executionObjectId, data) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.update(
@@ -87,7 +91,9 @@ function updateExecution (executionObjectId, data) {
  */
 AbstractWidgetExecutor.prototype.playFinally = function (err, executionModel) {
     if (err) {
-        logger.info('failed to play widget with id [%s]', executionModel.getWidgetId(), err.message);
+        services.logs.appendOutput('failed to play widget with id ' + executionModel.getWidgetId(), executionModel.getExecutionId());
+        services.logs.appendOutput(err.message, executionModel.getExecutionId());
+        //logger.info('failed to play widget with id [%s]', executionModel.getWidgetId(), err.message);
         updateExecution(executionModel.getExecutionObjectId(), {
             state: 'STOPPED',
             error: err.message
@@ -96,7 +102,8 @@ AbstractWidgetExecutor.prototype.playFinally = function (err, executionModel) {
         return;
     }
 
-    logger.info('finished widget execution!');
+    //logger.info('finished widget execution!');
+    services.logs.appendOutput('\nfinished widget execution!', executionModel.getExecutionId());
     executionModel.getExecutionCallback()(null, executionModel.getExecutionId());
 };
 
@@ -143,6 +150,7 @@ AbstractWidgetExecutor.prototype.sendEmailAfterInstall = function(executionModel
     var mandrillConfig = widget.socialLogin.handlers.mandrill;
     var publicIp = executionModel.getNodeModel().machineSshDetails.publicIp;
     var link = '<a href="http://"' + publicIp + '> http://' + publicIp + '</a>';
+    var that = this;
 
     managers.widgetLogins.getWidgetLoginById(executionModel.getLoginDetailsId(), function (err, result) {
         if (err) {
@@ -156,28 +164,31 @@ AbstractWidgetExecutor.prototype.sendEmailAfterInstall = function(executionModel
         }
 
         var fullname = result.loginDetails.name + ' ' + result.loginDetails.lastName;
+        var templateContent = [
+            {
+                'name': 'link',
+                'content': link
+            },
+            {
+                'name': 'name',
+                'content': fullname
+            },
+            {
+                'name': 'randomValue',
+                'content': executionModel.getNodeModel().randomValue
+            },
+            {
+                'name': 'publicIp',
+                'content': publicIp
+            }
+        ];
+
+        templateContent = templateContent.concat(that.getSendMailTemplateExtraContent(executionModel));
 
         var data = {
             'apiKey': mandrillConfig.apiKey,
             'template_name': mandrillConfig.templateName,
-            'template_content': [
-                {
-                    'name': 'link',
-                    'content': link
-                },
-                {
-                    'name': 'name',
-                    'content': fullname
-                },
-                {
-                    'name': 'randomValue',
-                    'content': executionModel.getNodeModel().randomValue
-                },
-                {
-                    'name': 'publicIp',
-                    'content': publicIp
-                }
-            ],
+            'template_content': templateContent,
             'message': {
                 'to': [
                     {

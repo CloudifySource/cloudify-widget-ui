@@ -23,18 +23,31 @@ util.inherits(SoloSoftlayerWidgetExecutor, AbstractWidgetExecutor);
 
 var env = 'softlayer_widget';
 
-function spawn(env, cmd/*, args, callback*/) {
+/**
+ * options = {
+        executionId: the execution ID,
+        env: the virtual env,
+        cmd: the command to execute,
+        shouldOutput: true | false
+    };
+
+ * @param executionId
+ * @param env
+ * @param cmd
+ * @returns {*}
+ */
+function spawn(options/*, args, callback*/) {
     var args, callback, stderr, stdout;
 
-    if(typeof arguments[2] === 'function') {
+    if(typeof arguments[1] === 'function') {
         args = {};
-        callback = arguments[2];
+        callback = arguments[1];
     } else {
-        args = arguments[2];
-        callback = arguments[3];
+        args = arguments[1];
+        callback = arguments[2];
     }
 
-    var exec = childProcess.spawn('bash', ['-c', 'source ' + path.resolve(env) + '/bin/activate; ' + cmd], args || {});
+    var exec = childProcess.spawn('bash', ['-c', 'source ' + path.resolve(options.env) + '/bin/activate; ' + options.cmd], args || {});
 
     exec.stdout.on('data', function (data) {
         //logger.trace('stdout: ' + data);
@@ -42,6 +55,9 @@ function spawn(env, cmd/*, args, callback*/) {
             stdout = '';
         }
         stdout += data;
+        if (options.shouldOutput) {
+            services.logs.appendOutput(data, options.executionId);
+        }
     });
 
     exec.stderr.on('data', function (data) {
@@ -50,6 +66,9 @@ function spawn(env, cmd/*, args, callback*/) {
             stderr = '';
         }
         stderr += data;
+        if (options.shouldOutput) {
+            services.logs.appendOutput(data, options.executionId);
+        }
     });
 
     exec.on('close', function (/*code*/) {
@@ -67,24 +86,24 @@ function spawn(env, cmd/*, args, callback*/) {
  * @param executionModel
  * @param childProcess
  */
-function listenOutput (executionModel, childProcess) {
-    managers.db.connect('widgetExecutions', function (db, collection) {
-        function handleLines(type) {
-            return function (lines) {
-                lines = _.map(lines, function (line) {
-                    logger.trace(type + ' :: [' + line + ']');
-                    return {'type': type, 'line': line};
-                });
-                collection.update({_id: executionModel.getExecutionObjectId()}, {$push: {'output': {$each: lines}}}, function () {
-                });
-            };
-        }
-
-        new services.GsReadline(childProcess.stdout).on('lines', handleLines('info'));
-        new services.GsReadline(childProcess.stderr).on('lines', handleLines('error'));
-    });
-
-}
+//function listenOutput (executionModel, childProcess) {
+//    managers.db.connect('widgetExecutions', function (db, collection) {
+//        function handleLines(type) {
+//            return function (lines) {
+//                lines = _.map(lines, function (line) {
+//                    logger.trace(type + ' :: [' + line + ']');
+//                    return {'type': type, 'line': line};
+//                });
+//                collection.update({_id: executionModel.getExecutionObjectId()}, {$push: {'output': {$each: lines}}}, function () {
+//                });
+//            };
+//        }
+//
+//        new services.GsReadline(childProcess.stdout).on('lines', handleLines('info'));
+//        new services.GsReadline(childProcess.stderr).on('lines', handleLines('error'));
+//    });
+//
+//}
 
 /**
  * noop callback
@@ -114,6 +133,7 @@ SoloSoftlayerWidgetExecutor.prototype.soloSoftlayerInit = function (executionMod
 };
 
 SoloSoftlayerWidgetExecutor.prototype.setupDirectory = function (executionModel, callback) {
+    services.logs.appendOutput('copying config files to temp folder', executionModel.getExecutionId());
     logger.debug('[setupDirectory] copying config files to temp folder');
     var tmpDirName = path.resolve(__dirname, '..', 'cp_' + executionModel.getExecutionId());
     executionModel.setDownloadsPath(tmpDirName);
@@ -131,6 +151,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupDirectory = function (executionModel,
             installWfCommand: 'cfy local execute -w install'
         };
         executionModel.setCommands(commands);
+        services.logs.appendOutput('configuration update. now it is \n' + JSON.stringify(executionModel.getCommands(), {}, 4), executionModel.getExecutionId());
         logger.debug('[setupDirectory] configuration update. now it is \n', JSON.stringify(executionModel.getCommands(), {}, 4));
 
         callback(null, executionModel);
@@ -140,7 +161,14 @@ SoloSoftlayerWidgetExecutor.prototype.setupDirectory = function (executionModel,
 SoloSoftlayerWidgetExecutor.prototype.setupEnvironmentVariables = function (executionModel, callback) {
     var executionDetails = executionModel.getExecutionDetails();
     process.env.SL_USERNAME = executionDetails.softlayer.params.username;
-    spawn(env, 'echo $SL_USERNAME', {env: process.env}, function (err, stdout) {
+    services.logs.appendOutput('Setting up environment variables....', executionModel.getExecutionId());
+    var options = {
+        executionId: executionModel.getExecutionId(),
+        env: env,
+        cmd: 'echo $SL_USERNAME',
+        shouldOutput: false
+    };
+    spawn(options, {env: process.env}, function (err, stdout) {
         if (err) {
             logger.error('[setupEnvironmentVariables] could not set environment variable: SL_USERNAME');
             callback(err, executionModel);
@@ -149,7 +177,13 @@ SoloSoftlayerWidgetExecutor.prototype.setupEnvironmentVariables = function (exec
         logger.debug('[setupEnvironmentVariables] this is the USERNAME: ', stdout);
 
         process.env.SL_API_KEY = executionDetails.softlayer.params.apiKey;
-        spawn(env, 'echo $SL_API_KEY', {env: process.env}, function (err, stdout) {
+        options = {
+            executionId: executionModel.getExecutionId(),
+            env: env,
+            cmd: 'echo $SL_API_KEY',
+            shouldOutput: false
+        };
+        spawn(options, {env: process.env}, function (err, stdout) {
             if (err) {
                 logger.error('[setupEnvironmentVariables] could not set environment variable: SL_API_KEY');
                 callback(err, executionModel);
@@ -162,7 +196,15 @@ SoloSoftlayerWidgetExecutor.prototype.setupEnvironmentVariables = function (exec
 };
 
 SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerCli = function (executionModel, callback) {
-    spawn(env, 'sudo pip install softlayer', function (err, stdout) {
+    services.logs.appendOutput('Setting up Softlayer CLI...', executionModel.getExecutionId());
+    var options = {
+        executionId: executionModel.getExecutionId(),
+        env: env,
+        cmd: 'sudo pip install softlayer',
+        shouldOutput: true
+    };
+
+    spawn(options, function (err, stdout) {
         if (err) {
             logger.error('[setupSoftlayerCli] error while installing softlayer CLI : ' + err);
             callback(new Error('failed to install softlayer CLI:\n' + stdout), executionModel);
@@ -170,11 +212,13 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerCli = function (executionMod
         }
 
         logger.debug('[setupSoftlayerCli] stdout: ' + stdout);
+        services.logs.appendOutput(stdout, executionModel.getExecutionId());
         callback(null, executionModel);
     });
 };
 
 SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionModel, callback) {
+    services.logs.appendOutput('running setup for softlayer ssh...', executionModel.getExecutionId());
     logger.debug('[setupSoftlayerSsh] running setup for softlayer ssh');
     var executionId = executionModel.getExecutionId();
     logger.debug('[setupSoftlayerSsh] your random key: ' + executionId);
@@ -182,21 +226,35 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionMod
     // inner waterfall tasks:
     function createKeyPairs (innerCallback) {
         logger.debug('[setupSoftlayerSsh] Trying to create keypairs ...');
-        spawn(env, 'ssh-keygen -t rsa -N "" -f ' + executionId, function (err, output) {
+        services.logs.appendOutput('Trying to create keypairs ...', executionModel.getExecutionId());
+        var options = {
+            executionId: executionModel.getExecutionId(),
+            env: env,
+            cmd: 'ssh-keygen -t rsa -N "" -f ' + executionId,
+            shouldOutput: false
+        };
+        spawn(options, function (err, output) {
             if (err) {
                 logger.error('[setupSoftlayerSsh] failed creating ssh keys: ' + err);
                 innerCallback(new Error('failed creating ssh keys'));
                 return;
             }
 
-            logger.debug('[setupSoftlayerSsh] success! ' + output);
+            logger.debug('[setupSoftlayerSsh] ' + output);
             innerCallback();
         });
     }
 
     function addSshKey (innerCallback) {
         logger.debug('[setupSoftlayerSsh] Trying to add SSH key to Softlayer...');
-        spawn(env, 'sl sshkey add -f ' + process.cwd() + '/' + executionId + '.pub' + ' ' + executionId, function (err, output) {
+        services.logs.appendOutput('Trying to add SSH key to Softlayer...', executionModel.getExecutionId());
+        var options = {
+            executionId: executionModel.getExecutionId(),
+            env: env,
+            cmd: 'sl sshkey add -f ' + process.cwd() + '/' + executionId + '.pub' + ' ' + executionId,
+            shouldOutput: false
+        };
+        spawn(options, function (err, output) {
             if (err) {
                 logger.error('[setupSoftlayerSsh] failed adding ssh key to softlayer: ' + err + output);
                 innerCallback(new Error('failed adding ssh key to softlayer'));
@@ -210,7 +268,14 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionMod
 
     function updateExecutionModel (innerCallback) {
         logger.debug('[setupSoftlayerSsh] Verifying...');
-        spawn(env, 'sl sshkey list', function (err, output) {
+        services.logs.appendOutput('Verifying...', executionModel.getExecutionId());
+        var options = {
+            executionId: executionModel.getExecutionId(),
+            env: env,
+            cmd: 'sl sshkey list',
+            shouldOutput: false
+        };
+        spawn(options, function (err, output) {
             if (err) {
                 logger.error('[setupSoftlayerSsh] failed running sshkey list on softlayer cli', err);
                 innerCallback(err);
@@ -275,11 +340,13 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionMod
 /*jshint camelcase: false */
 SoloSoftlayerWidgetExecutor.prototype.editInputsFile = function (executionModel, callback) {
     logger.debug('[editInputsFile] editing blu_sljson .. ');
+    services.logs.appendOutput('editing blu_sljson ...', executionModel.getExecutionId());
 
     var executionId = executionModel.getExecutionId();
     var executionDetails = executionModel.getExecutionDetails();
     var inputsFile = path.join(executionModel.getDownloadsPath(), 'blu_sl.json');
     logger.debug('[editInputsFile] inputsFile path is : ', inputsFile);
+    services.logs.appendOutput('inputsFile path is : ' + inputsFile, executionModel.getExecutionId());
 
     var softlayerInputs = require(inputsFile);
     logger.debug('[editInputsFile] softlayerInputs: ', softlayerInputs);
@@ -298,6 +365,8 @@ SoloSoftlayerWidgetExecutor.prototype.editInputsFile = function (executionModel,
 
     logger.debug('[editInputsFile] softlayerInputs after setting inputs: ', softlayerInputs);
     logger.debug('[editInputsFile] writing to input file .. ', 'blu_sl ' + softlayerInputs);
+    services.logs.appendOutput('writing to input file ..', executionModel.getExecutionId());
+
     fse.writeJSONFile(inputsFile, softlayerInputs, function (err) {
         if (err) {
             logger.error(err);
@@ -306,6 +375,7 @@ SoloSoftlayerWidgetExecutor.prototype.editInputsFile = function (executionModel,
         }
 
         logger.info('[editInputsFile] softlayerInputs file successfully updated');
+        services.logs.appendOutput('softlayerInputs file successfully updated', executionModel.getExecutionId());
         callback(null, executionModel);
     });
 };
@@ -314,24 +384,45 @@ SoloSoftlayerWidgetExecutor.prototype.runInitCommand = function (executionModel,
     var initCommand = executionModel.getCommands().initCommand;
 
     logger.debug('[runInitCommand] initializing..  ' + initCommand);
-    spawn(env, 'echo $SL_USERNAME', {env: process.env}, function (err, stdout) {
+    services.logs.appendOutput('initializing..  ' + initCommand, executionModel.getExecutionId());
+    var options = {
+        executionId: executionModel.getExecutionId(),
+        env: env,
+        cmd: 'echo $SL_USERNAME',
+        shouldOutput: false
+    };
+    spawn(options, {env: process.env}, function (err, stdout) {
         if (err) {
             logger.error('[runInitCommand] could not set environment variable: SL_USERNAME');
             callback(err, executionModel);
             return;
         }
         logger.debug('[runInitCommand] this is the USERNAME: ', stdout);
-        listenOutput(executionModel, spawn(env, initCommand, noOutputCallback(executionModel, callback)));
+        //listenOutput(executionModel, spawn(executionModel.getExecutionId(), env, initCommand, noOutputCallback(executionModel, callback)));
+        options = {
+            executionId: executionModel.getExecutionId(),
+            env: env,
+            cmd: initCommand,
+            shouldOutput: true
+        };
+        spawn(options, noOutputCallback(executionModel, callback));
     });
 };
 
 SoloSoftlayerWidgetExecutor.prototype.runInstallWorkflowCommand = function (executionModel, callback) {
     var installWfCommand = executionModel.getCommands().installWfCommand;
+    var that = this;
 
-    logger.debug('[runInstallWorkflowCommand] installing workflow: ' + installWfCommand);
+    //logger.debug('[runInstallWorkflowCommand] installing workflow: ' + installWfCommand);
+    services.logs.appendOutput('installing workflow: ' + installWfCommand, executionModel.getExecutionId());
 
-    // this.listenOutput(childProcess.exec(conf.installWfCommand, noOutputCallback(callback) ));
-    spawn(env, installWfCommand, function (err, output) {
+    var options = {
+        executionId: executionModel.getExecutionId(),
+        env: env,
+        cmd: installWfCommand,
+        shouldOutput: true
+    };
+    spawn(options, function (err, output) {
         logger.trace('[runInstallWorkflowCommand] cfy install ef command output: ' + output);
 
         if (err) {
@@ -340,8 +431,10 @@ SoloSoftlayerWidgetExecutor.prototype.runInstallWorkflowCommand = function (exec
             return;
         }
 
-        callback(null, executionModel);
+        that.sendEmailAfterInstall(executionModel);
     });
+
+    callback(null, executionModel);
 };
 
 //-----------  Private tasks end  ----------------------
@@ -349,6 +442,27 @@ SoloSoftlayerWidgetExecutor.prototype.runInstallWorkflowCommand = function (exec
 //-----------  Overrides  ----------------------
 
 SoloSoftlayerWidgetExecutor.prototype.executionType = 'Solo Softlayer';
+
+SoloSoftlayerWidgetExecutor.prototype.getSendMailTemplateExtraContent = function (executionModel) {
+    var retVal = [];
+
+    var db2express = executionModel.executionDetails.recipeProperties.filter(function(item) {
+        if (item.key === 'db2expressRandomValue') {
+            return item;
+        }
+    });
+
+    if (db2express.length > 0) {
+        retVal.push(
+            {
+                'name': 'db2expressRandomValue',
+                'content': db2express[0].value
+            }
+        );
+    }
+
+    return retVal;
+};
 
 SoloSoftlayerWidgetExecutor.prototype.getExecutionTasks = function () {
     return [
