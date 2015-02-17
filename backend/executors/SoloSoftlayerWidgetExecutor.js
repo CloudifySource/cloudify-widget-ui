@@ -6,7 +6,6 @@
 var util = require('util');
 var path = require('path');
 var logger = require('log4js').getLogger('SoloSoftlayerWidgetExecutor');
-var managers = require('../managers');
 var services = require('../services');
 var fse = require('fs-extra');
 var childProcess = require('child_process');
