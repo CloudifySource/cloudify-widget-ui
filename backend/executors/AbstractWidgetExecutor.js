@@ -115,7 +115,7 @@ function saveExecutionModel (executionModel, callback) {
 
             executionModel.setExecutionObjectId(docsInserted[0]._id);
             executionModel.setExecutionId(executionModel.getExecutionObjectId().toHexString());
-            callback(null);
+            callback();
             done();
         });
     });
