@@ -65,8 +65,25 @@ inputs:
     default: [REPLACE_THIS_WITH_YOUR_SL_KEY_ITEM_ID]
   ssh_key_filename:
     default: '~/.ssh/id_rsa'
+  db2expressRandomValue:
+    default: ''
 
 node_templates:
+
+  db2_node:
+    type: cloudify.nodes.ApplicationModule
+    interfaces:
+      cloudify.interfaces.lifecycle:
+        start:
+          implementation: changePwd.sh
+          inputs:
+            process:
+              env:
+                NEW_PASSWORD: { get_input: db2expressRandomValue }
+    relationships:
+      - target: blu_node
+        type: cloudify.relationships.contained_in
+
   # defining a single node template that will serve as our test node
   blu_node:
     type: cloudify.softlayer.nodes.VirtualServer

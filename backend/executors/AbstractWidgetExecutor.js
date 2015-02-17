@@ -55,6 +55,10 @@ AbstractWidgetExecutor.prototype.getCloudPropertiesUpdateLineInner = function (e
     return '';
 };
 
+AbstractWidgetExecutor.prototype.getSendMailTemplateExtraContent = function (executionModel) {
+    return [];
+};
+
 function updateExecution (executionObjectId, data) {
     managers.db.connect('widgetExecutions', function (db, collection, done) {
         collection.update(
@@ -79,6 +83,45 @@ function updateExecution (executionObjectId, data) {
 }
 
 /**
+ * Store the execution model in the DB. This creates a new document in widgetExecutions in the DB.
+ *
+ * @param executionModel
+ * @param callback
+ */
+function saveExecutionModel (executionModel, callback) {
+    logger.info('saving execution to mongo');
+
+    managers.db.connect('widgetExecutions', function (db, collection, done) {
+        // instantiate the execution model with the widget data, and remove the _id - we want mongodb to generate a unique id
+        var storedExecutionModel = {};
+        storedExecutionModel.widget = executionModel.getWidget();
+        storedExecutionModel.loginDetailsId = executionModel.getLoginDetailsId();
+        storedExecutionModel.state = 'RUNNING';
+
+        collection.insert(storedExecutionModel, function (err, docsInserted) {
+            if (err) {
+                logger.error('failed to store widget execution model to DB', err);
+                callback(err);
+                done();
+                return;
+            }
+
+            if (!docsInserted) {
+                logger.error('no widget execution docs inserted to database');
+                callback(new Error('no widget execution docs inserted to database'));
+                done();
+                return;
+            }
+
+            executionModel.setExecutionObjectId(docsInserted[0]._id);
+            executionModel.setExecutionId(executionModel.getExecutionObjectId().toHexString());
+            callback();
+            done();
+        });
+    });
+}
+
+/**
  * After all the execution tasks have completed their execution, this method is run to clean up and
  * call the provided callback.
  *
@@ -87,6 +130,8 @@ function updateExecution (executionObjectId, data) {
  */
 AbstractWidgetExecutor.prototype.playFinally = function (err, executionModel) {
     if (err) {
+        services.logs.appendOutput('failed to play widget with id ' + executionModel.getWidgetId(), executionModel.getExecutionId());
+        services.logs.appendOutput(err.message, executionModel.getExecutionId());
         logger.info('failed to play widget with id [%s]', executionModel.getWidgetId(), err.message);
         updateExecution(executionModel.getExecutionObjectId(), {
             state: 'STOPPED',
@@ -97,7 +142,7 @@ AbstractWidgetExecutor.prototype.playFinally = function (err, executionModel) {
     }
 
     logger.info('finished widget execution!');
-    executionModel.getExecutionCallback()(null, executionModel.getExecutionId());
+    services.logs.appendOutput('\nfinished widget execution!', executionModel.getExecutionId());
 };
 
 /**
@@ -110,17 +155,33 @@ AbstractWidgetExecutor.prototype.play = function (executionModel) {
     logger.info('Executing ' + this.executionType);
     this.executionModel = executionModel;
     logger.info('playing widget id: ' + executionModel.getWidgetId());
+    var that = this;
 
-    function playInit(callback) {
-        callback(null, executionModel);
-    }
+    // save execution model
+    saveExecutionModel(executionModel, function(err) {
+        if (err) {
+            logger.info('execution model failed. ', err);
+            executionModel.getExecutionCallback()(err);
+            return;
+        }
 
-    var tasks = [playInit];
-    var executionTasks = this.getExecutionTasks();
-    tasks = tasks.concat(executionTasks);
+        logger.info('execution model saved, id: ' + executionModel.getExecutionId());
 
-    async.waterfall(tasks, this.playFinally);
+        // call execution callback - so that widget polling can start.
+        executionModel.getExecutionCallback()(null, executionModel.getExecutionId());
 
+        // define waterfall
+        function playInit(callback) {
+            callback(null, executionModel);
+        }
+
+        var tasks = [playInit];
+        var executionTasks = that.getExecutionTasks();
+        tasks = tasks.concat(executionTasks);
+
+        // execute waterfall
+        async.waterfall(tasks, that.playFinally);
+    });
 };
 
 //-----------  Common tasks  ----------------------
@@ -142,7 +203,7 @@ AbstractWidgetExecutor.prototype.sendEmailAfterInstall = function(executionModel
 
     var mandrillConfig = widget.socialLogin.handlers.mandrill;
     var publicIp = executionModel.getNodeModel().machineSshDetails.publicIp;
-    var link = '<a href="http://"' + publicIp + '> http://' + publicIp + '</a>';
+    var that = this;
 
     managers.widgetLogins.getWidgetLoginById(executionModel.getLoginDetailsId(), function (err, result) {
         if (err) {
@@ -156,28 +217,31 @@ AbstractWidgetExecutor.prototype.sendEmailAfterInstall = function(executionModel
         }
 
         var fullname = result.loginDetails.name + ' ' + result.loginDetails.lastName;
+        var templateContent = [
+            {
+                'name': 'link',
+                'content': '<a href="http://"' + publicIp + '> http://' + publicIp + '</a>'
+            },
+            {
+                'name': 'name',
+                'content': fullname
+            },
+            {
+                'name': 'randomValue',
+                'content': executionModel.getNodeModel().randomValue
+            },
+            {
+                'name': 'publicIp',
+                'content': publicIp
+            }
+        ];
+
+        templateContent = templateContent.concat(that.getSendMailTemplateExtraContent(executionModel));
 
         var data = {
             'apiKey': mandrillConfig.apiKey,
             'template_name': mandrillConfig.templateName,
-            'template_content': [
-                {
-                    'name': 'link',
-                    'content': link
-                },
-                {
-                    'name': 'name',
-                    'content': fullname
-                },
-                {
-                    'name': 'randomValue',
-                    'content': executionModel.getNodeModel().randomValue
-                },
-                {
-                    'name': 'publicIp',
-                    'content': publicIp
-                }
-            ],
+            'template_content': templateContent,
             'message': {
                 'to': [
                     {
@@ -260,6 +324,7 @@ AbstractWidgetExecutor.prototype.updatePropertiesFile = function (fileName, upda
  */
 AbstractWidgetExecutor.prototype.getWidget = function (executionModel, callback) {
     logger.info('getting widget id ' + executionModel.getWidgetId());
+    var that = this;
 
     managers.db.connect('widgets', function (db, collection, done) {
         collection.findOne({_id: executionModel.getWidgetObjectId()}, function (err, result) {
@@ -278,47 +343,9 @@ AbstractWidgetExecutor.prototype.getWidget = function (executionModel, callback)
             }
 
             executionModel.setWidget(result);
-            callback(null, executionModel);
-            done();
-        });
-    });
-};
-
-/**
- * Store the execution model in the DB. This creates a new document in widgetExecutions in the DB.
- *
- * @param executionModel
- * @param callback
- */
-AbstractWidgetExecutor.prototype.saveExecutionModel = function (executionModel, callback) {
-    logger.info('saving execution to mongo');
-
-    managers.db.connect('widgetExecutions', function (db, collection, done) {
-        // instantiate the execution model with the widget data, and remove the _id - we want mongodb to generate a unique id
-        var storedExecutionModel = {};
-        storedExecutionModel.widget = executionModel.getWidget();
-        storedExecutionModel.loginDetailsId = executionModel.getLoginDetailsId();
-        storedExecutionModel.state = 'RUNNING';
-
-        collection.insert(storedExecutionModel, function (err, docsInserted) {
-            if (err) {
-                logger.error('failed to store widget execution model to DB', err);
-                callback(err, executionModel);
-                done();
-                return;
-            }
-
-            if (!docsInserted) {
-                logger.error('no widget execution docs inserted to database');
-                callback(new Error('no widget execution docs inserted to database'), executionModel);
-                done();
-                return;
-            }
-
-            executionModel.setExecutionObjectId(docsInserted[0]._id);
-            executionModel.setExecutionId(executionModel.getExecutionObjectId().toHexString());
-            callback(null, executionModel);
-            done();
+            that.updateExecutionModel({
+                widget: result
+            }, executionModel, callback);
         });
     });
 };
