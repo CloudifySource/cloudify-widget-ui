@@ -203,7 +203,6 @@ AbstractWidgetExecutor.prototype.sendEmailAfterInstall = function(executionModel
 
     var mandrillConfig = widget.socialLogin.handlers.mandrill;
     var publicIp = executionModel.getNodeModel().machineSshDetails.publicIp;
-    var link = '<a href="http://"' + publicIp + '> http://' + publicIp + '</a>';
     var that = this;
 
     managers.widgetLogins.getWidgetLoginById(executionModel.getLoginDetailsId(), function (err, result) {
@@ -221,7 +220,7 @@ AbstractWidgetExecutor.prototype.sendEmailAfterInstall = function(executionModel
         var templateContent = [
             {
                 'name': 'link',
-                'content': link
+                'content': '<a href="http://"' + publicIp + '> http://' + publicIp + '</a>'
             },
             {
                 'name': 'name',
