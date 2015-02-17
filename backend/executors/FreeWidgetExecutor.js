@@ -26,6 +26,7 @@ util.inherits(FreeWidgetExecutor, AbstractWidgetExecutor);
  */
 FreeWidgetExecutor.prototype.getPoolKey = function (executionModel, callback) {
     logger.info('getting pool key');
+    var that = this;
 
     managers.db.connect('users', function (db, collection) {
         collection.findOne({'_id': executionModel.getWidget().userId}, function (err, result) {
@@ -43,7 +44,9 @@ FreeWidgetExecutor.prototype.getPoolKey = function (executionModel, callback) {
 
             logger.info('found poolKey', result.poolKey);
             executionModel.setPoolKey(result.poolKey);
-            callback(null, executionModel);
+            that.updateExecutionModel({
+                poolKey: result.poolKey
+            }, executionModel, callback);
         });
     });
 };
@@ -176,7 +179,6 @@ FreeWidgetExecutor.prototype.getExecutionTasks = function () {
     return [
         this.getWidget.bind(this),
         this.getPoolKey.bind(this),
-        this.saveExecutionModel.bind(this),
         this.updateExecutionModelAddPaths.bind(this),
         this.downloadRecipe.bind(this),
         this.occupyMachine.bind(this),

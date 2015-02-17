@@ -148,7 +148,6 @@ SoloAWSWidgetExecutor.prototype.runBootstrapAndInstallCommands = function (execu
 
     logger.info('installTimeout:', installTimeout);
     logger.info('runCliBootstrapCommand, JOIN:', installPath);
-    //logger.info('-installPath after handlingseparators:', installPath);
 
     var command = {
         arguments: [
@@ -223,7 +222,6 @@ SoloAWSWidgetExecutor.prototype.executionType = 'Solo AWS';
 SoloAWSWidgetExecutor.prototype.getExecutionTasks = function () {
     return [
         this.getWidget.bind(this),
-        this.saveExecutionModel.bind(this),
         this.updateExecutionModelAddPaths.bind(this),
         this.updateExecutionModelAddExecutionDetails.bind(this),
         this.downloadRecipe.bind(this),
