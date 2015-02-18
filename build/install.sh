@@ -125,7 +125,9 @@ setup_local_env(){
 set -e
 if [ "$1" = "upgrade" ];then
     echo "upgrading"
-    setup_local_env
+    #setup_local_env
+    upgrade_main
+
 
 else
     echo "installing..."
