@@ -130,9 +130,9 @@ function saveExecutionModel (executionModel, callback) {
  */
 AbstractWidgetExecutor.prototype.playFinally = function (err, executionModel) {
     if (err) {
-        services.logs.appendOutput('failed to play widget with id ' + executionModel.getWidgetId(), executionModel.getExecutionId());
+        services.logs.appendOutput('\nfailed to play widget with id ' + executionModel.getWidgetId() + '\n', executionModel.getExecutionId());
         services.logs.appendOutput(err.message, executionModel.getExecutionId());
-        logger.info('failed to play widget with id [%s]', executionModel.getWidgetId(), err.message);
+        logger.info('\nfailed to play widget with id [%s]', executionModel.getWidgetId(), ' ', err.message);
         updateExecution(executionModel.getExecutionObjectId(), {
             state: 'STOPPED',
             error: err.message
