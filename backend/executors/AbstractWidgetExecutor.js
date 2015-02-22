@@ -137,7 +137,6 @@ AbstractWidgetExecutor.prototype.playFinally = function (err, executionModel) {
             state: 'STOPPED',
             error: err.message
         });
-        executionModel.getExecutionCallback()(err, executionModel.getExecutionId());
         return;
     }
 

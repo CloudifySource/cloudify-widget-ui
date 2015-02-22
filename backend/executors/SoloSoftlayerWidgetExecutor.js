@@ -51,18 +51,18 @@ function log(output, appendLogger, appendOutput, executionId) {
  * This introduced the need to know on which OS we are currently running on, so we can alter the command to execute accordingly.
  *
  */
-function getOsType() {
-    childProcess.exec('python -mplatform ', function(error, stdout, stderr) {
+function getOsType(callback) {
+    childProcess.exec('python -mplatform', function(error, stdout, stderr) {
         if (error || stderr) {
-            return undefined;
+            callback(undefined);
         }
 
         if (stdout.toLowerCase().indexOf('ubuntu') > -1 ) {
-            return 'ubuntu';
+            callback('ubuntu');
         }
 
         if (stdout.toLowerCase().indexOf('centos') > -1 ) {
-            return 'centos';
+            callback('centos');
         }
     });
 }
@@ -151,14 +151,19 @@ function noOutputCallback(executionModel, callback) {
 SoloSoftlayerWidgetExecutor.prototype.soloSoftlayerInit = function (executionModel, callback) {
     var executionDetails = executionModel.getExecutionDetails();
     executionDetails = _.merge({'configPrototype': path.resolve(__dirname, '..', 'cfy-config-softlayer')}, executionDetails);
-    executionDetails.osType = getOsType;
-    executionModel.setExecutionDetails(executionDetails);
+    var that = this;
 
-    log('Execution details: ...\n' + JSON.stringify(executionModel.getExecutionDetails, {}, 4), false, true, executionModel.getExecutionId());
+    getOsType(function(type) {
+        executionDetails.osType = type;
+        executionModel.setExecutionDetails(executionDetails);
 
-    this.updateExecutionModel({
-        executionDetails: executionModel.getExecutionDetails()
-    }, executionModel, callback);
+        log('Execution details: ...\n' + JSON.stringify(executionDetails, {}, 4), true);
+
+        that.updateExecutionModel({
+            executionDetails: executionDetails
+        }, executionModel, callback);
+
+    });
 };
 
 SoloSoftlayerWidgetExecutor.prototype.setupDirectory = function (executionModel, callback) {
@@ -208,7 +213,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupEnvironmentVariables = function (exec
 
         log('this is the USERNAME: ' + stdout, true);
         process.env.SL_API_KEY = executionDetails.softlayer.params.apiKey;
-        options = {
+        var options = {
             executionId: executionModel.getExecutionId(),
             env: env,
             cmd: 'echo $SL_API_KEY',
@@ -294,6 +299,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionMod
             }
 
             log('SSH key added.', true, true, executionModel.getExecutionId());
+            log(output, true);
             innerCallback();
         });
     }
@@ -319,7 +325,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionMod
                 return;
             }
 
-            log('[setupSoftlayerSsh] got sshkey list output\n ' + output, true);
+            log('[setupSoftlayerSsh] got sshkey list output\n' + output, true);
 
             var line = _.find(output.split('\n'), function (line) {
                 return line.indexOf(executionId) >= 0;
