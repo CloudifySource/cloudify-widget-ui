@@ -92,11 +92,11 @@ setup_local_env(){
 
     if [ ! -f softlayer_widget/bin/activate ];then
         echo updating apt cache
-        sudo apt-get -y update
+        python -mplatform | grep -i ubuntu && sudo apt-get -y update || sudo yum -y update
 
         # install prereqs
         echo installing prerequisites
-        sudo apt-get install -y curl python-dev vim
+        python -mplatform | grep -i ubuntu && sudo apt-get install -y curl python-dev vim || sudo yum install -y curl python-dev vim
 
         # install pip
         curl --silent --show-error --retry 5 https://bootstrap.pypa.io/get-pip.py | sudo python
