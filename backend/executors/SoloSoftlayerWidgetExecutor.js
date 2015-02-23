@@ -231,31 +231,6 @@ SoloSoftlayerWidgetExecutor.prototype.setupEnvironmentVariables = function (exec
     });
 };
 
-SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerCli = function (executionModel, callback) {
-    log('Setting up Softlayer CLI...', true, true, executionModel.getExecutionId());
-    var options = {
-        executionId: executionModel.getExecutionId(),
-        env: env,
-        shouldOutput: true
-    };
-
-    // See getOsType documentation.
-    executionModel.getExecutionDetails().osType === 'ubuntu' ?
-        options.cmd = 'sudo pip install softlayer' :
-        options.cmd = 'sudo pip2.7 install softlayer';
-
-    spawn(options, function (err, stdout) {
-        if (err) {
-            logger.error('[setupSoftlayerCli] error while installing softlayer CLI : ' + err);
-            callback(new Error('failed to install softlayer CLI:\n' + stdout), executionModel);
-            return;
-        }
-
-        log('[setupSoftlayerCli] stdout: ' + stdout, true);
-        callback(null, executionModel);
-    });
-};
-
 SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionModel, callback) {
     log('running setup for softlayer ssh...', true, true, executionModel.getExecutionId());
     var executionId = executionModel.getExecutionId();
@@ -293,7 +268,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionMod
         };
         spawn(options, function (err, output) {
             if (err) {
-                logger.error('[setupSoftlayerSsh] failed adding ssh key to softlayer: ' + err + output);
+                log('[setupSoftlayerSsh] failed adding ssh key to softlayer:\n' + err, true, true, executionModel.getExecutionId());
                 innerCallback(new Error('failed adding ssh key to softlayer'));
                 return;
             }
@@ -506,7 +481,6 @@ SoloSoftlayerWidgetExecutor.prototype.getExecutionTasks = function () {
         this.getWidget.bind(this),
         this.setupDirectory.bind(this),
         this.setupEnvironmentVariables.bind(this),
-        this.setupSoftlayerCli.bind(this),
         this.setupSoftlayerSsh.bind(this),
         this.editInputsFile.bind(this),
         this.runInitCommand.bind(this),
