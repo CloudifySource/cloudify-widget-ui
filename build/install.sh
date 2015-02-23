@@ -82,10 +82,10 @@ upgrade_main(){
     source $INSTALL_LOCATION/build/nginx.conf | dos2unix > /etc/nginx/sites-enabled/widget-ui.conf
     service nginx restart
 
-    ln -s /root/softlayer_widget/ /var/www/cloudify-widget-ui/package/softlayer_widget
-
     echo "service widget-ui"
     service widget-ui
+
+    ln -s /root/softlayer_widget/ /var/www/cloudify-widget-ui/package/softlayer_widget
 
 }
 
