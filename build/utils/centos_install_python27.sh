@@ -37,3 +37,14 @@ pip2.7 install virtualenv
 
 echo "virtualenv installed. now you can run virtualenv-2.7 command"
 
+echo "installing softlayer commandline"
+pip2.7 install softlayer
+
+echo "making sure sl command is available from sudo as well"
+ln -s /usr/local/bin/sl /usr/bin/sl
+
+
+
+ln -s /usr/local/bin/cfy /usr/bin/cfy
+
+
