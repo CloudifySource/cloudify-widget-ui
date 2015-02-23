@@ -43,3 +43,8 @@ pip2.7 install softlayer
 echo "making sure sl command is available from sudo as well"
 ln -s /usr/local/bin/sl /usr/bin/sl
 
+
+
+ln -s /usr/local/bin/cfy /usr/bin/cfy
+
+
