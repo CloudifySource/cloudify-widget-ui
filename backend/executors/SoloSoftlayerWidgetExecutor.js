@@ -22,6 +22,52 @@ util.inherits(SoloSoftlayerWidgetExecutor, AbstractWidgetExecutor);
 var env = 'softlayer_widget';
 
 /**
+ *
+ * Wrapper for logging facilities. Will log using logger, services.logs.appendOutput or both.
+
+ * @param output            the string to log
+ * @param appendLogger            should output lo logger (true | false)
+ * @param appendOutput      should output to logs service (true | false)
+ * @param executionId       the executionId (optional if appendOutput is false or undefined)
+ */
+function log(output, appendLogger, appendOutput, executionId) {
+    if (appendLogger) {
+        logger.debug(output);
+    }
+
+    if (appendOutput) {
+        services.logs.appendOutput('\n' + output, executionId);
+    }
+}
+
+/**
+ * Running softlayer CLI on Ubuntu and CentOS require different versions of pip and virtualenv.
+ * On CentOS 6.3, simply upgrading the pip and virtualenv is not recommended as it can royally screw the OS basic operations like YUM etc.
+ * See http://stackoverflow.com/questions/11492683/django-apache-mod-wsgi-no-module-named-importlib.
+ *
+ * So, we followed the procedure described in the link below to install both pip2.6 and pip2.7:
+ * http://toomuchdata.com/2014/02/16/how-to-install-python-on-centos/
+ *
+ * This introduced the need to know on which OS we are currently running on, so we can alter the command to execute accordingly.
+ *
+ */
+function getOsType(callback) {
+    childProcess.exec('python -mplatform', function(error, stdout, stderr) {
+        if (error || stderr) {
+            callback(undefined);
+        }
+
+        if (stdout.toLowerCase().indexOf('ubuntu') > -1 ) {
+            callback('ubuntu');
+        }
+
+        if (stdout.toLowerCase().indexOf('centos') > -1 ) {
+            callback('centos');
+        }
+    });
+}
+
+/**
  * This methos wrapps the childProcess.spawn functionality, listen for stdout/stderr.
  * It has support for virtual env.
  * Append them to the execution in mongo if options.shouldOutput is true.
@@ -39,7 +85,7 @@ var env = 'softlayer_widget';
  * @returns {*}
  */
 function spawn(options/*, args, callback*/) {
-    var args, callback, stderr, stdout;
+    var args, callback, stderr, stdout, cmd;
 
     if (typeof arguments[1] === 'function') {
         args = {};
@@ -49,7 +95,10 @@ function spawn(options/*, args, callback*/) {
         callback = arguments[2];
     }
 
-    var exec = childProcess.spawn('bash', ['-c', 'source ' + path.resolve(options.env) + '/bin/activate; ' + options.cmd], args || {});
+    // print the command to log (not mongo) for debugging
+    cmd = 'source ' + path.resolve(options.env) + '/bin/activate; ' + options.cmd;
+    log('command is: ' + cmd, true);
+    var exec = childProcess.spawn('bash', ['-c', cmd], args || {});
 
     exec.stdout.on('data', function (data) {
         if (!stdout) {
@@ -79,25 +128,6 @@ function spawn(options/*, args, callback*/) {
     return exec;
 }
 
-/**
- *
- * Wrapper for logging facilities. Will log using logger, services.logs.appendOutput or both.
-
- * @param output            the string to log
- * @param appendLogger            should output lo logger (true | false)
- * @param appendOutput      should output to logs service (true | false)
- * @param executionId       the executionId (optional if appendOutput is false or undefined)
- */
-function log(output, appendLogger, appendOutput, executionId) {
-    if (appendLogger) {
-        logger.debug(output);
-    }
-
-    if (appendOutput) {
-        services.logs.appendOutput('\n' + output, executionId);
-    }
-}
-
 //-----------  Private tasks  ----------------------
 /**
  * noop callback
@@ -121,13 +151,19 @@ function noOutputCallback(executionModel, callback) {
 SoloSoftlayerWidgetExecutor.prototype.soloSoftlayerInit = function (executionModel, callback) {
     var executionDetails = executionModel.getExecutionDetails();
     executionDetails = _.merge({'configPrototype': path.resolve(__dirname, '..', 'cfy-config-softlayer')}, executionDetails);
-    executionModel.setExecutionDetails(executionDetails);
+    var that = this;
 
-    log('Execution details: ...\n' + JSON.stringify(executionModel.getExecutionDetails, {}, 4), false, true, executionModel.getExecutionId());
+    getOsType(function(type) {
+        executionDetails.osType = type;
+        executionModel.setExecutionDetails(executionDetails);
 
-    this.updateExecutionModel({
-        executionDetails: executionModel.getExecutionDetails()
-    }, executionModel, callback);
+        log('Execution details: ...\n' + JSON.stringify(executionDetails, {}, 4), true);
+
+        that.updateExecutionModel({
+            executionDetails: executionDetails
+        }, executionModel, callback);
+
+    });
 };
 
 SoloSoftlayerWidgetExecutor.prototype.setupDirectory = function (executionModel, callback) {
@@ -177,7 +213,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupEnvironmentVariables = function (exec
 
         log('this is the USERNAME: ' + stdout, true);
         process.env.SL_API_KEY = executionDetails.softlayer.params.apiKey;
-        options = {
+        var options = {
             executionId: executionModel.getExecutionId(),
             env: env,
             cmd: 'echo $SL_API_KEY',
@@ -200,9 +236,13 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerCli = function (executionMod
     var options = {
         executionId: executionModel.getExecutionId(),
         env: env,
-        cmd: 'sudo pip install softlayer',
         shouldOutput: true
     };
+
+    // See getOsType documentation.
+    executionModel.getExecutionDetails().osType === 'ubuntu' ?
+        options.cmd = 'sudo pip install softlayer' :
+        options.cmd = 'sudo pip2.7 install softlayer';
 
     spawn(options, function (err, stdout) {
         if (err) {
@@ -259,6 +299,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionMod
             }
 
             log('SSH key added.', true, true, executionModel.getExecutionId());
+            log(output, true);
             innerCallback();
         });
     }
@@ -284,7 +325,7 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionMod
                 return;
             }
 
-            log('[setupSoftlayerSsh] got sshkey list output\n ' + output, true);
+            log('[setupSoftlayerSsh] got sshkey list output\n' + output, true);
 
             var line = _.find(output.split('\n'), function (line) {
                 return line.indexOf(executionId) >= 0;
