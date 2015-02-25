@@ -55,8 +55,51 @@ AbstractWidgetExecutor.prototype.getCloudPropertiesUpdateLineInner = function (e
     return '';
 };
 
-AbstractWidgetExecutor.prototype.getSendMailTemplateExtraContent = function (executionModel) {
-    return [];
+/**
+ * For sending mail after installation, extending classes should provide the data object for mandrill to use.
+ *
+ * data object is something similar to:
+ * <pre>    var data = {
+        'apiKey': mandrillConfig.apiKey,
+        'template_name': mandrillConfig.templateName,
+        'template_content': templateContent,
+        'message': {
+            'to': [
+                {
+                    'email': executionModel.executionDetails.leadDetails.email,
+                    'name': fullname,
+                    'type': 'to'
+                }
+            ]
+        },
+        'async': true
+    };</pre>
+
+ *
+ * and the template content is similar to:
+ * <pre>    var templateContent = [
+         {
+             'name': 'link',
+             'content': '<a href="http://"' + publicIp + '> http://' + publicIp + '</a>'
+         },
+         {
+             'name': 'name',
+             'content': fullname
+         },
+         {
+             'name': 'publicIp',
+             'content': publicIp
+         }
+         ];</pre>
+
+ *
+ * @param executionModel
+ *                          the execution model, for info about the execution, login details, emails etc.
+ * @param mandrillConfig
+ *                          the mandrill config, for apiKey, template name etc.
+ */
+AbstractWidgetExecutor.prototype.getSendMailData = function (executionModel, mandrillConfig) {
+    throw new Error('Abstract method not implemented in inheriting class!');
 };
 
 function updateExecution (executionObjectId, data) {
@@ -187,8 +230,8 @@ AbstractWidgetExecutor.prototype.play = function (executionModel) {
 
 /**
  * A util function that facilitates sending an email using mandrill when the execution is complete.
- * The email recipient is derived from the social login performed prior to the execution. If such a social login is not
- * present, no email will be sent.
+ * The email recipient is derived from the social login performed prior to the execution in Free mode or from the execution details in Solo mode.
+ * If such a social login is undefined or if mandrill is not enabled, no email will be sent.
  *
  * @param executionModel
  */
@@ -201,67 +244,18 @@ AbstractWidgetExecutor.prototype.sendEmailAfterInstall = function(executionModel
     }
 
     var mandrillConfig = widget.socialLogin.handlers.mandrill;
-    var publicIp = executionModel.getNodeModel().machineSshDetails.publicIp;
-    var that = this;
+    // get data object from specific implementation
+    var data = this.getSendMailData(executionModel, mandrillConfig);
 
-    managers.widgetLogins.getWidgetLoginById(executionModel.getLoginDetailsId(), function (err, result) {
-        if (err) {
-            logger.error('unable to find login details, email send failed', err);
-            return;
-        }
-
-        if (!result) {
-            logger.error('result is null for login details find, email send failed');
-            return;
-        }
-
-        var fullname = result.loginDetails.name + ' ' + result.loginDetails.lastName;
-        var templateContent = [
-            {
-                'name': 'link',
-                'content': '<a href="http://"' + publicIp + '> http://' + publicIp + '</a>'
-            },
-            {
-                'name': 'name',
-                'content': fullname
-            },
-            {
-                'name': 'randomValue',
-                'content': executionModel.getNodeModel().randomValue
-            },
-            {
-                'name': 'publicIp',
-                'content': publicIp
+    services.mandrill.sendMandrillTemplate(data,
+        function (err, result) {
+            if (err) {
+                executionModel.getWidget().socialLogin.handlers.mandrill.status = err;
+            } else {
+                executionModel.getWidget().socialLogin.handlers.mandrill.status = result;
             }
-        ];
+        });
 
-        templateContent = templateContent.concat(that.getSendMailTemplateExtraContent(executionModel));
-
-        var data = {
-            'apiKey': mandrillConfig.apiKey,
-            'template_name': mandrillConfig.templateName,
-            'template_content': templateContent,
-            'message': {
-                'to': [
-                    {
-                        'email': result.loginDetails.email,
-                        'name': fullname,
-                        'type': 'to'
-                    }
-                ]
-            },
-            'async': true
-        };
-
-        services.mandrill.sendMandrillTemplate(data,
-            function (err, result) {
-                if (err) {
-                    executionModel.getWidget().socialLogin.handlers.mandrill.status = err;
-                } else {
-                    executionModel.getWidget().socialLogin.handlers.mandrill.status = result;
-                }
-            });
-    });
 };
 
 /**

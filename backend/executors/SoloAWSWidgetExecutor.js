@@ -2,6 +2,7 @@
  * Created by sefi on 26/01/15.
  */
 'use strict';
+/*jshint unused:false */
 
 var AbstractWidgetExecutor = require('./AbstractWidgetExecutor');
 var logger = require('log4js').getLogger('TasksDirectory');
@@ -201,6 +202,8 @@ SoloAWSWidgetExecutor.prototype.overrideCloudPropertiesFile = function (executio
 //-----------  Private tasks end ----------------------
 
 //-----------  Overrides  ----------------------
+SoloAWSWidgetExecutor.prototype.executionType = 'Solo AWS';
+
 SoloAWSWidgetExecutor.prototype.getCloudPropertiesUpdateLineInner = function (executionDetails, executionId) {
     var ec2user = executionDetails.EC2.params.apiKey;
     var ec2apiKey = executionDetails.EC2.params.secretKey;
@@ -217,7 +220,12 @@ SoloAWSWidgetExecutor.prototype.getCloudPropertiesUpdateLineInner = function (ex
     return updateLine;
 };
 
-SoloAWSWidgetExecutor.prototype.executionType = 'Solo AWS';
+/**
+ * See {@link AbstractWidgetExecutor#getSendMailData(executionModel, mandrillConfig)}
+ */
+SoloAWSWidgetExecutor.prototype.getSendMailData = function (executionModel, mandrillConfig) {
+    return {};
+};
 
 SoloAWSWidgetExecutor.prototype.getExecutionTasks = function () {
     return [
