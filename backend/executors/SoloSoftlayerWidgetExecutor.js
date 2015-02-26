@@ -2,6 +2,7 @@
  * Created by sefi on 28/01/15.
  */
 'use strict';
+/*jshint unused:false */
 
 var util = require('util');
 var path = require('path');
@@ -85,7 +86,7 @@ function getOsType(callback) {
  * @returns {*}
  */
 function spawn(options/*, args, callback*/) {
-    var args, callback, stderr, stdout, cmd;
+    var args, callback, stderr = '', stdout = '', cmd;
 
     if (typeof arguments[1] === 'function') {
         args = {};
@@ -101,9 +102,6 @@ function spawn(options/*, args, callback*/) {
     var exec = childProcess.spawn('bash', ['-c', cmd], args || {});
 
     exec.stdout.on('data', function (data) {
-        if (!stdout) {
-            stdout = '';
-        }
         stdout += data;
         if (options.shouldOutput) {
             services.logs.appendOutput(data, options.executionId);
@@ -111,9 +109,6 @@ function spawn(options/*, args, callback*/) {
     });
 
     exec.stderr.on('data', function (data) {
-        if (!stderr) {
-            stderr = '';
-        }
         stderr += data;
         if (options.shouldOutput) {
             services.logs.appendOutput(data, options.executionId);
@@ -196,8 +191,8 @@ SoloSoftlayerWidgetExecutor.prototype.setupDirectory = function (executionModel,
 
 SoloSoftlayerWidgetExecutor.prototype.setupEnvironmentVariables = function (executionModel, callback) {
     var executionDetails = executionModel.getExecutionDetails();
-    process.env.SL_USERNAME = executionDetails.softlayer.params.username;
     log('Setting up environment variables....', false, true, executionModel.getExecutionId());
+    process.env.SL_USERNAME = executionDetails.softlayer.params.username;
     var options = {
         executionId: executionModel.getExecutionId(),
         env: env,
@@ -225,8 +220,26 @@ SoloSoftlayerWidgetExecutor.prototype.setupEnvironmentVariables = function (exec
                 callback(err, executionModel);
                 return;
             }
+
             log('this is the API_KEY: ' + stdout, true);
-            callback(null, executionModel);
+            // this env variable is for disabling python output buffering.
+            process.env.PYTHONUNBUFFERED = 'x';
+            var options = {
+                executionId: executionModel.getExecutionId(),
+                env: env,
+                cmd: 'echo $PYTHONUNBUFFERED',
+                shouldOutput: false
+            };
+            spawn(options, {env: process.env}, function (err, stdout) {
+                if (err) {
+                    logger.error('could not set environment variable: PYTHONUNBUFFERED');
+                    callback(err, executionModel);
+                    return;
+                }
+                log('this is the PYTHONUNBUFFERED: ' + stdout, true);
+
+                callback(null, executionModel);
+            });
         });
     });
 };
@@ -410,7 +423,6 @@ SoloSoftlayerWidgetExecutor.prototype.runInitCommand = function (executionModel,
             return;
         }
         log('[runInitCommand] this is the USERNAME: ' + stdout, true);
-        //listenOutput(executionModel, spawn(executionModel.getExecutionId(), env, initCommand, noOutputCallback(executionModel, callback)));
         options = {
             executionId: executionModel.getExecutionId(),
             env: env,
@@ -425,7 +437,7 @@ SoloSoftlayerWidgetExecutor.prototype.runInstallWorkflowCommand = function (exec
     var installWfCommand = executionModel.getCommands().installWfCommand;
     var that = this;
 
-    log('installing workflow: ' + installWfCommand, true, true, executionModel.getExecutionId());
+    log('installing workflow: ' + installWfCommand + '\n', true, true, executionModel.getExecutionId());
 
     var options = {
         executionId: executionModel.getExecutionId(),
@@ -433,17 +445,52 @@ SoloSoftlayerWidgetExecutor.prototype.runInstallWorkflowCommand = function (exec
         cmd: installWfCommand,
         shouldOutput: true
     };
-    spawn(options, function (err, output) {
-        log('[runInstallWorkflowCommand] cfy install ef command output: ' + output, true);
+    spawn(options, function (err, installOutput) {
+        log(installOutput, true);
 
         if (err) {
-            logger.error('[runInstallWorkflowCommand] failed running install workflow command');
+            log('\nfailed running install workflow command' + err, true, true, executionModel.getExecutionId());
             callback(new Error('failed running install workflow command'), executionModel);
             return;
         }
 
-        that.sendEmailAfterInstall(executionModel);
-        callback(null, executionModel);
+        // locating the line in the output that contains the hostname
+        var line = _.find(installOutput.split('\n'), function (line) {
+            return line.indexOf('Server [hostname: ') >= 0;
+        });
+
+        if (!line) {
+            log('\nCould not find hostname.', true, true, executionModel.getExecutionId());
+            callback(new Error('could not find line with hostname.'));
+            return;
+        }
+
+        // isolating the hostname from the line.
+        line = line.substring(line.indexOf('Server [hostname:')+18);
+        var hostname = line.substring(0, line.indexOf(', id'));
+
+        // getting hostname IP from softlayer
+        var options = {
+            executionId: executionModel.getExecutionId(),
+            env: env,
+            cmd: 'sl cci list -H ' + hostname,
+            shouldOutput: true
+        };
+        spawn(options, function(err, output) {
+            if (err) {
+                logger.info('err: ' + err);
+                callback(new Error('failed running install workflow command'), executionModel);
+                return;
+            }
+
+            logger.info('output: ' + output);
+            executionModel.getExecutionDetails().publicIp = output.replace(/\s+/g, ' ').split(' ')[5];
+
+            // send email
+            that.sendEmailAfterInstall(executionModel);
+            callback(null, executionModel);
+        });
+
     });
 
 };
@@ -454,8 +501,27 @@ SoloSoftlayerWidgetExecutor.prototype.runInstallWorkflowCommand = function (exec
 
 SoloSoftlayerWidgetExecutor.prototype.executionType = 'Solo Softlayer';
 
-SoloSoftlayerWidgetExecutor.prototype.getSendMailTemplateExtraContent = function (executionModel) {
-    var retVal = [];
+/**
+ * See {@link AbstractWidgetExecutor#getSendMailData(executionModel, mandrillConfig)}
+ */
+SoloSoftlayerWidgetExecutor.prototype.getSendMailData = function (executionModel, mandrillConfig) {
+    var fullname = executionModel.executionDetails.leadDetails.firstName + ' ' + executionModel.executionDetails.leadDetails.lastName;
+    var publicIp = executionModel.getExecutionDetails().publicIp;
+
+    var templateContent = [
+        {
+            'name': 'link',
+            'content': '<a href="http://"' + publicIp + '> http://' + publicIp + '</a>'
+        },
+        {
+            'name': 'name',
+            'content': fullname
+        },
+        {
+            'name': 'publicIp',
+            'content': publicIp
+        }
+    ];
 
     var db2express = executionModel.executionDetails.recipeProperties.filter(function (item) {
         if (item.key === 'db2expressRandomValue') {
@@ -464,7 +530,7 @@ SoloSoftlayerWidgetExecutor.prototype.getSendMailTemplateExtraContent = function
     });
 
     if (db2express.length > 0) {
-        retVal.push(
+        templateContent.push(
             {
                 'name': 'db2expressRandomValue',
                 'content': db2express[0].value
@@ -472,7 +538,23 @@ SoloSoftlayerWidgetExecutor.prototype.getSendMailTemplateExtraContent = function
         );
     }
 
-    return retVal;
+    var data = {
+        'apiKey': mandrillConfig.apiKey,
+        'template_name': mandrillConfig.templateName,
+        'template_content': templateContent,
+        'message': {
+            'to': [
+                {
+                    'email': executionModel.executionDetails.leadDetails.email,
+                    'name': fullname,
+                    'type': 'to'
+                }
+            ]
+        },
+        'async': true
+    };
+
+    return data;
 };
 
 SoloSoftlayerWidgetExecutor.prototype.getExecutionTasks = function () {

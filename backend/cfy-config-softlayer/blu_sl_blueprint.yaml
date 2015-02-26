@@ -75,11 +75,13 @@ node_templates:
     interfaces:
       cloudify.interfaces.lifecycle:
         start:
-          implementation: changePwd.sh
+          implementation: runRemoteScript.sh
           inputs:
             process:
               env:
                 NEW_PASSWORD: { get_input: db2expressRandomValue }
+                HOST_IP: { get_attribute: [ blu_node, public_ip ] }
+                ADMIN_PASSWORD: { get_attribute: [ blu_node, password ] }
     relationships:
       - target: blu_node
         type: cloudify.relationships.contained_in

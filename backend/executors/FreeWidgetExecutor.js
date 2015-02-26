@@ -175,6 +175,63 @@ FreeWidgetExecutor.prototype.runInstallCommand = function (executionModel, callb
 
 FreeWidgetExecutor.prototype.executionType = 'Free';
 
+/**
+ * See {@link AbstractWidgetExecutor#getSendMailData(executionModel, mandrillConfig)}
+ */
+FreeWidgetExecutor.prototype.getSendMailData = function (executionModel, mandrillConfig) {
+    managers.widgetLogins.getWidgetLoginById(executionModel.getLoginDetailsId(), function (err, result) {
+        if (err) {
+            logger.error('unable to find login details, email send failed', err);
+            return;
+        }
+
+        if (!result) {
+            logger.error('result is null for login details find, email send failed');
+            return;
+        }
+
+        var fullname = result.loginDetails.name + ' ' + result.loginDetails.lastName;
+        var publicIp = executionModel.getNodeModel().machineSshDetails.publicIp;
+
+        var templateContent = [
+            {
+                'name': 'link',
+                'content': '<a href="http://"' + publicIp + '> http://' + publicIp + '</a>'
+            },
+            {
+                'name': 'name',
+                'content': fullname
+            },
+            {
+                'name': 'randomValue',
+                'content': executionModel.getNodeModel().randomValue
+            },
+            {
+                'name': 'publicIp',
+                'content': publicIp
+            }
+        ];
+
+        var data = {
+            'apiKey': mandrillConfig.apiKey,
+            'template_name': mandrillConfig.templateName,
+            'template_content': templateContent,
+            'message': {
+                'to': [
+                    {
+                        'email': result.loginDetails.email,
+                        'name': fullname,
+                        'type': 'to'
+                    }
+                ]
+            },
+            'async': true
+        };
+
+        return data;
+    });
+};
+
 FreeWidgetExecutor.prototype.getExecutionTasks = function () {
     return [
         this.getWidget.bind(this),
