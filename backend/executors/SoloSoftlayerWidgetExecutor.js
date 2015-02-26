@@ -2,7 +2,6 @@
  * Created by sefi on 28/01/15.
  */
 'use strict';
-/*jshint unused:false */
 
 var util = require('util');
 var path = require('path');
@@ -315,32 +314,30 @@ SoloSoftlayerWidgetExecutor.prototype.setupSoftlayerSsh = function (executionMod
 
             log('[setupSoftlayerSsh] got sshkey list output\n' + output, true);
 
-            var line = _.find(output.split('\n'), function (line) {
-                return line.indexOf(executionId) >= 0;
+            services.logs.locateLineWithCriteria(output, executionId, function(err, line) {
+                if (err) {
+                    logger.error('[setupSoftlayerSsh] expected to find a line with ' +executionId + ' but could not find one. all I got was, ' + output);
+                    innerCallback(new Error('could not find line with id' + executionId + '. unable to get key id'));
+                    return;
+                }
+
+                log('[setupSoftlayerSsh] line ' + line, true);
+                var keyId = line.split(' ', 1);
+
+                if (keyId.length === 0) {
+                    logger.info('[setupSoftlayerSsh] keyId is an empty array - length is: ' + keyId);
+                    innerCallback(new Error('could not find the keyId on keyId[0]'));
+                    return;
+                }
+
+                log('[setupSoftlayerSsh] got the keyId: ' + keyId, true);
+                var idAsNumber = Number(keyId);
+                log('[setupSoftlayerSsh] got the idAsNumber: ' + idAsNumber, true);
+
+                executionModel.setSshKey(idAsNumber);
+
+                innerCallback();
             });
-
-            if (!line) {
-                logger.error('[setupSoftlayerSsh] expected to find a line with ' +executionId + ' but could not find one. all I got was, ' + output);
-                innerCallback(new Error('could not find line with id' + executionId + '. unable to get key id'));
-                return;
-            }
-
-            log('[setupSoftlayerSsh] line ' + line, true);
-            var keyId = line.split(' ', 1);
-
-            if (keyId.length === 0) {
-                logger.info('[setupSoftlayerSsh] keyId is an empty array - length is: ' + keyId);
-                innerCallback(new Error('could not find the keyId on keyId[0]'));
-                return;
-            }
-
-            log('[setupSoftlayerSsh] got the keyId: ' + keyId, true);
-            var idAsNumber = Number(keyId);
-            log('[setupSoftlayerSsh] got the idAsNumber: ' + idAsNumber, true);
-
-            executionModel.setSshKey(idAsNumber);
-
-            innerCallback();
         });
     }
 
@@ -454,43 +451,41 @@ SoloSoftlayerWidgetExecutor.prototype.runInstallWorkflowCommand = function (exec
             return;
         }
 
-        // locating the line in the output that contains the hostname
-        var line = _.find(installOutput.split('\n'), function (line) {
-            return line.indexOf('Server [hostname: ') >= 0;
-        });
-
-        if (!line) {
-            log('\nCould not find hostname.', true, true, executionModel.getExecutionId());
-            callback(new Error('could not find line with hostname.'));
-            return;
-        }
-
-        // isolating the hostname from the line.
-        line = line.substring(line.indexOf('Server [hostname:')+18);
-        var hostname = line.substring(0, line.indexOf(', id'));
-
-        // getting hostname IP from softlayer
-        var options = {
-            executionId: executionModel.getExecutionId(),
-            env: env,
-            cmd: 'sl cci list -H ' + hostname,
-            shouldOutput: true
-        };
-        spawn(options, function(err, output) {
+        services.logs.locateLineWithCriteria(installOutput, 'Server [hostname: ', function(err, line) {
             if (err) {
-                logger.info('err: ' + err);
-                callback(new Error('failed running install workflow command'), executionModel);
+                log('\nCould not find hostname.', true, true, executionModel.getExecutionId());
+                callback(new Error('could not find line with hostname.'));
                 return;
             }
 
-            logger.info('output: ' + output);
-            executionModel.getExecutionDetails().publicIp = output.replace(/\s+/g, ' ').split(' ')[5];
+            // isolating the hostname from the line.
+            line = line.substring(line.indexOf('Server [hostname:')+18);
+            var hostname = line.substring(0, line.indexOf(', id'));
 
-            // send email
-            that.sendEmailAfterInstall(executionModel);
-            callback(null, executionModel);
+            // getting hostname IP from softlayer
+            var options = {
+                executionId: executionModel.getExecutionId(),
+                env: env,
+                cmd: 'sl cci list -H ' + hostname,
+                shouldOutput: true
+            };
+            spawn(options, function(err, output) {
+                if (err) {
+                    logger.info('err: ' + err);
+                    callback(new Error('failed running install workflow command'), executionModel);
+                    return;
+                }
+
+                logger.info('output: ' + output);
+                // the host's primary (public) IP is the 6th token in the output from softlayer.
+                // replace all white spaces with ' ' and take the 6th token.
+                executionModel.getExecutionDetails().publicIp = output.replace(/\s+/g, ' ').split(' ')[5];
+
+                // send email
+                that.sendEmailAfterInstall(executionModel);
+                callback(null, executionModel);
+            });
         });
-
     });
 
 };

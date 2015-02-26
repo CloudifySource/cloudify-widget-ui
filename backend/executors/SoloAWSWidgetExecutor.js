@@ -2,7 +2,6 @@
  * Created by sefi on 26/01/15.
  */
 'use strict';
-/*jshint unused:false */
 
 var AbstractWidgetExecutor = require('./AbstractWidgetExecutor');
 var logger = require('log4js').getLogger('TasksDirectory');
@@ -10,6 +9,7 @@ var services = require('../services');
 var path = require('path');
 var fs = require('fs');
 var util = require('util');
+var _ = require('lodash');
 
 function SoloAWSWidgetExecutor() {
     AbstractWidgetExecutor.call(this);
@@ -43,7 +43,10 @@ SoloAWSWidgetExecutor.prototype.updateExecutionModelAddExecutionDetails = functi
                 apiKey: services.crypto.encrypt(encryptionKey, details.EC2.params.apiKey),
                 secretKey: services.crypto.encrypt(encryptionKey, details.EC2.params.secretKey)
             }
-        }
+        },
+        loginDetails: details.leadDetails,
+        recipeProperties: details.recipeProperties
+
     }, executionModel, callback);
 
 };
@@ -146,6 +149,7 @@ SoloAWSWidgetExecutor.prototype.runBootstrapAndInstallCommands = function (execu
 
     var installPath = path.resolve(path.join(executionModel.getDownloadsPath(), widget.recipeRootPath));
     var installTimeout = widget.installTimeout;
+    var that = this;
 
     logger.info('installTimeout:', installTimeout);
     logger.info('runCliBootstrapCommand, JOIN:', installPath);
@@ -165,9 +169,29 @@ SoloAWSWidgetExecutor.prototype.runBootstrapAndInstallCommands = function (execu
 
     logger.info('-command', command);
 
-    services.cloudifyCli.executeCommand(command);
+    services.cloudifyCli.executeCommand(command, function(err, result) {
+        if (err) {
+            logger.info('err: ' + err + '\noutput: ' + result.output);
+            callback(new Error('execution failed'), executionModel);
+            return;
+        }
 
-    callback(null, executionModel);
+        logger.info('result: ' + result);
+
+        services.logs.locateLineWithCriteria(result.output, 'New machine is allocated', function(err, line) {
+            if (err) {
+                logger.info('\nCould not find host IP.');
+                callback(new Error('could not find line with host IP.'), executionModel);
+                return;
+            }
+
+            executionModel.getExecutionDetails().publicIp = line.substring(line.indexOf('[') + 1, line.length - 1);
+
+            that.sendEmailAfterInstall(executionModel);
+            callback(null, executionModel);
+
+        });
+    });
 };
 
 /**
@@ -224,7 +248,56 @@ SoloAWSWidgetExecutor.prototype.getCloudPropertiesUpdateLineInner = function (ex
  * See {@link AbstractWidgetExecutor#getSendMailData(executionModel, mandrillConfig)}
  */
 SoloAWSWidgetExecutor.prototype.getSendMailData = function (executionModel, mandrillConfig) {
-    return {};
+    var fullname = executionModel.executionDetails.leadDetails.firstName + ' ' + executionModel.executionDetails.leadDetails.lastName;
+    var publicIp = executionModel.getExecutionDetails().publicIp;
+
+    var templateContent = [
+        {
+            'name': 'link',
+            'content': '<a href="http://"' + publicIp + '> http://' + publicIp + '</a>'
+        },
+        {
+            'name': 'name',
+            'content': fullname
+        },
+        {
+            'name': 'publicIp',
+            'content': publicIp
+        }
+    ];
+
+    var db2express = executionModel.executionDetails.recipeProperties.filter(function (item) {
+        if (item.key === 'db2expressRandomValue') {
+            return item;
+        }
+    });
+
+    if (db2express.length > 0) {
+        templateContent.push(
+            {
+                'name': 'db2expressRandomValue',
+                'content': db2express[0].value
+            }
+        );
+    }
+
+    var data = {
+        'apiKey': mandrillConfig.apiKey,
+        'template_name': mandrillConfig.templateName,
+        'template_content': templateContent,
+        'message': {
+            'to': [
+                {
+                    'email': executionModel.executionDetails.leadDetails.email,
+                    'name': fullname,
+                    'type': 'to'
+                }
+            ]
+        },
+        'async': true
+    };
+
+    return data;
 };
 
 SoloAWSWidgetExecutor.prototype.getExecutionTasks = function () {
