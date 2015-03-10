@@ -9,7 +9,6 @@ var services = require('../services');
 var path = require('path');
 var fs = require('fs');
 var util = require('util');
-var _ = require('lodash');
 
 function SoloAWSWidgetExecutor() {
     AbstractWidgetExecutor.call(this);
