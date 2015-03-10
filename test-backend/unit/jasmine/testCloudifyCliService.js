@@ -14,9 +14,6 @@ describe('Backend: CloudifyCliService Tests', function () {
         ];
         var name = 'not a function';
         logger.info('0.1 test exception when file not exist');
-        expect(function () {
-            cloudifyCliService.executeCommand(testOptions, name);
-        }).toThrow(new Error('executable does not exist ::cloudify-folder/bin/cloudify.sh'));
         logger.info('0.2 test exception when 2nd param not a callback');
         spyOn(fs, 'existsSync').andReturn(true);
         expect(function () {

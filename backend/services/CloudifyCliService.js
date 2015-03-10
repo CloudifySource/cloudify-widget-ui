@@ -20,9 +20,10 @@ var _ = require('lodash');
  *          executionId: '1234231412341234'
  *      }
  */
-exports.executeCommand = function (options, onExit) {
+exports.executeCommand = function (options, callback) {
 
     var _options = options;
+    var output = '';
     if (_.isArray(options)) {
         _options = {arguments: options};
     }
@@ -52,7 +53,7 @@ exports.executeCommand = function (options, onExit) {
         throw new Error('commandArgs are missing from command');
     }
 
-    if (onExit && typeof onExit !== 'function') {
+    if (callback && typeof callback !== 'function') {
         throw new Error('onExit callback must be a function');
     }
 
@@ -61,15 +62,17 @@ exports.executeCommand = function (options, onExit) {
         myCmd = spawn(executable, commandArgs);
     } catch (e) {
         logger.error('error while spawning command');
-        onExit(e);
+        callback(e);
     }
 
 
     function appendToLogFile(data) {
+        output += data;
         logs.appendOutput(data, _options.executionId);
     }
 
     function writeStatusJsonFile(status) {
+        output += status;
         logs.writeStatus(JSON.stringify(status, null, 4) + '\n', _options.executionId);
     }
 
@@ -78,23 +81,26 @@ exports.executeCommand = function (options, onExit) {
     myCmd.stderr.on('data', appendToLogFile);
 
     myCmd.on('error', function (err) {
+        logger.error(err);
         writeStatusJsonFile({'error': err});
+        callback(err, { output: output });
     });
 
     myCmd.on('exit', function (code, signal) {
         logger.info('finished running command. exit code is [%s], exit signal is [%s]', code, signal);
         logs.clearOutputBuffer(_options.executionId);
-        if (onExit) {
+        if (callback) {
             if (code !== 0) {
-                onExit(new Error('command failed with exit code [' + code + '] and exit signal [' + signal + ']'));
+                callback(new Error('command failed with exit code [' + code + '] and exit signal [' + signal + ']'), { output: output });
             } else {
-                onExit(null, { code: code, signal: signal });
+                callback(null, { code: code, signal: signal, output: output });
             }
         }
     });
 
     myCmd.on('close', function (code) {
         writeStatusJsonFile({'code': code});
+        callback(null, { code: code, output: output });
     });
 
     logger.info('running command [%s] [%s]...', executable, commandArgs);

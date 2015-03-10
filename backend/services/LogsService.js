@@ -2,6 +2,7 @@
 
 var logger = require('log4js').getLogger('LogsService');
 var managers = require('../managers');
+var _ = require('lodash');
 
 var outputBuffer = {};
 
@@ -100,6 +101,24 @@ exports.clearOutputBuffer = function (executionId) {
     clearOutputBufferString(executionId);
 };
 
+exports.locateLineWithCriteria = function (data, criteria, callback) {
+    if (!callback || typeof callback !== 'function') {
+        throw new Error('callback is mandatory and must be a function');
+    }
+
+    var line = _.find(data.split('\n'), function (line) {
+        return line.indexOf(criteria) >= 0;
+    });
+
+    if (!line) {
+        var msg = '\nCould not find a line that matches the criteria [' + criteria + ']';
+        logger.info(msg);
+        callback(new Error(msg));
+        return;
+    }
+
+    callback(null, line);
+};
 
 
 
