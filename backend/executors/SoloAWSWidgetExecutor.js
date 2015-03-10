@@ -176,7 +176,7 @@ SoloAWSWidgetExecutor.prototype.runBootstrapAndInstallCommands = function (execu
             return;
         }
 
-        logger.info('result: ' + result);
+        logger.info('output: ' + result.output);
 
         services.logs.locateLineWithCriteria(result.output, 'New machine is allocated', function(err, line) {
             if (err) {

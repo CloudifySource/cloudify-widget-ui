@@ -78,7 +78,9 @@ exports.executeCommand = function (options, callback) {
     myCmd.stderr.on('data', appendToLogFile);
 
     myCmd.on('error', function (err) {
+        logger.error(err);
         writeStatusJsonFile({'error': err});
+        callback(err, { output: output });
     });
 
     myCmd.on('exit', function (code, signal) {
