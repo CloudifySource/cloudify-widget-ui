@@ -53,6 +53,9 @@ exports.executeCommand = function (options, callback) {
         throw new Error('commandArgs are missing from command');
     }
 
+    if (callback && typeof callback !== 'function') {
+        throw new Error('onExit callback must be a function');
+    }
 
     var myCmd;
     try {
