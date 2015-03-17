@@ -181,7 +181,7 @@ exports.stop = function (req, res) {
             return;
         }
 
-        var isSoloMode = executionModel.widget.executionDetails.isSoloMode;
+        var isSoloMode = executionModel && executionModel.widget && executionModel.widget.executionDetails && executionModel.widget.executionDetails.isSoloMode;
 
         managers.widget.stop(req.params.widgetId, req.params.executionId, isSoloMode, function (err, result) {
             if (!!err) {
