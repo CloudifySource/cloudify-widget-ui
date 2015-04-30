@@ -1,7 +1,7 @@
 set -e
 
 # bootstrap_script located in bucket=cloudify-widget-bootstrap of ec2automations !!
-
+#
 sudo wget "https://s3.amazonaws.com/cloudify-widget-bootstrap/ops+provision+script/bootstrap_script.sh"
 
 source bootstrap_script.sh
